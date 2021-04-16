@@ -1,0 +1,2 @@
+// This will ignore the current directory from the tests with GoConvey
+IGNORE
