@@ -1,0 +1,9 @@
+# Project executables
+PartMATE
+*.exe
+
+# Visual Studio Code workspace
+.vscode/
+
+# Vendor dir (if existing)
+vendor/
