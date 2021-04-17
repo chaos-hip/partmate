@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
@@ -23,11 +24,44 @@ import (
 */
 
 func main() {
+	// -- Predefinition --
 	conf := viper.New()
 	conf.Get("hello.world")
 	logrus.Info("Hello again")
-	gin.Default()
+
 	x := sqlx.AT
 	logrus.Info(x)
 	fmt.Println("Hello PartMATE")
+	// -- Live --
+	router := gin.Default()
+	router.GET("/i/:id", handleQrShortLink)
+	router.GET("/t-stuff", handleTeaPottJeeey)
+	apiRouter := router.Group("/api")
+	{
+		apiRouter.POST("/login", handleTeaPottJeeey)
+		apiRouter.POST("/logout", handleTeaPottJeeey)
+		// Part handling
+		apiRouter.GET("/parts/:id", handleTeaPottJeeey)
+		apiRouter.POST("/parts/search", handleTeaPottJeeey)
+		//
+		apiRouter.POST("/parts/:id/link", handleTeaPottJeeey)
+		apiRouter.DELETE("/parts/:id/link/:linkID", handleTeaPottJeeey)
+		// Inc or Dec Stock count
+		apiRouter.POST("/parts/:id/checkin", handleTeaPottJeeey)
+		apiRouter.POST("/parts/:id/checkout", handleTeaPottJeeey)
+	}
+	router.Run()
+}
+
+func handleQrShortLink(ctx *gin.Context) {
+	id := ctx.Param("id")
+	ctx.JSON(http.StatusOK, gin.H{
+		"id": id,
+	})
+}
+
+func handleTeaPottJeeey(ctx *gin.Context) {
+	ctx.JSON(http.StatusTeapot, gin.H{
+		"error": "A nice warm Cup of green Tea (Kameldung)",
+	})
 }
