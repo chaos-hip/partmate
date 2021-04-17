@@ -36,19 +36,25 @@ func main() {
 	router := gin.Default()
 	router.GET("/i/:id", handleQrShortLink)
 	router.GET("/t-stuff", handleTeaPottJeeey)
+	router.GET("/attachments/:id/:format", handleTeaPottJeeey) // download attachment
+
 	apiRouter := router.Group("/api")
 	{
 		apiRouter.POST("/login", handleTeaPottJeeey)
 		apiRouter.POST("/logout", handleTeaPottJeeey)
 		// Part handling
 		apiRouter.GET("/parts/:id", handleTeaPottJeeey)
+		apiRouter.GET("/parts/:id/qr", handleTeaPottJeeey)
 		apiRouter.POST("/parts/search", handleTeaPottJeeey)
-		//
+		apiRouter.POST("/parts/:id/attachments", handleTeaPottJeeey) // manage Attachements of Parts
+		// Link handling
+		apiRouter.POST("/links", handleTeaPottJeeey) // create Link
+		apiRouter.DELETE("/links/:id", handleTeaPottJeeey)
 		apiRouter.POST("/parts/:id/link", handleTeaPottJeeey)
 		apiRouter.DELETE("/parts/:id/link/:linkID", handleTeaPottJeeey)
 		// Inc or Dec Stock count
-		apiRouter.POST("/parts/:id/checkin", handleTeaPottJeeey)
-		apiRouter.POST("/parts/:id/checkout", handleTeaPottJeeey)
+		apiRouter.POST("/parts/:id/stockadd", handleTeaPottJeeey)
+		apiRouter.POST("/parts/:id/stockremove", handleTeaPottJeeey)
 	}
 	router.Run()
 }
