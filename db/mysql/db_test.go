@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"git.chaos-hip.de/RepairCafe/PartMATE/db"
@@ -23,10 +24,6 @@ func TestDBConnect(t *testing.T) {
 			db, err := mysql.NewDB("127.0.0.1", "3306", "partfiend", "partmate", "partmate")
 			So(err, ShouldNotBeNil)
 			So(db, ShouldBeNil)
-
-			Reset(func() {
-				db.Close()
-			})
 		})
 
 		Reset(func() {
@@ -40,8 +37,8 @@ func TestFoo(t *testing.T) {
 	Convey("doing things", t, func() {
 		dings, bums, err := connectToDb()
 		So(err, ShouldBeNil)
-		So(dings, ShouldBeNil)
-		So(bums, ShouldBeNil)
+		So(dings, ShouldNotBeNil)
+		So(bums, ShouldNotBeNil)
 
 	})
 }
@@ -52,7 +49,11 @@ func connectToDb() (db.DB, *sqlx.DB, error) {
 		return nil, nil, err
 	}
 
-	if _, err := sqlxDB.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", dbName)); err != nil {
+	if _, err := sqlxDB.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s;", dbName)); err != nil {
+		return nil, nil, err
+	}
+
+	if _, err := sqlxDB.Exec(fmt.Sprintf("USE `%s`;", dbName)); err != nil {
 		return nil, nil, err
 	}
 
@@ -61,8 +62,16 @@ func connectToDb() (db.DB, *sqlx.DB, error) {
 		return nil, nil, err
 	}
 
-	if _, err := sqlxDB.Exec(string(data)); err != nil {
-		return nil, nil, err
+	parts := strings.Split(string(data), ";")
+
+	for _, qry := range parts {
+
+		if strings.TrimSpace(qry) != "" {
+			if _, err := sqlxDB.DB.Exec(qry + ";"); err != nil {
+				return nil, nil, err
+			}
+		}
+
 	}
 
 	foo := mysql.NewDBWithConnection(sqlxDB)

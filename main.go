@@ -18,7 +18,7 @@ import (
 	- HTTP Server => Go-Kit || Gin✅ || Echo || Gorilla
 	- Auth & Permissions =>
 	- DB-Access => sql || sqlx✅ || gorm
-	- DB-Migration =>
+	- DB-Migration => https://github.com/golang-migrate/migrate
 	- Config => viper✅
 	- Logging => log || logrus✅ || zap
 */
