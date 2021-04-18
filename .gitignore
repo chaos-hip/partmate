@@ -9,4 +9,4 @@ PartMATE
 vendor/
 
 # dumps
-*.sql
+partkeepr.sql
