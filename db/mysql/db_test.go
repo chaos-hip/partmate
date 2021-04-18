@@ -34,11 +34,15 @@ func TestDBConnect(t *testing.T) {
 }
 
 func TestFoo(t *testing.T) {
-	Convey("doing things", t, func() {
+	Convey("doing things!", t, func() {
 		dings, bums, err := connectToDb()
 		So(err, ShouldBeNil)
 		So(dings, ShouldNotBeNil)
 		So(bums, ShouldNotBeNil)
+
+		Reset(func() {
+			destroyDB(bums)
+		})
 
 	})
 }
