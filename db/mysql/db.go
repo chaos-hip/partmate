@@ -22,39 +22,39 @@ type DB struct {
 }
 
 func (d *DB) GetPartByID(id string) (*models.Part, error) {
-	return nil, fmt.Errorf("nich implementiert \u200d")
+	return nil, fmt.Errorf("not implemented \u200d")
 }
 
 func (d *DB) SearchParts(search models.Search) ([]models.Part, error) {
-	return nil, fmt.Errorf("nich implementiert \u200d")
+	return nil, fmt.Errorf("not implemented \u200d")
 }
 
 func (d *DB) GetUserByName(name string) (*models.User, error) {
-	return nil, fmt.Errorf("nich implementiert \u200d")
+	return nil, fmt.Errorf("not implemented \u200d")
 }
 
 func (d *DB) DeleteLinkByID(id string) error {
-	return fmt.Errorf("nich implementiert \u200d")
+	return fmt.Errorf("not implemented \u200d")
 }
 
 func (d *DB) CreateLink(id, targetType, target string) (*models.Link, error) {
-	return nil, fmt.Errorf("nich implementiert \u200d")
+	return nil, fmt.Errorf("not implemented \u200d")
 }
 
 func (d *DB) CreatePartAttachmentEntry(partID, filename, mimeType string) (*models.Attachment, error) {
-	return nil, fmt.Errorf("nich implementiert \u200d")
+	return nil, fmt.Errorf("not implemented \u200d")
 }
 
 func (d *DB) GetAttachmentEntry(id string) (*models.Attachment, error) {
-	return nil, fmt.Errorf("nich implementiert \u200d")
+	return nil, fmt.Errorf("not implemented \u200d")
 }
 
 func (d *DB) AddPartStock(id, price, comment string, amount uint) error {
-	return fmt.Errorf("nich implementiert \u200d")
+	return fmt.Errorf("not implemented \u200d")
 }
 
 func (d *DB) RemovePartStock(id, comment string, amount uint) error {
-	return fmt.Errorf("nich implementiert \u200d")
+	return fmt.Errorf("not implemented \u200d")
 }
 
 func (d *DB) Close() {

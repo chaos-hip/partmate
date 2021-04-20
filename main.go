@@ -55,6 +55,11 @@ func main() {
 		// Inc or Dec Stock count
 		apiRouter.POST("/parts/:id/stockadd", handleTeaPottJeeey)
 		apiRouter.POST("/parts/:id/stockremove", handleTeaPottJeeey)
+		// Lists
+		apiRouter.GET("/categories", handleTeaPottJeeey)        // Get a list of all categories
+		apiRouter.GET("/manufacturers", handleTeaPottJeeey)     // Get a list of manufacturers
+		apiRouter.GET("/distributors", handleTeaPottJeeey)      // Get list of distributors
+		apiRouter.GET("/storage-locations", handleTeaPottJeeey) // Get list of available storage locations
 	}
 	router.Run()
 }
