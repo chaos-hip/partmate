@@ -2,8 +2,9 @@ package db
 
 import "git.chaos-hip.de/RepairCafe/PartMATE/models"
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o mock/db.go --fake-name MockDB . DB
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
 
+//counterfeiter:generate -o mock --fake-name MockDB . DB
 type DB interface {
 	// Parts 🧩
 	GetPartByID(id string) (*models.Part, error)

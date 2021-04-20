@@ -107,6 +107,17 @@ type MockDB struct {
 		result1 *models.User
 		result2 error
 	}
+	MigrateStub        func(string) error
+	migrateMutex       sync.RWMutex
+	migrateArgsForCall []struct {
+		arg1 string
+	}
+	migrateReturns struct {
+		result1 error
+	}
+	migrateReturnsOnCall map[int]struct {
+		result1 error
+	}
 	RemovePartStockStub        func(string, string, uint) error
 	removePartStockMutex       sync.RWMutex
 	removePartStockArgsForCall []struct {
@@ -610,6 +621,67 @@ func (fake *MockDB) GetUserByNameReturnsOnCall(i int, result1 *models.User, resu
 	}{result1, result2}
 }
 
+func (fake *MockDB) Migrate(arg1 string) error {
+	fake.migrateMutex.Lock()
+	ret, specificReturn := fake.migrateReturnsOnCall[len(fake.migrateArgsForCall)]
+	fake.migrateArgsForCall = append(fake.migrateArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.MigrateStub
+	fakeReturns := fake.migrateReturns
+	fake.recordInvocation("Migrate", []interface{}{arg1})
+	fake.migrateMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *MockDB) MigrateCallCount() int {
+	fake.migrateMutex.RLock()
+	defer fake.migrateMutex.RUnlock()
+	return len(fake.migrateArgsForCall)
+}
+
+func (fake *MockDB) MigrateCalls(stub func(string) error) {
+	fake.migrateMutex.Lock()
+	defer fake.migrateMutex.Unlock()
+	fake.MigrateStub = stub
+}
+
+func (fake *MockDB) MigrateArgsForCall(i int) string {
+	fake.migrateMutex.RLock()
+	defer fake.migrateMutex.RUnlock()
+	argsForCall := fake.migrateArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *MockDB) MigrateReturns(result1 error) {
+	fake.migrateMutex.Lock()
+	defer fake.migrateMutex.Unlock()
+	fake.MigrateStub = nil
+	fake.migrateReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *MockDB) MigrateReturnsOnCall(i int, result1 error) {
+	fake.migrateMutex.Lock()
+	defer fake.migrateMutex.Unlock()
+	fake.MigrateStub = nil
+	if fake.migrateReturnsOnCall == nil {
+		fake.migrateReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.migrateReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *MockDB) RemovePartStock(arg1 string, arg2 string, arg3 uint) error {
 	fake.removePartStockMutex.Lock()
 	ret, specificReturn := fake.removePartStockReturnsOnCall[len(fake.removePartStockArgsForCall)]
@@ -756,6 +828,8 @@ func (fake *MockDB) Invocations() map[string][][]interface{} {
 	defer fake.getPartByIDMutex.RUnlock()
 	fake.getUserByNameMutex.RLock()
 	defer fake.getUserByNameMutex.RUnlock()
+	fake.migrateMutex.RLock()
+	defer fake.migrateMutex.RUnlock()
 	fake.removePartStockMutex.RLock()
 	defer fake.removePartStockMutex.RUnlock()
 	fake.searchPartsMutex.RLock()

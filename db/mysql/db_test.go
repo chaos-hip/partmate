@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"git.chaos-hip.de/RepairCafe/PartMATE/db"
@@ -14,14 +13,18 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+const (
+	migrationSource = "file://../../dbmigrations"
+)
+
 func TestDBConnect(t *testing.T) {
 	Convey("connecting to a database", t, func() {
-		db, err := mysql.NewDB("127.0.0.1", "3306", "partmate", "partmate", "partmate")
+		db, err := mysql.NewDB("127.0.0.1", "3306", "partmate", "partmate", "partmate", migrationSource)
 		So(err, ShouldBeNil)
 		So(db, ShouldNotBeNil)
 
 		Convey("connecting with wrong credentials should fail", func() {
-			db, err := mysql.NewDB("127.0.0.1", "3306", "partfiend", "partmate", "partmate")
+			db, err := mysql.NewDB("127.0.0.1", "3306", "partfiend", "partmate", "partmate", migrationSource)
 			So(err, ShouldNotBeNil)
 			So(db, ShouldBeNil)
 		})
@@ -33,22 +36,28 @@ func TestDBConnect(t *testing.T) {
 
 }
 
-func TestFoo(t *testing.T) {
-	Convey("doing things!", t, func() {
-		dings, bums, err := connectToDb()
+func TestMigrate(t *testing.T) {
+	Convey("Having a database connection", t, func() {
+		db, sqlxDB, err := connectToDb()
 		So(err, ShouldBeNil)
-		So(dings, ShouldNotBeNil)
-		So(bums, ShouldNotBeNil)
+		So(db, ShouldNotBeNil)
+		So(sqlxDB, ShouldNotBeNil)
+
+		Convey("Migrating up to the current version should work flawlessly", func() {
+			err := mysql.Migrate(sqlxDB.DB, migrationSource)
+			So(err, ShouldBeNil)
+		})
 
 		Reset(func() {
-			destroyDB(bums)
+			destroyDB(sqlxDB)
 		})
 
 	})
 }
 
 func connectToDb() (db.DB, *sqlx.DB, error) {
-	sqlxDB, err := sqlx.Connect("mysql", "partmate:partmate@tcp(localhost:3306)/?parseTime=true")
+	// enable multiStatements to support multiple queries in one Exec()
+	sqlxDB, err := sqlx.Connect("mysql", "partmate:partmate@tcp(localhost:3306)/?parseTime=true&multiStatements=true")
 	if err != nil {
 		return nil, nil, err
 	}
@@ -66,16 +75,8 @@ func connectToDb() (db.DB, *sqlx.DB, error) {
 		return nil, nil, err
 	}
 
-	parts := strings.Split(string(data), ";")
-
-	for _, qry := range parts {
-
-		if strings.TrimSpace(qry) != "" {
-			if _, err := sqlxDB.DB.Exec(qry + ";"); err != nil {
-				return nil, nil, err
-			}
-		}
-
+	if _, err := sqlxDB.DB.Exec(string(data)); err != nil {
+		return nil, nil, err
 	}
 
 	foo := mysql.NewDBWithConnection(sqlxDB)
