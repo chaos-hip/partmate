@@ -50,8 +50,7 @@ func main() {
 		// Link handling
 		apiRouter.POST("/links", handleTeaPottJeeey) // create Link
 		apiRouter.DELETE("/links/:id", handleTeaPottJeeey)
-		apiRouter.POST("/parts/:id/link", handleTeaPottJeeey)
-		apiRouter.DELETE("/parts/:id/link/:linkID", handleTeaPottJeeey)
+		apiRouter.POST("/parts/:id/link/:linkID", handleTeaPottJeeey)
 		// Inc or Dec Stock count
 		apiRouter.POST("/parts/:id/stockadd", handleTeaPottJeeey)
 		apiRouter.POST("/parts/:id/stockremove", handleTeaPottJeeey)
