@@ -46,7 +46,7 @@ func main() {
 		apiRouter.GET("/parts/:id", handleTeaPottJeeey)
 		apiRouter.GET("/parts/:id/qr", handleTeaPottJeeey)
 		apiRouter.POST("/parts/search", handleTeaPottJeeey)
-		apiRouter.POST("/parts/:id/attachments", handleTeaPottJeeey) // manage Attachements of Parts
+		apiRouter.POST("/parts/:id/attachments", handleTeaPottJeeey) // manage Attachments of Parts
 		// Link handling
 		apiRouter.POST("/links", handleTeaPottJeeey) // create Link
 		apiRouter.DELETE("/links/:id", handleTeaPottJeeey)
