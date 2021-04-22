@@ -5,4 +5,8 @@ type Part struct {
 	Description string   `json:"description" db:"description"`
 	Comment     string   `json:"comment" db:"comment"`
 	Category    Category `json:"category"`
+	StockLevel  string   `json:"stocklevel" db:"stockLevel"`
+	Status      string   `json:"status" db:"status"`
+	NeedsReview *bool    `json:"needsreview" db:"needsReview"`
+	LowStock    *bool    `json:"lowstock" db:"lowStock"`
 }
