@@ -1,5 +1,6 @@
 package models
 
+// Part represents the Struct for Part/Item Querys
 type Part struct {
 	Name        string   `json:"name" db:"name"`
 	Description string   `json:"description" db:"description"`
