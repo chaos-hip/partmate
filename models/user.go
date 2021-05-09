@@ -1,11 +1,9 @@
 package models
 
-// User is the Struct to identify the User (Requests and Cretentials)
+// User is the Struct to identify the User (Table: mate_users)
 type User struct {
-	UserID   string `json:"-" db:"id"`
-	Username string `json:"username" db:"username"`
-	Enabled  *bool  `json:"enabled" db:"enabled"`
-	Password string `json:"-" db:"password"` // Swordfish
-	Salt     string `json:"-" db:"salt"`
-	Locked   *bool  `json:"locked" db:"locked"`
+	UserID      string `json:"-" db:"id"`
+	Username    string `json:"name" db:"name"`
+	Password    string `json:"-" db:"password_hash"` // Swordfish
+	Permissions string `json:"permissions" db:"permissions"`
 }
