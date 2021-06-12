@@ -18,7 +18,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"{{user}}\",\n    \"password\": \"{{password}}\"\n}",
+							"raw": "{\n    \"user\": \"root\",\n    \"password\": \"changeme\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -26,29 +26,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseURL}}/login",
+							"raw": "{{baseURL}}/api/login",
 							"host": [
 								"{{baseURL}}"
 							],
 							"path": [
+								"api",
 								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Logout",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/logout",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"logout"
 							]
 						}
 					},

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/rand"
+	"crypto/rsa"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -8,6 +10,7 @@ import (
 	"git.chaos-hip.de/RepairCafe/PartMATE/db"
 	"git.chaos-hip.de/RepairCafe/PartMATE/db/mysql"
 	"git.chaos-hip.de/RepairCafe/PartMATE/routes"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/sirupsen/logrus"
@@ -18,14 +21,17 @@ import (
 const (
 	envVarPrefix = "PARTMATE"
 
-	confKeyLogLevel = "log.level"
-	confKeyDBHost   = "db.host"
-	confKeyDBPort   = "db.port"
-	confKeyDBUser   = "db.user"
-	confKeyDBPass   = "db.password"
-	confKeyDBName   = "db.database"
-	confKeyDataDir  = "partkeepr.data-dir"
-	confKeyListen   = "listen"
+	confKeyLogLevel      = "log.level"
+	confKeyDBHost        = "db.host"
+	confKeyDBPort        = "db.port"
+	confKeyDBUser        = "db.user"
+	confKeyDBPass        = "db.password"
+	confKeyDBName        = "db.database"
+	confKeyDataDir       = "partkeepr.data-dir"
+	confKeyListen        = "listen"
+	confKeyJWTPrivateKey = "jwt.key"
+	confKeyJWTIssuer     = "jwt.issuer"
+	confKeyJWTKeyLength  = "jwt.keylength"
 )
 
 /*
@@ -55,7 +61,25 @@ func main() {
 		logrus.WithError(err).Fatal("Failed to initialize database connection")
 	}
 
-	router := initRouting(dbInstance)
+	// JWT keys
+	jwtKeyStr := conf.GetString(confKeyJWTPrivateKey)
+	var privateKey *rsa.PrivateKey
+	if jwtKeyStr == "" {
+		// Generate our private key
+		logrus.Info("No private key configured - generating our own")
+		privateKey, err = generateJWTKeypair(conf.GetInt(confKeyJWTKeyLength))
+		if err != nil {
+			logrus.WithError(err).Fatal("Failed to generate private key for JWT generation")
+		}
+	} else {
+		// Load the external private key
+		privateKey, err = jwt.ParseRSAPrivateKeyFromPEM([]byte(jwtKeyStr))
+		if err != nil {
+			logrus.WithError(err).Fatal("Failed to load private key for JWT generation")
+		}
+	}
+
+	router := initRouting(dbInstance, privateKey, conf)
 	router.Run(conf.GetString("listen"))
 }
 
@@ -80,7 +104,7 @@ func initLogger(conf *viper.Viper) error {
 	return nil
 }
 
-func initRouting(dbInstance db.DB) *gin.Engine {
+func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper) *gin.Engine {
 	router := gin.Default()
 	router.Use(ginlogrus.Logger(logrus.StandardLogger()), gin.Recovery())
 	// Respond with a proper JSON on 404
@@ -88,7 +112,7 @@ func initRouting(dbInstance db.DB) *gin.Engine {
 
 	apiRouter := router.Group("/api")
 	{
-		apiRouter.POST("/login", handleTeaPottJeeey)
+		apiRouter.POST("/login", routes.MakeLoginHandler(dbInstance, privateKey, conf.GetString(confKeyJWTIssuer)))
 		apiRouter.POST("/logout", handleTeaPottJeeey)
 		// Users
 		apiRouter.POST("/user", routes.MakeUserCreateHandler(dbInstance))
@@ -134,6 +158,11 @@ func initConfig() (*viper.Viper, error) {
 	conf.SetDefault(confKeyListen, ":3000")
 	conf.SetDefault(confKeyDataDir, filepath.Join(".", "data"))
 
+	// JWT
+	conf.SetDefault(confKeyJWTIssuer, "partmate")
+	conf.SetDefault(confKeyJWTPrivateKey, "")
+	conf.SetDefault(confKeyJWTKeyLength, 4096)
+
 	if err := conf.ReadInConfig(); err != nil {
 		if strings.Contains(err.Error(), "Config File \"config\" Not Found in") {
 			logrus.Warn("No configuration file found. Hope you have everything configured with EnvVars...")
@@ -155,15 +184,14 @@ func initDB(conf *viper.Viper) (db.DB, error) {
 	)
 }
 
-func handleQrShortLink(ctx *gin.Context) {
-	id := ctx.Param("id")
-	ctx.JSON(http.StatusOK, gin.H{
-		"id": id,
-	})
-}
-
 func handleTeaPottJeeey(ctx *gin.Context) {
 	ctx.JSON(http.StatusTeapot, gin.H{
 		"error": "A nice warm Cup of green Tea (Kameldung)",
 	})
+}
+
+// generateJWTKey creates a new keypair (public- and private keys) that can be used to sign JWTs after login
+func generateJWTKeypair(keyLength int) (*rsa.PrivateKey, error) {
+	logrus.Infof("Generating RSA private key for JWT signing with a length of %d", keyLength)
+	return rsa.GenerateKey(rand.Reader, keyLength)
 }
