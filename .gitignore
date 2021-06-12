@@ -10,3 +10,7 @@ vendor/
 
 # dumps
 partkeepr.sql
+
+# Local docker volumes for testing
+docker/volumes/mariadb/
+docker/volumes/partmate/data/
