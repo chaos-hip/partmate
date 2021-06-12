@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"regexp"
+	"strings"
 	"testing"
 
 	"git.chaos-hip.de/RepairCafe/PartMATE/auth"
@@ -44,6 +45,13 @@ func TestArgonHash(t *testing.T) {
 					So(ok, ShouldBeTrue)
 					So(bytes.Equal(a.Key, b.Key), ShouldBeTrue)
 					So(hash2.String(), ShouldEqual, hash.String())
+				})
+				Convey("Using 'Matches()' should work", func() {
+					So(hash.Matches(testCase), ShouldBeTrue)
+					So(hash.Matches(testCase+"foo"), ShouldBeFalse)
+					if strings.ToUpper(testCase) != testCase {
+						So(hash.Matches(strings.ToUpper(testCase)), ShouldBeFalse)
+					}
 				})
 				Convey("Serializing and deserializing of the string variant should work", func() {
 					serialized := hash.String()

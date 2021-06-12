@@ -54,9 +54,7 @@ func NewArgonHash(password string) (Hash, error) {
 
 func newArgonHashFromHashString(str string) (*ArgonHash, error) {
 	parts := strings.Split(str, "|")
-	if len(parts) != 7 {
-		return nil, fmt.Errorf("incompatible field length: %d of 7 fields found", len(parts))
-	}
+	// We don't need to check the length here, since the RegEx already does this for us
 	out := &ArgonHash{}
 	// Memory
 	tmp, err := strconv.ParseUint(parts[2], 10, 32)
