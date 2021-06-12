@@ -11,6 +11,9 @@ vendor/
 # dumps
 partkeepr.sql
 
+# docker-compose .env file
+.env
+
 # Local docker volumes for testing
 docker/volumes/mariadb/
 docker/volumes/partmate/data/
