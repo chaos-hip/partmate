@@ -5,15 +5,27 @@ import (
 	"path/filepath"
 	"strings"
 
+	"git.chaos-hip.de/RepairCafe/PartMATE/db"
+	"git.chaos-hip.de/RepairCafe/PartMATE/db/mysql"
+	"git.chaos-hip.de/RepairCafe/PartMATE/routes"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	ginlogrus "github.com/toorop/gin-logrus"
 )
 
 const (
 	envVarPrefix = "PARTMATE"
+
+	confKeyLogLevel = "log.level"
+	confKeyDBHost   = "db.host"
+	confKeyDBPort   = "db.port"
+	confKeyDBUser   = "db.user"
+	confKeyDBPass   = "db.password"
+	confKeyDBName   = "db.database"
+	confKeyDataDir  = "partkeepr.data-dir"
+	confKeyListen   = "listen"
 )
 
 /*
@@ -34,26 +46,45 @@ func main() {
 		logrus.WithError(err).Fatal("Failed to initialize configuration")
 	}
 
-	_, err = initLogger(conf)
-	if err != nil {
+	if err = initLogger(conf); err != nil {
 		logrus.WithError(err).Fatal("Failed to initialize logger")
 	}
 
-	_, err = initDB()
+	dbInstance, err := initDB(conf)
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to initialize database connection")
 	}
 
-	router := initRouting()
+	router := initRouting(dbInstance)
 	router.Run(conf.GetString("listen"))
 }
 
-func initLogger(conf *viper.Viper) (logrus.StdLogger, error) {
-	return nil, nil
+func initLogger(conf *viper.Viper) error {
+	switch conf.GetString("log.level") {
+	case "debug":
+		logrus.Info("Setting log level to 'debug'")
+		logrus.SetLevel(logrus.DebugLevel)
+	case "info":
+		logrus.Info("Setting log level to 'info'")
+		logrus.SetLevel(logrus.InfoLevel)
+	case "warn":
+		logrus.Info("Setting log level to 'warn'")
+		logrus.SetLevel(logrus.WarnLevel)
+	case "error":
+		logrus.Info("Setting log level to 'error'")
+		logrus.SetLevel(logrus.ErrorLevel)
+	default:
+		logrus.Warnf("Illegal log level %#v - falling back to default level \"info\"")
+		logrus.SetLevel(logrus.InfoLevel)
+	}
+	return nil
 }
 
-func initRouting() *gin.Engine {
+func initRouting(dbInstance db.DB) *gin.Engine {
 	router := gin.Default()
+	router.Use(ginlogrus.Logger(logrus.StandardLogger()), gin.Recovery())
+	// Respond with a proper JSON on 404
+	router.NoRoute(routes.Default404Handler)
 
 	apiRouter := router.Group("/api")
 	{
@@ -92,12 +123,14 @@ func initConfig() (*viper.Viper, error) {
 	conf.AutomaticEnv()
 
 	// Prepare the defaults for the config
-	conf.SetDefault("log.level", "warn")
-	conf.SetDefault("db.host", "mariadb")
-	conf.SetDefault("db.user", "partmate")
-	conf.SetDefault("db.password", "change_me")
-	conf.SetDefault("db.database", "partkeepr")
-	conf.SetDefault("partkeepr.data-dir", filepath.Join(".", "data"))
+	conf.SetDefault(confKeyLogLevel, "warn")
+	conf.SetDefault(confKeyDBHost, "mariadb")
+	conf.SetDefault(confKeyDBPort, "3306")
+	conf.SetDefault(confKeyDBUser, "partmate")
+	conf.SetDefault(confKeyDBPass, "change_me")
+	conf.SetDefault(confKeyDBName, "partkeepr")
+	conf.SetDefault(confKeyListen, ":3000")
+	conf.SetDefault(confKeyDataDir, filepath.Join(".", "data"))
 
 	if err := conf.ReadInConfig(); err != nil {
 		if strings.Contains(err.Error(), "Config File \"config\" Not Found in") {
@@ -109,8 +142,15 @@ func initConfig() (*viper.Viper, error) {
 	return conf, nil
 }
 
-func initDB() (*sqlx.DB, error) {
-	return nil, nil
+func initDB(conf *viper.Viper) (db.DB, error) {
+	return mysql.NewDB(
+		conf.GetString(confKeyDBHost),
+		conf.GetString(confKeyDBPort),
+		conf.GetString(confKeyDBUser),
+		conf.GetString(confKeyDBPass),
+		conf.GetString(confKeyDBName),
+		"file://dbmigrations",
+	)
 }
 
 func handleQrShortLink(ctx *gin.Context) {

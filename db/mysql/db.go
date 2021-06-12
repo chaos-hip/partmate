@@ -3,6 +3,7 @@ package mysql
 import (
 	"database/sql"
 	"fmt"
+	"text/template"
 
 	"git.chaos-hip.de/RepairCafe/PartMATE/db"
 	"git.chaos-hip.de/RepairCafe/PartMATE/models"
@@ -11,6 +12,7 @@ import (
 	migratedb "github.com/golang-migrate/migrate/v4/database/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -62,6 +64,7 @@ func (d *DB) Close() {
 }
 
 func Migrate(db *sql.DB, source string) error {
+	logrus.Info("Running database migrations...")
 	drv, err := migratedb.WithInstance(
 		db,
 		&migratedb.Config{
@@ -84,10 +87,17 @@ func Migrate(db *sql.DB, source string) error {
 	if err := migrator.Up(); err != nil && err != migrate.ErrNoChange {
 		return err
 	}
+	logrus.Info("Migrations done")
 	return nil
 }
 
 func NewDB(host, port, username, password, dbName, migrationSource string) (db.DB, error) {
+
+	host = template.URLQueryEscaper(host)
+	port = template.URLQueryEscaper(port)
+	username = template.URLQueryEscaper(username)
+	password = template.URLQueryEscaper(password)
+	dbName = template.URLQueryEscaper(dbName)
 
 	// Create migration connection
 	// multiStatements enables batch processing
@@ -100,7 +110,7 @@ func NewDB(host, port, username, password, dbName, migrationSource string) (db.D
 		return nil, fmt.Errorf("failed to migrate database: %w", err)
 	}
 
-	sqlxDB, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?multiStatements=true&parseTime=true", username, password, host, port, dbName))
+	sqlxDB, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", username, password, host, port, dbName))
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
