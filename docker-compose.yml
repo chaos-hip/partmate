@@ -38,6 +38,12 @@ services:
       - "3000:3000"
     networks:
       - net
+    environment:
+      PARTMATE_DB_HOST: mariadb
+      PARTMATE_DB_USER: root # Since this is for local testing only, this should be enough
+      PARTMATE_DB_PASSWORD: "${MARIA_ROOT_PASSWORD}"
+      PARTMATE_PARTKEEPR_DATA_DIR: /partmate/data
+      PARTMATE_LOG_LEVEL: debug
 
 networks:
   net:

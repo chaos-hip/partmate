@@ -1,14 +1,19 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
+	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+)
+
+const (
+	envVarPrefix = "PARTMATE"
 )
 
 /*
@@ -24,19 +29,31 @@ import (
 */
 
 func main() {
-	// -- Predefinition --
-	conf := viper.New()
-	conf.Get("hello.world")
-	logrus.Info("Hello again")
+	conf, err := initConfig()
+	if err != nil {
+		logrus.WithError(err).Fatal("Failed to initialize configuration")
+	}
 
-	x := sqlx.AT
-	logrus.Info(x)
-	fmt.Println("Hello PartMATE")
-	// -- Live --
+	_, err = initLogger(conf)
+	if err != nil {
+		logrus.WithError(err).Fatal("Failed to initialize logger")
+	}
+
+	_, err = initDB()
+	if err != nil {
+		logrus.WithError(err).Fatal("Failed to initialize database connection")
+	}
+
+	router := initRouting()
+	router.Run(conf.GetString("listen"))
+}
+
+func initLogger(conf *viper.Viper) (logrus.StdLogger, error) {
+	return nil, nil
+}
+
+func initRouting() *gin.Engine {
 	router := gin.Default()
-	router.GET("/i/:id", handleQrShortLink)
-	router.GET("/t-stuff", handleTeaPottJeeey)
-	router.GET("/attachments/:id/:format", handleTeaPottJeeey) // download attachment
 
 	apiRouter := router.Group("/api")
 	{
@@ -60,7 +77,40 @@ func main() {
 		apiRouter.GET("/distributors", handleTeaPottJeeey)      // Get list of distributors
 		apiRouter.GET("/storage-locations", handleTeaPottJeeey) // Get list of available storage locations
 	}
-	router.Run()
+	return router
+}
+
+func initConfig() (*viper.Viper, error) {
+	conf := viper.New()
+	conf.AddConfigPath(".")
+	conf.AddConfigPath(filepath.Join(".", "config"))
+	conf.SetConfigName("config")
+	conf.SetConfigType("toml")
+	conf.SetEnvPrefix(envVarPrefix)
+	conf.SetEnvKeyReplacer(strings.NewReplacer("-", "_", ".", "_", " ", "_", ":", "_"))
+	logrus.Debugf("Configuration env var prefix set to '%s_'", envVarPrefix)
+	conf.AutomaticEnv()
+
+	// Prepare the defaults for the config
+	conf.SetDefault("log.level", "warn")
+	conf.SetDefault("db.host", "mariadb")
+	conf.SetDefault("db.user", "partmate")
+	conf.SetDefault("db.password", "change_me")
+	conf.SetDefault("db.database", "partkeepr")
+	conf.SetDefault("partkeepr.data-dir", filepath.Join(".", "data"))
+
+	if err := conf.ReadInConfig(); err != nil {
+		if strings.Contains(err.Error(), "Config File \"config\" Not Found in") {
+			logrus.Warn("No configuration file found. Hope you have everything configured with EnvVars...")
+		} else {
+			return nil, err
+		}
+	}
+	return conf, nil
+}
+
+func initDB() (*sqlx.DB, error) {
+	return nil, nil
 }
 
 func handleQrShortLink(ctx *gin.Context) {
