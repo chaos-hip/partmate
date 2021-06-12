@@ -57,6 +57,17 @@ type MockDB struct {
 		result1 *models.Attachment
 		result2 error
 	}
+	CreateUserStub        func(models.User) error
+	createUserMutex       sync.RWMutex
+	createUserArgsForCall []struct {
+		arg1 models.User
+	}
+	createUserReturns struct {
+		result1 error
+	}
+	createUserReturnsOnCall map[int]struct {
+		result1 error
+	}
 	DeleteLinkByIDStub        func(string) error
 	deleteLinkByIDMutex       sync.RWMutex
 	deleteLinkByIDArgsForCall []struct {
@@ -106,17 +117,6 @@ type MockDB struct {
 	getUserByNameReturnsOnCall map[int]struct {
 		result1 *models.User
 		result2 error
-	}
-	MigrateStub        func(string) error
-	migrateMutex       sync.RWMutex
-	migrateArgsForCall []struct {
-		arg1 string
-	}
-	migrateReturns struct {
-		result1 error
-	}
-	migrateReturnsOnCall map[int]struct {
-		result1 error
 	}
 	RemovePartStockStub        func(string, string, uint) error
 	removePartStockMutex       sync.RWMutex
@@ -366,6 +366,67 @@ func (fake *MockDB) CreatePartAttachmentEntryReturnsOnCall(i int, result1 *model
 		result1 *models.Attachment
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *MockDB) CreateUser(arg1 models.User) error {
+	fake.createUserMutex.Lock()
+	ret, specificReturn := fake.createUserReturnsOnCall[len(fake.createUserArgsForCall)]
+	fake.createUserArgsForCall = append(fake.createUserArgsForCall, struct {
+		arg1 models.User
+	}{arg1})
+	stub := fake.CreateUserStub
+	fakeReturns := fake.createUserReturns
+	fake.recordInvocation("CreateUser", []interface{}{arg1})
+	fake.createUserMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *MockDB) CreateUserCallCount() int {
+	fake.createUserMutex.RLock()
+	defer fake.createUserMutex.RUnlock()
+	return len(fake.createUserArgsForCall)
+}
+
+func (fake *MockDB) CreateUserCalls(stub func(models.User) error) {
+	fake.createUserMutex.Lock()
+	defer fake.createUserMutex.Unlock()
+	fake.CreateUserStub = stub
+}
+
+func (fake *MockDB) CreateUserArgsForCall(i int) models.User {
+	fake.createUserMutex.RLock()
+	defer fake.createUserMutex.RUnlock()
+	argsForCall := fake.createUserArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *MockDB) CreateUserReturns(result1 error) {
+	fake.createUserMutex.Lock()
+	defer fake.createUserMutex.Unlock()
+	fake.CreateUserStub = nil
+	fake.createUserReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *MockDB) CreateUserReturnsOnCall(i int, result1 error) {
+	fake.createUserMutex.Lock()
+	defer fake.createUserMutex.Unlock()
+	fake.CreateUserStub = nil
+	if fake.createUserReturnsOnCall == nil {
+		fake.createUserReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.createUserReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *MockDB) DeleteLinkByID(arg1 string) error {
@@ -621,67 +682,6 @@ func (fake *MockDB) GetUserByNameReturnsOnCall(i int, result1 *models.User, resu
 	}{result1, result2}
 }
 
-func (fake *MockDB) Migrate(arg1 string) error {
-	fake.migrateMutex.Lock()
-	ret, specificReturn := fake.migrateReturnsOnCall[len(fake.migrateArgsForCall)]
-	fake.migrateArgsForCall = append(fake.migrateArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	stub := fake.MigrateStub
-	fakeReturns := fake.migrateReturns
-	fake.recordInvocation("Migrate", []interface{}{arg1})
-	fake.migrateMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fakeReturns.result1
-}
-
-func (fake *MockDB) MigrateCallCount() int {
-	fake.migrateMutex.RLock()
-	defer fake.migrateMutex.RUnlock()
-	return len(fake.migrateArgsForCall)
-}
-
-func (fake *MockDB) MigrateCalls(stub func(string) error) {
-	fake.migrateMutex.Lock()
-	defer fake.migrateMutex.Unlock()
-	fake.MigrateStub = stub
-}
-
-func (fake *MockDB) MigrateArgsForCall(i int) string {
-	fake.migrateMutex.RLock()
-	defer fake.migrateMutex.RUnlock()
-	argsForCall := fake.migrateArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *MockDB) MigrateReturns(result1 error) {
-	fake.migrateMutex.Lock()
-	defer fake.migrateMutex.Unlock()
-	fake.MigrateStub = nil
-	fake.migrateReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *MockDB) MigrateReturnsOnCall(i int, result1 error) {
-	fake.migrateMutex.Lock()
-	defer fake.migrateMutex.Unlock()
-	fake.MigrateStub = nil
-	if fake.migrateReturnsOnCall == nil {
-		fake.migrateReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.migrateReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
 func (fake *MockDB) RemovePartStock(arg1 string, arg2 string, arg3 uint) error {
 	fake.removePartStockMutex.Lock()
 	ret, specificReturn := fake.removePartStockReturnsOnCall[len(fake.removePartStockArgsForCall)]
@@ -820,6 +820,8 @@ func (fake *MockDB) Invocations() map[string][][]interface{} {
 	defer fake.createLinkMutex.RUnlock()
 	fake.createPartAttachmentEntryMutex.RLock()
 	defer fake.createPartAttachmentEntryMutex.RUnlock()
+	fake.createUserMutex.RLock()
+	defer fake.createUserMutex.RUnlock()
 	fake.deleteLinkByIDMutex.RLock()
 	defer fake.deleteLinkByIDMutex.RUnlock()
 	fake.getAttachmentEntryMutex.RLock()
@@ -828,8 +830,6 @@ func (fake *MockDB) Invocations() map[string][][]interface{} {
 	defer fake.getPartByIDMutex.RUnlock()
 	fake.getUserByNameMutex.RLock()
 	defer fake.getUserByNameMutex.RUnlock()
-	fake.migrateMutex.RLock()
-	defer fake.migrateMutex.RUnlock()
 	fake.removePartStockMutex.RLock()
 	defer fake.removePartStockMutex.RUnlock()
 	fake.searchPartsMutex.RLock()

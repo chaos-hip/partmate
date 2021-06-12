@@ -9,7 +9,12 @@ type DB interface {
 	// Parts 🧩
 	GetPartByID(id string) (*models.Part, error)
 	SearchParts(search models.Search) ([]models.Part, error)
+
+	// Users 👤
+	// GetUserByName returns the user with the given username or nothing if the user does not exist
 	GetUserByName(name string) (*models.User, error)
+	// CreateUser creates a new user in the database
+	CreateUser(models.User) error
 
 	// Links 🔗
 	DeleteLinkByID(id string) error

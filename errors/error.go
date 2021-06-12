@@ -13,6 +13,8 @@ const (
 	TypeForbidden = "ACCESS_DENIED"
 	// TypeConflict is the error type for trying to create an already existing entity
 	TypeConflict = "CONFLICT"
+	// TypeValidationFailed is the error type for invalid input data
+	TypeValidationFailed = "VALIDATION_FAILED"
 )
 
 type ErrorResponse struct {

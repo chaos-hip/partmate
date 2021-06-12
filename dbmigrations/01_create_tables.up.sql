@@ -1,10 +1,8 @@
 CREATE TABLE IF NOT EXISTS `mate_users` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,
   `password_hash` varchar(256) NOT NULL DEFAULT '',
   `permissions` text NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `UNIQ_NAME` (`name`)
+  PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `mate_links` (

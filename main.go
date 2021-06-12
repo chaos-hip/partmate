@@ -90,6 +90,8 @@ func initRouting(dbInstance db.DB) *gin.Engine {
 	{
 		apiRouter.POST("/login", handleTeaPottJeeey)
 		apiRouter.POST("/logout", handleTeaPottJeeey)
+		// Users
+		apiRouter.POST("/user", routes.MakeUserCreateHandler(dbInstance))
 		// Part handling
 		apiRouter.GET("/parts/:id", handleTeaPottJeeey)
 		apiRouter.GET("/parts/:id/qr", handleTeaPottJeeey)
