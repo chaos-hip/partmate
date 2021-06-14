@@ -125,7 +125,7 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 		// Link handling
 		apiRouter.POST("/links", routes.MakeLinkCreateHandler(dbInstance))       // create Link
 		apiRouter.DELETE("/links/:id", routes.MakeLinkDeleteHandler(dbInstance)) // delete Link
-		apiRouter.POST("/parts/:id/link/:linkID", handleTeaPottJeeey)
+		apiRouter.POST("/parts/:id/link/:linkID", routes.MakeLinkCreateByPathHandler(dbInstance))
 		// Inc or Dec Stock count
 		apiRouter.POST("/parts/:id/stockadd", handleTeaPottJeeey)
 		apiRouter.POST("/parts/:id/stockremove", handleTeaPottJeeey)

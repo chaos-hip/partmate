@@ -80,7 +80,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"term\": \"Foo bar\",\n    \"category\": \"categoryLink\",\n    \"manufacturor\": \"manufacturorLink\",\n    \"distributor\": \"distributorLink\",\n    \"location\": \"storageLocationLink\",\n    \"stockFrom\": 0,\n    \"stockTo\": 0,\n    \"lowStock\": true,\n    \"needsReview\": true\n}",
+							"raw": "{\n    \"term\": \"TFT\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -201,15 +201,6 @@
 					"request": {
 						"method": "POST",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"targetType\": \"part\",\n    \"target\": \"f8zegwfzgeufg87ewzu987zhefw\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseURL}}/api/parts/:id/link/:linkId",
 							"host": [
@@ -225,12 +216,12 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "",
+									"value": "giysXW76K7xNPeLXC46u4V",
 									"description": "ID of the part"
 								},
 								{
 									"key": "linkId",
-									"value": "",
+									"value": "fooBar",
 									"description": "ID of the new link to generate (optional)"
 								}
 							]
@@ -322,7 +313,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"link\": \"iuhrfiuhrfireuhguerhgierhgv\",\n    \"targetType\": \"part\",\n    \"target\": \"f8zegwfzgeufg87ewzu987zhefw\"\n}",
+							"raw": "{\n    \"link\": \"EinLinkDerDeinenNamenTrägt\",\n    \"targetType\": \"part\",\n    \"target\": \"giysXW76K7xNPeLXC46u4V\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -360,7 +351,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "",
+									"value": "aaaaaaaaa",
 									"description": "ID of the link to be deleted"
 								}
 							]
