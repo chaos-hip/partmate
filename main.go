@@ -113,17 +113,18 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 	apiRouter := router.Group("/api")
 	{
 		apiRouter.POST("/login", routes.MakeLoginHandler(dbInstance, privateKey, conf.GetString(confKeyJWTIssuer)))
-		apiRouter.POST("/logout", handleTeaPottJeeey)
+		// No logout - the frontend will just delete its JWT
+
 		// Users
 		apiRouter.POST("/user", routes.MakeUserCreateHandler(dbInstance))
 		// Part handling
 		apiRouter.GET("/parts/:id", handleTeaPottJeeey)
 		apiRouter.GET("/parts/:id/qr", handleTeaPottJeeey)
-		apiRouter.POST("/parts/search", handleTeaPottJeeey)
+		apiRouter.POST("/parts/search", routes.MakePartsSearchHandler(dbInstance))
 		apiRouter.POST("/parts/:id/attachments", handleTeaPottJeeey) // manage Attachments of Parts
 		// Link handling
-		apiRouter.POST("/links", handleTeaPottJeeey) // create Link
-		apiRouter.DELETE("/links/:id", handleTeaPottJeeey)
+		apiRouter.POST("/links", routes.MakeLinkCreateHandler(dbInstance))       // create Link
+		apiRouter.DELETE("/links/:id", routes.MakeLinkDeleteHandler(dbInstance)) // delete Link
 		apiRouter.POST("/parts/:id/link/:linkID", handleTeaPottJeeey)
 		// Inc or Dec Stock count
 		apiRouter.POST("/parts/:id/stockadd", handleTeaPottJeeey)
