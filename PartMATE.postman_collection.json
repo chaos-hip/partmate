@@ -10,6 +10,22 @@
 			"item": [
 				{
 					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Correct response\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.response.to.have.status(200);",
+									"    pm.expect(jsonData.token).to.be.not.empty;",
+									"    pm.globals.set(\"partmateJwt\", jsonData.token);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "noauth"
@@ -18,7 +34,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"user\": \"root\",\n    \"password\": \"changeme\"\n}",
+							"raw": "{\n    \"user\": \"whity\",\n    \"password\": \"changeme\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -41,9 +57,6 @@
 				{
 					"name": "Create User",
 					"request": {
-						"auth": {
-							"type": "noauth"
-						},
 						"method": "POST",
 						"header": [],
 						"body": {
@@ -367,7 +380,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "{{token}}",
+				"value": "{{partmateJwt}}",
 				"type": "string"
 			}
 		]
