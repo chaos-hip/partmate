@@ -107,6 +107,10 @@ func initLogger(conf *viper.Viper) error {
 
 func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper) *gin.Engine {
 	router := gin.Default()
+
+	// Load templates
+	router.LoadHTMLGlob("templates/*")
+
 	router.Use(ginlogrus.Logger(logrus.StandardLogger()), gin.Recovery())
 	// Respond with a proper JSON on 404
 	router.NoRoute(routes.Default404Handler)
@@ -114,6 +118,14 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 	// Unsecured API
 	router.POST("/api/login", routes.MakeLoginHandler(dbInstance, privateKey, conf.GetString(confKeyJWTIssuer)))
 	// No logout - the frontend will just delete its JWT
+
+	// Redirect all requests to "/" to the UI
+	router.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusTemporaryRedirect, "/ui/index.html")
+	})
+
+	// Static files
+	router.Static("/ui", "public")
 
 	apiRouter := router.Group("/api")
 	{

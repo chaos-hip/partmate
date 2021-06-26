@@ -23,6 +23,7 @@ WORKDIR /opt/app/
 COPY --from=builder /go/src/git.chaos-hip.de/RepairCafe/PartMATE/PartMATE .
 COPY --from=builder /go/src/git.chaos-hip.de/RepairCafe/PartMATE/dbmigrations/ ./dbmigrations/
 COPY --from=builder /go/src/git.chaos-hip.de/RepairCafe/PartMATE/templates/ ./templates/
+COPY --from=builder /go/src/git.chaos-hip.de/RepairCafe/PartMATE/ui/dist/ ./ui/
 RUN echo "Creating application user" && \
     adduser \
     --disabled-password \
