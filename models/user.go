@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"git.chaos-hip.de/RepairCafe/PartMATE/auth"
+	"git.chaos-hip.de/RepairCafe/PartMATE/auth/hash"
 	"github.com/sirupsen/logrus"
 )
 
@@ -22,7 +22,7 @@ type User struct {
 
 // CheckPassword takes a given password and checks if the password has matches that input
 func (u *User) CheckPassword(input string) bool {
-	hash, err := auth.HashFromString(u.PasswordHash)
+	hash, err := hash.FromString(u.PasswordHash)
 	if err != nil {
 		logrus.WithError(err).Error("Failed to decode password hash for user %#v: %w", u.Username, err)
 	}
@@ -62,7 +62,7 @@ func (u *UserDTO) ToUser() (*User, error) {
 	}
 	out.RawPermissions = string(permData)
 	if u.Password != "" {
-		hash, err := auth.NewArgonHash(u.Password)
+		hash, err := hash.NewArgon(u.Password)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create password hash for user: %w", err)
 		}

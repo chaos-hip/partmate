@@ -1,4 +1,4 @@
-package auth_test
+package hash_test
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"git.chaos-hip.de/RepairCafe/PartMATE/auth"
+	"git.chaos-hip.de/RepairCafe/PartMATE/auth/hash"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -32,36 +32,36 @@ func TestArgonHash(t *testing.T) {
 	Convey("Having a set of hashing test-cases", t, func() {
 		for i, testCase := range hashTestCases {
 			Convey(fmt.Sprintf("[%d] Having an Argon2 hashed password", i), func() {
-				hash, err := auth.NewArgonHash(testCase)
+				hashInstance, err := hash.NewArgon(testCase)
 				So(err, ShouldBeNil)
-				So(hash, ShouldNotBeNil)
+				So(hashInstance, ShouldNotBeNil)
 				Convey("Using the same password with the same parameters should result in the same hash", func() {
-					hash2, err := hash.HashPassword(testCase)
+					hashInstance2, err := hashInstance.HashPassword(testCase)
 					So(err, ShouldBeNil)
-					So(hash2, ShouldNotBeNil)
-					a, ok := hash.(*auth.ArgonHash)
+					So(hashInstance2, ShouldNotBeNil)
+					a, ok := hashInstance.(*hash.Argon)
 					So(ok, ShouldBeTrue)
-					b, ok := hash2.(*auth.ArgonHash)
+					b, ok := hashInstance2.(*hash.Argon)
 					So(ok, ShouldBeTrue)
 					So(bytes.Equal(a.Key, b.Key), ShouldBeTrue)
-					So(hash2.String(), ShouldEqual, hash.String())
+					So(hashInstance2.String(), ShouldEqual, hashInstance.String())
 				})
 				Convey("Using 'Matches()' should work", func() {
-					So(hash.Matches(testCase), ShouldBeTrue)
-					So(hash.Matches(testCase+"foo"), ShouldBeFalse)
+					So(hashInstance.Matches(testCase), ShouldBeTrue)
+					So(hashInstance.Matches(testCase+"foo"), ShouldBeFalse)
 					if strings.ToUpper(testCase) != testCase {
-						So(hash.Matches(strings.ToUpper(testCase)), ShouldBeFalse)
+						So(hashInstance.Matches(strings.ToUpper(testCase)), ShouldBeFalse)
 					}
 				})
 				Convey("Serializing and deserializing of the string variant should work", func() {
-					serialized := hash.String()
+					serialized := hashInstance.String()
 					So(argonRegex.MatchString(serialized), ShouldBeTrue)
-					out, err := auth.HashFromString(serialized)
+					out, err := hash.FromString(serialized)
 					So(err, ShouldBeNil)
 					So(out, ShouldNotBeNil)
-					newHash, ok := out.(*auth.ArgonHash)
+					newHash, ok := out.(*hash.Argon)
 					So(ok, ShouldBeTrue)
-					oldHash := hash.(*auth.ArgonHash)
+					oldHash := hashInstance.(*hash.Argon)
 					So(*newHash, ShouldResemble, *oldHash)
 				})
 			})
@@ -128,7 +128,7 @@ func TestArgonHashDeserialize(t *testing.T) {
 		for i, testCase := range hashStringTestCases {
 			tc := testCase
 			Convey(fmt.Sprintf("[%d] Decoding a hash from string", i), func() {
-				hash, err := auth.HashFromString(tc.str)
+				hash, err := hash.FromString(tc.str)
 				if tc.err == "" {
 					Convey("Should decode the string successfully", func() {
 						So(err, ShouldBeNil)

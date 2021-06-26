@@ -22,6 +22,7 @@ FROM alpine
 WORKDIR /opt/app/
 COPY --from=builder /go/src/git.chaos-hip.de/RepairCafe/PartMATE/PartMATE .
 COPY --from=builder /go/src/git.chaos-hip.de/RepairCafe/PartMATE/dbmigrations/ ./dbmigrations/
+COPY --from=builder /go/src/git.chaos-hip.de/RepairCafe/PartMATE/templates/ ./templates/
 RUN echo "Creating application user" && \
     adduser \
     --disabled-password \

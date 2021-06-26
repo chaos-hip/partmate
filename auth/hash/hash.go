@@ -1,4 +1,4 @@
-package auth
+package hash
 
 import (
 	"bytes"
@@ -32,8 +32,8 @@ type Hash interface {
 	Matches(string) bool
 }
 
-// ArgonHash represents a password has created using Argon2ID key derivation
-type ArgonHash struct {
+// Argon represents a password has created using Argon2ID key derivation
+type Argon struct {
 	Memory      uint32
 	Iterations  uint32
 	Parallelism uint8
@@ -41,10 +41,10 @@ type ArgonHash struct {
 	Key         []byte
 }
 
-// NewArgonHash uses the given password and creates its hashed version - using the default parameters
+// NewArgon uses the given password and creates its hashed version - using the default parameters
 // and a newly generated salt
-func NewArgonHash(password string) (Hash, error) {
-	hash := &ArgonHash{
+func NewArgon(password string) (Hash, error) {
+	hash := &Argon{
 		Memory:      defaultMemory,
 		Iterations:  defaultIterations,
 		Parallelism: defaultParallelism,
@@ -52,10 +52,10 @@ func NewArgonHash(password string) (Hash, error) {
 	return hash.HashPassword(password)
 }
 
-func newArgonHashFromHashString(str string) (*ArgonHash, error) {
+func newArgonFromHashString(str string) (*Argon, error) {
 	parts := strings.Split(str, "|")
 	// We don't need to check the length here, since the RegEx already does this for us
-	out := &ArgonHash{}
+	out := &Argon{}
 	// Memory
 	tmp, err := strconv.ParseUint(parts[2], 10, 32)
 	if err != nil {
@@ -89,18 +89,18 @@ func newArgonHashFromHashString(str string) (*ArgonHash, error) {
 	return out, nil
 }
 
-// HashFromString tries to read a hashed password from its string representation
+// FromString tries to read a hashed password from its string representation
 // The stored hash has to be encoded by any of the functions supported by PartMATE (currently Argon2ID)
-func HashFromString(str string) (Hash, error) {
+func FromString(str string) (Hash, error) {
 	switch {
 	case argonRegex.MatchString(str):
-		return newArgonHashFromHashString(str)
+		return newArgonFromHashString(str)
 	default:
 		return nil, fmt.Errorf("unknown or illegal hash string - no matching hashing algorithm found for %#v", str)
 	}
 }
 
-func (a *ArgonHash) String() string {
+func (a *Argon) String() string {
 	// Type | Version | Memory | Iterations | Parallelism | Salt (base64) | Hash (=key;base64)
 	return fmt.Sprintf(
 		"argon2id|%d|%d|%d|%d|%s|%s",
@@ -115,8 +115,8 @@ func (a *ArgonHash) String() string {
 
 // HashPassword creates a new password hash for the given password, using the parameters from this hash
 // (including salt)
-func (a *ArgonHash) HashPassword(password string) (Hash, error) {
-	out := &ArgonHash{
+func (a *Argon) HashPassword(password string) (Hash, error) {
+	out := &Argon{
 		Memory:      a.Memory,
 		Iterations:  a.Iterations,
 		Parallelism: a.Parallelism,
@@ -141,13 +141,13 @@ func (a *ArgonHash) HashPassword(password string) (Hash, error) {
 }
 
 // Matches checks if the given password corresponds to the hash
-func (a *ArgonHash) Matches(password string) bool {
+func (a *Argon) Matches(password string) bool {
 	otherHash, err := a.HashPassword(password)
 	if err != nil {
 		logrus.WithError(err).Error("Failed to hash password for comparison")
 		return false
 	}
-	b := otherHash.(*ArgonHash)
+	b := otherHash.(*Argon)
 	return bytes.Equal(a.Key, b.Key)
 }
 

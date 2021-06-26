@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"git.chaos-hip.de/RepairCafe/PartMATE/auth"
 	"git.chaos-hip.de/RepairCafe/PartMATE/db"
 	"git.chaos-hip.de/RepairCafe/PartMATE/db/mysql"
 	"git.chaos-hip.de/RepairCafe/PartMATE/routes"
@@ -110,10 +111,13 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 	// Respond with a proper JSON on 404
 	router.NoRoute(routes.Default404Handler)
 
+	// Unsecured API
+	router.POST("/api/login", routes.MakeLoginHandler(dbInstance, privateKey, conf.GetString(confKeyJWTIssuer)))
+	// No logout - the frontend will just delete its JWT
+
 	apiRouter := router.Group("/api")
 	{
-		apiRouter.POST("/login", routes.MakeLoginHandler(dbInstance, privateKey, conf.GetString(confKeyJWTIssuer)))
-		// No logout - the frontend will just delete its JWT
+		apiRouter.Use(auth.MakeAuthMiddleware(dbInstance, &privateKey.PublicKey))
 
 		// Users
 		apiRouter.POST("/user", routes.MakeUserCreateHandler(dbInstance))
