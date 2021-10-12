@@ -1,52 +1,73 @@
 <template>
   <IonApp>
     <IonSplitPane content-id="main-content">
-      <ion-menu content-id="main-content" type="overlay">
+      <ion-menu content-id="main-content" type="overlay" v-show="$store.user">
         <ion-content>
           <ion-list id="inbox-list">
             <ion-list-header>PartMATE</ion-list-header>
-            <ion-note>some@user.com</ion-note>
+            <ion-note>{{ userName }}</ion-note>
 
-            <ion-menu-toggle
-              auto-hide="false"
-              v-for="(p, i) in appPages"
-              :key="i"
-            >
+            <template v-if="$store.user">
+              <ion-menu-toggle
+                auto-hide="false"
+                v-for="(p, i) in appPages"
+                :key="i"
+              >
+                <ion-item
+                  @click="selectedIndex = i"
+                  router-direction="root"
+                  :router-link="p.url"
+                  lines="none"
+                  detail="false"
+                  class="hydrated"
+                  :class="{ selected: selectedIndex === i }"
+                >
+                  <ion-icon
+                    slot="start"
+                    :ios="p.iosIcon"
+                    :md="p.mdIcon"
+                  ></ion-icon>
+                  <ion-label>{{ p.title }}</ion-label>
+                </ion-item>
+              </ion-menu-toggle>
+            </template>
+            <template v-if="!$store.user">
+              <ion-menu-toggle auto-hide="false">
+                <ion-item
+                  router-direction="root"
+                  router-link="/login"
+                  lines="none"
+                  detail="false"
+                  class="hydrated"
+                >
+                  <ion-icon
+                    slot="start"
+                    :ios="logInOutline"
+                    :md="logInSharp"
+                  ></ion-icon>
+                  <ion-label>Login</ion-label>
+                </ion-item>
+              </ion-menu-toggle>
+            </template>
+          </ion-list>
+          <template v-if="$store.user">
+            <ion-list id="labels-list">
+              <ion-list-header>So ne Liste...</ion-list-header>
+
               <ion-item
-                @click="selectedIndex = i"
-                router-direction="root"
-                :router-link="p.url"
+                v-for="(label, index) in labels"
                 lines="none"
-                detail="false"
-                class="hydrated"
-                :class="{ selected: selectedIndex === i }"
+                :key="index"
               >
                 <ion-icon
                   slot="start"
-                  :ios="p.iosIcon"
-                  :md="p.mdIcon"
+                  :ios="codeSlashOutline"
+                  :md="codeSlashSharp"
                 ></ion-icon>
-                <ion-label>{{ p.title }}</ion-label>
+                <ion-label>{{ label }}</ion-label>
               </ion-item>
-            </ion-menu-toggle>
-          </ion-list>
-
-          <ion-list id="labels-list">
-            <ion-list-header>So ne Liste...</ion-list-header>
-
-            <ion-item
-              v-for="(label, index) in labels"
-              lines="none"
-              :key="index"
-            >
-              <ion-icon
-                slot="start"
-                :ios="codeSlashOutline"
-                :md="codeSlashSharp"
-              ></ion-icon>
-              <ion-label>{{ label }}</ion-label>
-            </ion-item>
-          </ion-list>
+            </ion-list>
+          </template>
         </ion-content>
       </ion-menu>
       <ion-router-outlet id="main-content"></ion-router-outlet>
@@ -58,10 +79,15 @@
 import { IonApp, IonContent, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonMenu, IonMenuToggle, IonNote, IonRouterOutlet, IonSplitPane } from '@ionic/vue';
 import { defineComponent, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { searchOutline, searchSharp, cameraOutline, cameraSharp, codeSlashOutline, codeSlashSharp } from 'ionicons/icons';
+import { searchOutline, searchSharp, cameraOutline, cameraSharp, codeSlashOutline, codeSlashSharp, logInOutline, logInSharp } from 'ionicons/icons';
 
 export default defineComponent({
   name: 'App',
+  computed: {
+    userName() {
+      return this.$store.state.user ? this.$store.state.user.name : '';
+    }
+  },
   components: {
     IonApp,
     IonContent,
@@ -111,6 +137,8 @@ export default defineComponent({
       cameraSharp,
       codeSlashOutline,
       codeSlashSharp,
+      logInOutline,
+      logInSharp,
       isSelected: (url: string) => url === route.path ? 'selected' : ''
     }
   }
