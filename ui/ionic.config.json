@@ -1,0 +1,13 @@
+{
+  "name": "PartMATE",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue",
+  "proxies": [
+    {
+      "path": "/api",
+      "proxyUrl": "http://localhost:3000/api"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 ARG ENVIRONMENT=develop
-FROM golang:alpine AS builder
+FROM golang:alpine AS goBuilder
 
 ENV GOPRIVATE="git.chaos-hip.de"
 
@@ -17,13 +17,19 @@ COPY . /go/src/git.chaos-hip.de/RepairCafe/PartMATE
 WORKDIR /go/src/git.chaos-hip.de/RepairCafe/PartMATE
 RUN go build
 
+FROM node:latest AS nodeBuilder
+COPY ./ui /src
+WORKDIR /src
+RUN npm ci && \
+    npm run build
+
 # The real image
 FROM alpine
 WORKDIR /opt/app/
-COPY --from=builder /go/src/git.chaos-hip.de/RepairCafe/PartMATE/PartMATE .
-COPY --from=builder /go/src/git.chaos-hip.de/RepairCafe/PartMATE/dbmigrations/ ./dbmigrations/
-COPY --from=builder /go/src/git.chaos-hip.de/RepairCafe/PartMATE/templates/ ./templates/
-COPY --from=builder /go/src/git.chaos-hip.de/RepairCafe/PartMATE/ui/dist/ ./ui/
+COPY --from=goBuilder /go/src/git.chaos-hip.de/RepairCafe/PartMATE/PartMATE .
+COPY --from=goBuilder /go/src/git.chaos-hip.de/RepairCafe/PartMATE/dbmigrations/ ./dbmigrations/
+COPY --from=goBuilder /go/src/git.chaos-hip.de/RepairCafe/PartMATE/templates/ ./templates/
+COPY --from=nodeBuilder /src/dist/ ./public/
 RUN echo "Creating application user" && \
     adduser \
     --disabled-password \
