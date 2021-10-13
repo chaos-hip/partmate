@@ -11,22 +11,33 @@
     <ion-content :fullscreen="true">
       <ion-card style="max-width: 450px">
         <ion-card-content>
-          <form>
+          <form @submit.prevent="doLogin" ref="loginForm">
             <ion-item>
               <ion-label position="fixed">Benutzer</ion-label>
-              <ion-input autofocus clear-input required></ion-input>
+              <ion-input
+                autofocus
+                clear-input
+                required
+                v-model="username"
+                @keyup="onUserKeyUp"
+              ></ion-input>
             </ion-item>
             <ion-item>
               <ion-label position="fixed">Passwort</ion-label>
               <ion-input
+                id="iptPassword"
                 clear-input
                 enterkeyhint="send"
                 required
                 type="password"
+                v-model="password"
+                @keyup="onPassKeyUp"
               ></ion-input>
             </ion-item>
             <ion-item>
-              <ion-button slot="end" color="primary">Login</ion-button>
+              <ion-button slot="end" color="primary" @click="doLogin"
+                >Login</ion-button
+              >
             </ion-item>
           </form>
         </ion-card-content>
@@ -36,9 +47,10 @@
 </template>
 
 <script lang="ts">
+import { ref, defineComponent } from 'vue';
 import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonCard, IonCardContent, IonButton, IonItem, IonLabel, IonInput } from '@ionic/vue';
 
-export default {
+export default defineComponent({
   name: 'Folder',
   components: {
     IonButtons,
@@ -54,8 +66,38 @@ export default {
     IonItem,
     IonLabel,
     IonInput,
+  },
+  methods: {
+    doLogin() {
+      if (this.username !== '' && this.password !== '') {
+        // ToDo: Implement the login function
+        console.log('IMPLEMENT ME!!!');
+      }
+    },
+    onUserKeyUp(ev: KeyboardEvent) {
+      if (ev.key == 'Enter') {
+        if (this.password !== '' && this.username !== '') {
+          this.doLogin();
+        } else if (this.username !== '') {
+          (document.querySelector('#iptPassword > input') as HTMLElement).focus();
+        }
+      }
+    },
+    onPassKeyUp(ev: KeyboardEvent) {
+      if (ev.key == 'Enter' && this.password !== '' && this.username !== '') {
+        this.doLogin();
+      }
+    }
+  },
+  setup() {
+    const username = ref("");
+    const password = ref("");
+    return {
+      username,
+      password,
+    };
   }
-}
+});
 </script>
 
 <style scoped>
