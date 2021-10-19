@@ -4,10 +4,12 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 
 	"git.chaos-hip.de/RepairCafe/PartMATE/auth"
+	"git.chaos-hip.de/RepairCafe/PartMATE/command"
 	"git.chaos-hip.de/RepairCafe/PartMATE/db"
 	"git.chaos-hip.de/RepairCafe/PartMATE/db/mysql"
 	"git.chaos-hip.de/RepairCafe/PartMATE/routes"
@@ -45,6 +47,12 @@ const (
 	- DB-Migration => https://github.com/golang-migrate/migrate
 	- Config => viper✅
 	- Logging => log || logrus✅ || zap
+
+	QR-Core link format:
+	${baseURL}/l/${ID}
+
+	e.g.
+	https://i.repaircafe-hilpoltstein.de/l/fooBarBaz
 */
 
 func main() {
@@ -60,6 +68,25 @@ func main() {
 	dbInstance, err := initDB(conf)
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to initialize database connection")
+	}
+
+	if len(os.Args) > 1 {
+		subcmd := os.Args[1]
+		var cmd command.Command
+		switch subcmd {
+		case "qr":
+			cmd = command.NewQR()
+		default:
+			logrus.Errorf("Unknown command %#v", subcmd)
+			os.Exit(1)
+		}
+		if err := cmd.Run(os.Args[2:]); err != nil {
+			logrus.WithError(err).Errorf("Failed to execute command %#v", subcmd)
+			os.Exit(1)
+		} else {
+			logrus.Infof("Finished executing command %#v", subcmd)
+			os.Exit(0)
+		}
 	}
 
 	// JWT keys
