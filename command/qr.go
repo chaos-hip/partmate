@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"image"
-	"path"
+	"strings"
 
 	"github.com/fogleman/gg"
 	"github.com/lithammer/shortuuid/v3"
@@ -59,7 +59,8 @@ func (q *QR) createCodeImage(code string) (image.Image, error) {
 	dc.SetLineWidth(1)
 	dc.DrawRectangle(0, 0, float64(bounds.Dx()), float64(bounds.Dy()))
 	dc.Stroke()
-	url := path.Join(q.baseUrl, "l", code)
+	base := strings.TrimSuffix(q.baseUrl, "/")
+	url := fmt.Sprintf("%s/l/%s", base, code)
 	qrCode, err := qrcode.New(url, qrcode.Highest)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate QR code: %w", err)
