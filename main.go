@@ -76,6 +76,8 @@ func main() {
 		switch subcmd {
 		case "qr":
 			cmd = command.NewQR()
+		case "user":
+			cmd = command.NewUser(dbInstance)
 		default:
 			logrus.Errorf("Unknown command %#v", subcmd)
 			os.Exit(1)
