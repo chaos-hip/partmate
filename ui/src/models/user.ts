@@ -1,5 +1,6 @@
 interface JwtPayload {
     sub?: string;
+    exp?: number;
 }
 
 /**
@@ -19,14 +20,19 @@ function decodeJWTPayload(jwt: string): JwtPayload {
 }
 
 export class User {
-    #name: string;
+    name: string;
+    expires: number;
 
     constructor(jwt: string) {
         const payload = decodeJWTPayload(jwt);
-        this.#name = payload.sub || '';
+        this.name = payload.sub || '';
+        this.expires = payload.exp || 0;
+        console.dir(this);
     }
 
-    public get name() {
-        return this.#name;
+    public get valid(): boolean {
+        const dt = new Date();
+        return dt.getTime() < (this.expires * 1000);
     }
+
 }

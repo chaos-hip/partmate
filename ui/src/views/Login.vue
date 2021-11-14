@@ -48,7 +48,23 @@
 
 <script lang="ts">
 import { ref, defineComponent } from 'vue';
-import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonCard, IonCardContent, IonButton, IonItem, IonLabel, IonInput } from '@ionic/vue';
+import {
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonMenuButton,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+  IonCard,
+  IonCardContent,
+  IonButton,
+  IonItem,
+  IonLabel,
+  IonInput,
+  toastController,
+} from '@ionic/vue';
+import { login } from '../api';
 
 export default defineComponent({
   name: 'Folder',
@@ -68,10 +84,16 @@ export default defineComponent({
     IonInput,
   },
   methods: {
-    doLogin() {
+    async doLogin() {
       if (this.username !== '' && this.password !== '') {
-        // ToDo: Implement the login function
-        console.log('IMPLEMENT ME!!!');
+        try {
+          await login(this.username, this.password);
+        } catch (err) {
+          this.showError('Login fehlgeschlagen', (err as Error).message);
+          return;
+        }
+        this.password = '';
+        this.$router.push('/');
       }
     },
     onUserKeyUp(ev: KeyboardEvent) {
@@ -87,14 +109,32 @@ export default defineComponent({
       if (ev.key == 'Enter' && this.password !== '' && this.username !== '') {
         this.doLogin();
       }
-    }
+    },
+    async showError(title: string, message: string) {
+      const toast = await toastController.create({
+        header: title,
+        message: message,
+        position: 'middle',
+        color: 'danger',
+        buttons: [
+          {
+            text: 'OK',
+          }
+        ]
+      });
+      await toast.present();
+    },
   },
   setup() {
     const username = ref("");
     const password = ref("");
+    const errorTitle = ref("");
+    const errorMessage = ref("");
     return {
       username,
       password,
+      errorTitle,
+      errorMessage,
     };
   }
 });
