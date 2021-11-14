@@ -5,12 +5,27 @@ import store from '../store';
 const routes: Array<RouteRecordRaw> = [
   {
     path: '',
-    redirect: '/example/Suche'
+    redirect: '/search'
   },
   {
     name: 'Login',
     path: '/login',
     component: () => import('../views/Login.vue')
+  },
+  {
+    name: 'Search',
+    path: '/search',
+    component: () => import('../views/Search.vue')
+  },
+  {
+    name: 'PartViewer',
+    path: '/part/:id',
+    component: () => import('../views/Search.vue')
+  },
+  {
+    name: 'StorageViewer',
+    path: '/storage/:id',
+    component: () => import('../views/Search.vue')
   },
   {
     path: '/example/:id',
@@ -24,10 +39,10 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.name !== 'Login' && !store.state.user) {
+  if (to.name !== 'Login' && (!store.state.user || !store.state.user.valid)) {
     next('/login');
     return;
-  } else if (to.name === 'Login' && store.state.user) {
+  } else if (to.name === 'Login' && store.state.user && store.state.user.valid) {
     next('/');
     return;
   }
