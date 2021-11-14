@@ -3,7 +3,7 @@
     <IonSplitPane content-id="main-content">
       <ion-menu content-id="main-content" type="overlay">
         <ion-content>
-          <ion-list id="inbox-list">
+          <ion-list id="menu-list">
             <ion-list-header>{{ t("menu.title") }}</ion-list-header>
             <ion-note>{{ userName }}</ion-note>
 
@@ -125,7 +125,6 @@ export default defineComponent({
         mdIcon: cameraSharp
       }
     ];
-    const labels = ['Foo', 'Bar', 'Baz', 'Zoink', 'Floengel', 'Hurz'];
 
     const path = window.location.pathname.split('example/')[1];
     if (path !== undefined) {
@@ -137,7 +136,6 @@ export default defineComponent({
     return {
       selectedIndex,
       appPages,
-      labels,
       searchOutline,
       searchSharp,
       cameraOutline,
@@ -197,11 +195,11 @@ ion-menu.md ion-note {
   padding-left: 10px;
 }
 
-ion-menu.md ion-list#inbox-list {
+ion-menu.md ion-list#menu-list {
   border-bottom: 1px solid var(--ion-color-step-150, #d7d8da);
 }
 
-ion-menu.md ion-list#inbox-list ion-list-header {
+ion-menu.md ion-list#menu-list ion-list-header {
   font-size: 22px;
   font-weight: 600;
 

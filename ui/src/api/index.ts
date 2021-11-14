@@ -1,3 +1,4 @@
+import { Part } from '@/models/part';
 import store from '../store';
 
 interface LoginResponse {
@@ -34,6 +35,15 @@ async function makeApiError(res: Response): Promise<ApiError> {
     return new ApiError(obj, res);
 }
 
+/**
+ * Logs in the user with the given credentials.
+ * Will throw an error if something goes wrong.
+ *
+ * If successful, the user instance will be reachable through the application's store
+ *
+ * @param username The user name to log in with
+ * @param password The password to log in with
+ */
 export async function login(username: string, password: string) {
     const res = await fetch('/api/login', {
         method: 'POST',
@@ -54,4 +64,19 @@ export async function login(username: string, password: string) {
         throw new Error("No token in server response");
     }
     store.commit('loggedIn', data.token);
+}
+
+/**
+ * Searches for parts matching a given search term
+ *
+ * @param term Search term
+ * @returns A list of parts matching the search term
+ */
+export async function searchParts(term: string): Promise<Array<Part>> {
+    return [new Part({
+        id: "FooBarBaz",
+        name: "Some Name",
+        description: "Some description",
+        comment: "Some comment"
+    })];
 }

@@ -12,30 +12,44 @@
     <ion-content :fullscreen="true">
       <ion-header collapse="condense">
         <ion-toolbar>
-          <ion-title size="large">{{ $route.params.id }}</ion-title>
+          <ion-title size="large">FOO</ion-title>
         </ion-toolbar>
       </ion-header>
-
-      <div id="container">
-        <strong class="capitalize">{{ $route.params.id }}</strong>
-        <p>
-          Explore
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://ionicframework.com/docs/components"
-            >UI Components</a
-          >
-        </p>
-      </div>
+      <ion-list>
+        <ion-item v-for="part in searchResult" :key="part.id">
+          <ion-thumbnail slot="start">
+            <img
+              src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw=="
+            />
+          </ion-thumbnail>
+          <ion-label>
+            {{ part.name }}
+          </ion-label>
+        </ion-item>
+      </ion-list>
     </ion-content>
   </ion-page>
 </template>
 
 <script lang="ts">
-import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
-import { defineComponent } from '@vue/runtime-core';
+import { Part } from '@/models/part';
+import {
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonMenuButton,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+  IonList,
+  IonItem,
+  IonThumbnail,
+  IonLabel,
+  toastController
+} from '@ionic/vue';
+import { defineComponent, ref } from '@vue/runtime-core';
 import { useI18n } from 'vue-i18n';
+import { searchParts } from '../api';
 
 export default defineComponent({
   name: 'Folder',
@@ -46,7 +60,37 @@ export default defineComponent({
     IonMenuButton,
     IonPage,
     IonTitle,
-    IonToolbar
+    IonToolbar,
+    IonList,
+    IonItem,
+    IonThumbnail,
+    IonLabel,
+  },
+  methods: {
+    async doSearch() {
+      try {
+        this.searchResult = await searchParts("");
+      } catch (err) {
+        this.showError(this.t('err.search'), this.t((err as Error).message));
+      }
+    },
+    async showError(title: string, message: string) {
+      const toast = await toastController.create({
+        header: title,
+        message: message,
+        position: 'middle',
+        color: 'danger',
+        buttons: [
+          {
+            text: this.t('btn.dismiss'),
+          }
+        ]
+      });
+      await toast.present();
+    },
+  },
+  mounted() {
+    this.doSearch();
   },
   setup() {
     const { t } = useI18n({
@@ -54,9 +98,12 @@ export default defineComponent({
       useScope: 'local'
     })
 
-    // Something todo ..
+    const searchResult = ref(([] as Part[]));
 
-    return { t }
+    return {
+      t,
+      searchResult,
+    }
   }
 });
 </script>

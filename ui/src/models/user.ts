@@ -27,7 +27,6 @@ export class User {
         const payload = decodeJWTPayload(jwt);
         this.name = payload.sub || '';
         this.expires = payload.exp || 0;
-        console.dir(this);
     }
 
     public get valid(): boolean {
