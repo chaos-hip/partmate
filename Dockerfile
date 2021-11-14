@@ -20,7 +20,8 @@ RUN go build
 FROM node:latest AS nodeBuilder
 COPY ./ui /src
 WORKDIR /src
-RUN npm ci && \
+RUN export NODE_OPTIONS=--openssl-legacy-provider && \
+    npm ci && \
     npm run build
 
 # The real image
