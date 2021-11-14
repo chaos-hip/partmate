@@ -5,7 +5,7 @@
         <ion-buttons slot="start">
           <ion-menu-button color="primary"></ion-menu-button>
         </ion-buttons>
-        <ion-title>{{ $t("search.title") }}</ion-title>
+        <ion-title>{{ t("title") }}</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -34,8 +34,10 @@
 
 <script lang="ts">
 import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import { defineComponent } from '@vue/runtime-core';
+import { useI18n } from 'vue-i18n';
 
-export default {
+export default defineComponent({
   name: 'Folder',
   components: {
     IonButtons,
@@ -45,9 +47,26 @@ export default {
     IonPage,
     IonTitle,
     IonToolbar
+  },
+  setup() {
+    const { t } = useI18n({
+      inheritLocale: true,
+      useScope: 'local'
+    })
+
+    // Something todo ..
+
+    return { t }
   }
-}
+});
 </script>
+
+<i18n locale="de" lang="yaml">
+  title: 'Suche'
+</i18n>
+<i18n locale="en" lang="yaml">
+  title: 'Search'
+</i18n>
 
 <style scoped>
 #container {

@@ -5,7 +5,7 @@
         <ion-buttons slot="start">
           <ion-menu-button color="primary"></ion-menu-button>
         </ion-buttons>
-        <ion-title>PartMATE | Login</ion-title>
+        <ion-title>{{ t("title") }}</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
@@ -13,7 +13,7 @@
         <ion-card-content>
           <form @submit.prevent="doLogin" ref="loginForm">
             <ion-item>
-              <ion-label position="fixed">Benutzer</ion-label>
+              <ion-label position="fixed">{{ t("label.user") }}</ion-label>
               <ion-input
                 autofocus
                 clear-input
@@ -23,7 +23,7 @@
               ></ion-input>
             </ion-item>
             <ion-item>
-              <ion-label position="fixed">Passwort</ion-label>
+              <ion-label position="fixed">{{ t("label.password") }}</ion-label>
               <ion-input
                 id="iptPassword"
                 clear-input
@@ -35,9 +35,9 @@
               ></ion-input>
             </ion-item>
             <ion-item>
-              <ion-button slot="end" color="primary" @click="doLogin"
-                >Login</ion-button
-              >
+              <ion-button slot="end" color="primary" @click="doLogin">{{
+                t("btn.login")
+              }}</ion-button>
             </ion-item>
           </form>
         </ion-card-content>
@@ -65,6 +65,7 @@ import {
   toastController,
 } from '@ionic/vue';
 import { login } from '../api';
+import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
   name: 'Folder',
@@ -89,7 +90,7 @@ export default defineComponent({
         try {
           await login(this.username, this.password);
         } catch (err) {
-          this.showError('Login fehlgeschlagen', (err as Error).message);
+          this.showError(this.t('err.loginFailed'), this.t(`err.` + (err as Error).message));
           return;
         }
         this.password = '';
@@ -118,7 +119,7 @@ export default defineComponent({
         color: 'danger',
         buttons: [
           {
-            text: 'OK',
+            text: this.t('btn.dismiss'),
           }
         ]
       });
@@ -130,15 +131,47 @@ export default defineComponent({
     const password = ref("");
     const errorTitle = ref("");
     const errorMessage = ref("");
+    const { t } = useI18n({
+      inheritLocale: true,
+      useScope: 'local'
+    })
     return {
       username,
       password,
       errorTitle,
       errorMessage,
+      t,
     };
   }
 });
 </script>
+
+<i18n locale="de" lang="yaml">
+  title: 'PartMATE - Login'
+  btn:
+    dismiss: Verwerfen
+    login: Einloggen
+  label:
+    user: Benutzer
+    password: Kennwort
+  err:
+    loginFailed: 'Login fehlgeschlagen'
+    'User does not exist': 'Der Benutzername existiert nicht'
+    'Wrong password': 'Falsches Kennwort.'
+</i18n>
+<i18n locale="en" lang="yaml">
+  title: 'PartMATE - Login'
+  btn:
+    dismiss: Dismiss
+    login: Login
+  label:
+    user: User
+    password: Password
+  err:
+    loginFailed: 'Login failed'
+    'User does not exist': 'The user with the given name does not exist'
+    'Wrong password': 'Wrong password.'
+</i18n>
 
 <style scoped>
 </style>

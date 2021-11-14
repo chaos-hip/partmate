@@ -4,7 +4,7 @@
       <ion-menu content-id="main-content" type="overlay">
         <ion-content>
           <ion-list id="inbox-list">
-            <ion-list-header>PartMATE</ion-list-header>
+            <ion-list-header>{{ t("menu.title") }}</ion-list-header>
             <ion-note>{{ userName }}</ion-note>
 
             <ion-menu-toggle
@@ -44,7 +44,7 @@
                   :ios="logInOutline"
                   :md="logInSharp"
                 ></ion-icon>
-                <ion-label>Login</ion-label>
+                <ion-label>{{ t("menu.login") }}</ion-label>
               </ion-item>
             </ion-menu-toggle>
           </ion-list>
@@ -61,7 +61,7 @@
                 :ios="logOutOutline"
                 :md="logOutSharp"
               ></ion-icon>
-              <ion-label>Logout</ion-label>
+              <ion-label>{{ t("menu.logout") }}</ion-label>
             </ion-item>
           </ion-list>
         </ion-content>
@@ -76,6 +76,7 @@ import { IonApp, IonContent, IonIcon, IonItem, IonLabel, IonList, IonListHeader,
 import { defineComponent, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { searchOutline, searchSharp, cameraOutline, cameraSharp, codeSlashOutline, codeSlashSharp, logInOutline, logInSharp, logOutOutline, logOutSharp } from 'ionicons/icons';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
   name: 'App',
@@ -105,16 +106,20 @@ export default defineComponent({
     }
   },
   setup() {
+    const { t } = useI18n({
+      inheritLocale: true,
+      useScope: 'local'
+    })
     const selectedIndex = ref(0);
     const appPages = [
       {
-        title: 'Suche',
-        url: '/example/Suche',
+        title: t('menu.search'),
+        url: '/search',
         iosIcon: searchOutline,
         mdIcon: searchSharp
       },
       {
-        title: 'Scannen',
+        title: t('menu.scan'),
         url: '/example/Scan',
         iosIcon: cameraOutline,
         mdIcon: cameraSharp
@@ -143,11 +148,29 @@ export default defineComponent({
       logInSharp,
       logOutOutline,
       logOutSharp,
+      t,
       isSelected: (url: string) => url === route.path ? 'selected' : ''
     }
   }
 });
 </script>
+
+<i18n locale="de" lang="yaml">
+  menu:
+    title: 'PartMATE'
+    login: 'Einloggen'
+    logout: 'Ausloggen'
+    search: 'Suche'
+    scan: 'Scannen'
+</i18n>
+<i18n locale="en" lang="yaml">
+  menu:
+    title: 'PartMATE'
+    login: 'Login'
+    logout: 'Logout'
+    search: 'Search'
+    scan: 'Scan'
+</i18n>
 
 <style scoped>
 ion-menu ion-content {
