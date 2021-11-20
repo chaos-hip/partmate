@@ -16,6 +16,8 @@ type Part struct {
 	Status        string         `db:"status"`
 	NeedsReview   bool           `db:"needsReview"`
 	LowStock      bool           `db:"lowStock"`
+	ImageID       sql.NullInt64  `db:"image_id"`   // Internal ID of the attachment used as image for this part
+	ImageLink     sql.NullString `db:"image_link"` // Link pointing to the image used for this part
 }
 
 // ToDTO converts the part into its DTO counterpart
@@ -24,7 +26,6 @@ func (p *Part) ToDTO() PartDTO {
 		Name:          p.Name,
 		Description:   p.Description,
 		Comment:       p.Comment,
-		CategoryID:    p.CategoryID,
 		Condition:     p.Condition,
 		StockLevel:    p.StockLevel,
 		MinStockLevel: p.MinStockLevel,
@@ -35,6 +36,9 @@ func (p *Part) ToDTO() PartDTO {
 	if p.Link.Valid {
 		out.Link = p.Link.String
 	}
+	if p.ImageLink.Valid {
+		out.ImageLink = p.ImageLink.String
+	}
 	return out
 }
 
@@ -44,11 +48,11 @@ type PartDTO struct {
 	Name          string `json:"name"`
 	Description   string `json:"description"`
 	Comment       string `json:"comment"`
-	CategoryID    int    `json:"categoryId"`
 	Condition     string `json:"condition"`
 	StockLevel    int    `json:"stockLevel"`
 	MinStockLevel int    `json:"minStockLevel"`
 	Status        string `json:"status"`
 	NeedsReview   bool   `json:"needsReview"`
 	LowStock      bool   `json:"lowStock"`
+	ImageLink     string `json:"image"` // The link (external ID) of the "cover image" for this part
 }
