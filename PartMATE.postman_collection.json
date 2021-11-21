@@ -93,7 +93,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"term\": \"TFT\"\n}",
+							"raw": "{\n    \"term\": \"lcd\",\n    \"limit\": 10,\n    \"offset\": 0\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -366,6 +366,50 @@
 									"key": "id",
 									"value": "aaaaaaaaa",
 									"description": "ID of the link to be deleted"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Attachments",
+			"item": [
+				{
+					"name": "Get thumbnail for attachment",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/attachments/:id/thumb",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"attachments",
+								":id",
+								"thumb"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "Q2QfDFAMjbtwEKwwiyyKSB",
+									"description": "ID (Link) for the attachment"
 								}
 							]
 						}
