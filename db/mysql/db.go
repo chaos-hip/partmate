@@ -18,6 +18,9 @@ import (
 )
 
 const (
+	defaultPageSize = 10
+	maximumPageSize = 100
+
 	migrationTableName = "mate_migrations"
 
 	userFields    = "name, password_hash, permissions"
@@ -70,7 +73,9 @@ var (
 		parts.name LIKE ? OR
 		parts.description LIKE ?
 	ORDER BY
-		parts.name`,
+		parts.name
+	LIMIT ?
+	OFFSET ?`,
 		partTableName,
 		linkTableName,
 		linkTableName,
@@ -96,10 +101,36 @@ var (
 		linkTableName,
 		linkTableName,
 	)
+
+	queryGetAttachmentByLink = fmt.Sprintf(`SELECT
+		attachments.id AS id,
+		attachments.part_id AS part_id,
+		attachments.type AS type,
+		attachments.filename AS filename,
+		attachments.originalname AS originalname,
+		attachments.mimetype AS mimetype,
+		attachments.size AS size,
+		attachments.extension AS extension,
+		attachments.description AS description,
+		attachments.isImage AS isImage
+	FROM
+		%s AS links
+	LEFT OUTER JOIN
+		%s AS attachments
+	ON
+		attachments.id = links.partAttachmentID
+	WHERE
+		links.link = ?
+	AND
+		attachments.id IS NOT NULL`,
+		linkTableName,
+		partAttachmentTableName,
+	)
 )
 
 type DB struct {
-	db *sqlx.DB
+	db      *sqlx.DB
+	dataDir string
 }
 
 // getStorageLocationsByIDs returns the locations matching the IDs given
@@ -144,8 +175,17 @@ func (d *DB) GetPartByLink(id string) (*models.Part, error) {
 func (d *DB) SearchParts(search models.Search) ([]models.Part, error) {
 	res := []*models.Part{}
 	term := fmt.Sprintf("%%%s%%", search.Term)
-	if err := d.db.Select(&res, querySearchPart, term, term); err != nil {
+	if search.Limit > maximumPageSize {
+		search.Limit = maximumPageSize
+	}
+	if search.Limit == 0 {
+		search.Limit = defaultPageSize
+	}
+	if err := d.db.Select(&res, querySearchPart, term, term, search.Limit, search.Offset); err != nil {
 		return nil, fmt.Errorf("failed to search parts: %w", err)
+	}
+	if len(res) == 0 {
+		return []models.Part{}, nil
 	}
 	storageMap := map[int][]*models.Part{}
 	// Create links for all the parts that have none - and images that have none
@@ -305,20 +345,28 @@ func (d *DB) CreateLink(link models.Link) (*models.Link, error) {
 	return &link, nil
 }
 
-func (d *DB) CreatePartAttachmentEntry(partID, filename, mimeType string) (*models.Attachment, error) {
-	return nil, fmt.Errorf("not implemented \u200d")
+func (d *DB) CreatePartAttachmentEntry(partID, filename, mimeType string) (*models.PartAttachment, error) {
+	return nil, fmt.Errorf("not implemented")
 }
 
-func (d *DB) GetAttachmentEntry(id string) (*models.Attachment, error) {
-	return nil, fmt.Errorf("not implemented \u200d")
+func (d *DB) GetAttachmentEntry(id string) (*models.PartAttachment, error) {
+	var res models.PartAttachment
+	if err := d.db.Get(&res, queryGetAttachmentByLink, id); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to retrieve attachment by ID: %w", err)
+	}
+	res.BaseDir = d.dataDir
+	return &res, nil
 }
 
 func (d *DB) AddPartStock(id, price, comment string, amount uint) error {
-	return fmt.Errorf("not implemented \u200d")
+	return fmt.Errorf("not implemented")
 }
 
 func (d *DB) RemovePartStock(id, comment string, amount uint) error {
-	return fmt.Errorf("not implemented \u200d")
+	return fmt.Errorf("not implemented")
 }
 
 func (d *DB) Close() {
@@ -353,7 +401,7 @@ func Migrate(db *sql.DB, source string) error {
 	return nil
 }
 
-func NewDB(host, port, username, password, dbName, migrationSource string) (db.DB, error) {
+func NewDB(host, port, username, password, dbName, migrationSource, dataDir string) (db.DB, error) {
 
 	host = template.URLQueryEscaper(host)
 	port = template.URLQueryEscaper(port)
@@ -377,11 +425,12 @@ func NewDB(host, port, username, password, dbName, migrationSource string) (db.D
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	return NewDBWithConnection(sqlxDB), nil
+	return NewDBWithConnection(sqlxDB, dataDir), nil
 }
 
-func NewDBWithConnection(conn *sqlx.DB) db.DB {
+func NewDBWithConnection(conn *sqlx.DB, dataDir string) db.DB {
 	return &DB{
-		db: conn,
+		db:      conn,
+		dataDir: dataDir,
 	}
 }

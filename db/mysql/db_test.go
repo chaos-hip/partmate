@@ -19,12 +19,12 @@ const (
 
 func TestDBConnect(t *testing.T) {
 	Convey("connecting to a database", t, func() {
-		db, err := mysql.NewDB("127.0.0.1", "3306", "partmate", "partmate", "partmate", migrationSource)
+		db, err := mysql.NewDB("127.0.0.1", "3306", "partmate", "partmate", "partmate", migrationSource, "./")
 		So(err, ShouldBeNil)
 		So(db, ShouldNotBeNil)
 
 		Convey("connecting with wrong credentials should fail", func() {
-			db, err := mysql.NewDB("127.0.0.1", "3306", "partfiend", "partmate", "partmate", migrationSource)
+			db, err := mysql.NewDB("127.0.0.1", "3306", "partfiend", "partmate", "partmate", migrationSource, "./")
 			So(err, ShouldNotBeNil)
 			So(db, ShouldBeNil)
 		})
@@ -79,7 +79,7 @@ func connectToDb() (db.DB, *sqlx.DB, error) {
 		return nil, nil, err
 	}
 
-	foo := mysql.NewDBWithConnection(sqlxDB)
+	foo := mysql.NewDBWithConnection(sqlxDB, "./")
 	return foo, sqlxDB, nil
 }
 

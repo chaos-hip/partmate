@@ -42,8 +42,8 @@ type DB interface {
 
 	//-- Attachments 📎 --------------------------------------
 
-	CreatePartAttachmentEntry(partID, filename, mimeType string) (*models.Attachment, error)
-	GetAttachmentEntry(id string) (*models.Attachment, error)
+	CreatePartAttachmentEntry(partID, filename, mimeType string) (*models.PartAttachment, error)
+	GetAttachmentEntry(id string) (*models.PartAttachment, error)
 
 	//-- Stock 📈📉 -------------------------------------------
 

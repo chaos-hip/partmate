@@ -40,7 +40,7 @@ type MockDB struct {
 		result1 *models.Link
 		result2 error
 	}
-	CreatePartAttachmentEntryStub        func(string, string, string) (*models.Attachment, error)
+	CreatePartAttachmentEntryStub        func(string, string, string) (*models.PartAttachment, error)
 	createPartAttachmentEntryMutex       sync.RWMutex
 	createPartAttachmentEntryArgsForCall []struct {
 		arg1 string
@@ -48,11 +48,11 @@ type MockDB struct {
 		arg3 string
 	}
 	createPartAttachmentEntryReturns struct {
-		result1 *models.Attachment
+		result1 *models.PartAttachment
 		result2 error
 	}
 	createPartAttachmentEntryReturnsOnCall map[int]struct {
-		result1 *models.Attachment
+		result1 *models.PartAttachment
 		result2 error
 	}
 	CreateUserStub        func(models.User) error
@@ -77,17 +77,17 @@ type MockDB struct {
 	deleteLinkByIDReturnsOnCall map[int]struct {
 		result1 error
 	}
-	GetAttachmentEntryStub        func(string) (*models.Attachment, error)
+	GetAttachmentEntryStub        func(string) (*models.PartAttachment, error)
 	getAttachmentEntryMutex       sync.RWMutex
 	getAttachmentEntryArgsForCall []struct {
 		arg1 string
 	}
 	getAttachmentEntryReturns struct {
-		result1 *models.Attachment
+		result1 *models.PartAttachment
 		result2 error
 	}
 	getAttachmentEntryReturnsOnCall map[int]struct {
-		result1 *models.Attachment
+		result1 *models.PartAttachment
 		result2 error
 	}
 	GetLinkByIDStub        func(string) (*models.Link, error)
@@ -311,7 +311,7 @@ func (fake *MockDB) CreateLinkReturnsOnCall(i int, result1 *models.Link, result2
 	}{result1, result2}
 }
 
-func (fake *MockDB) CreatePartAttachmentEntry(arg1 string, arg2 string, arg3 string) (*models.Attachment, error) {
+func (fake *MockDB) CreatePartAttachmentEntry(arg1 string, arg2 string, arg3 string) (*models.PartAttachment, error) {
 	fake.createPartAttachmentEntryMutex.Lock()
 	ret, specificReturn := fake.createPartAttachmentEntryReturnsOnCall[len(fake.createPartAttachmentEntryArgsForCall)]
 	fake.createPartAttachmentEntryArgsForCall = append(fake.createPartAttachmentEntryArgsForCall, struct {
@@ -338,7 +338,7 @@ func (fake *MockDB) CreatePartAttachmentEntryCallCount() int {
 	return len(fake.createPartAttachmentEntryArgsForCall)
 }
 
-func (fake *MockDB) CreatePartAttachmentEntryCalls(stub func(string, string, string) (*models.Attachment, error)) {
+func (fake *MockDB) CreatePartAttachmentEntryCalls(stub func(string, string, string) (*models.PartAttachment, error)) {
 	fake.createPartAttachmentEntryMutex.Lock()
 	defer fake.createPartAttachmentEntryMutex.Unlock()
 	fake.CreatePartAttachmentEntryStub = stub
@@ -351,28 +351,28 @@ func (fake *MockDB) CreatePartAttachmentEntryArgsForCall(i int) (string, string,
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *MockDB) CreatePartAttachmentEntryReturns(result1 *models.Attachment, result2 error) {
+func (fake *MockDB) CreatePartAttachmentEntryReturns(result1 *models.PartAttachment, result2 error) {
 	fake.createPartAttachmentEntryMutex.Lock()
 	defer fake.createPartAttachmentEntryMutex.Unlock()
 	fake.CreatePartAttachmentEntryStub = nil
 	fake.createPartAttachmentEntryReturns = struct {
-		result1 *models.Attachment
+		result1 *models.PartAttachment
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *MockDB) CreatePartAttachmentEntryReturnsOnCall(i int, result1 *models.Attachment, result2 error) {
+func (fake *MockDB) CreatePartAttachmentEntryReturnsOnCall(i int, result1 *models.PartAttachment, result2 error) {
 	fake.createPartAttachmentEntryMutex.Lock()
 	defer fake.createPartAttachmentEntryMutex.Unlock()
 	fake.CreatePartAttachmentEntryStub = nil
 	if fake.createPartAttachmentEntryReturnsOnCall == nil {
 		fake.createPartAttachmentEntryReturnsOnCall = make(map[int]struct {
-			result1 *models.Attachment
+			result1 *models.PartAttachment
 			result2 error
 		})
 	}
 	fake.createPartAttachmentEntryReturnsOnCall[i] = struct {
-		result1 *models.Attachment
+		result1 *models.PartAttachment
 		result2 error
 	}{result1, result2}
 }
@@ -499,7 +499,7 @@ func (fake *MockDB) DeleteLinkByIDReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *MockDB) GetAttachmentEntry(arg1 string) (*models.Attachment, error) {
+func (fake *MockDB) GetAttachmentEntry(arg1 string) (*models.PartAttachment, error) {
 	fake.getAttachmentEntryMutex.Lock()
 	ret, specificReturn := fake.getAttachmentEntryReturnsOnCall[len(fake.getAttachmentEntryArgsForCall)]
 	fake.getAttachmentEntryArgsForCall = append(fake.getAttachmentEntryArgsForCall, struct {
@@ -524,7 +524,7 @@ func (fake *MockDB) GetAttachmentEntryCallCount() int {
 	return len(fake.getAttachmentEntryArgsForCall)
 }
 
-func (fake *MockDB) GetAttachmentEntryCalls(stub func(string) (*models.Attachment, error)) {
+func (fake *MockDB) GetAttachmentEntryCalls(stub func(string) (*models.PartAttachment, error)) {
 	fake.getAttachmentEntryMutex.Lock()
 	defer fake.getAttachmentEntryMutex.Unlock()
 	fake.GetAttachmentEntryStub = stub
@@ -537,28 +537,28 @@ func (fake *MockDB) GetAttachmentEntryArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *MockDB) GetAttachmentEntryReturns(result1 *models.Attachment, result2 error) {
+func (fake *MockDB) GetAttachmentEntryReturns(result1 *models.PartAttachment, result2 error) {
 	fake.getAttachmentEntryMutex.Lock()
 	defer fake.getAttachmentEntryMutex.Unlock()
 	fake.GetAttachmentEntryStub = nil
 	fake.getAttachmentEntryReturns = struct {
-		result1 *models.Attachment
+		result1 *models.PartAttachment
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *MockDB) GetAttachmentEntryReturnsOnCall(i int, result1 *models.Attachment, result2 error) {
+func (fake *MockDB) GetAttachmentEntryReturnsOnCall(i int, result1 *models.PartAttachment, result2 error) {
 	fake.getAttachmentEntryMutex.Lock()
 	defer fake.getAttachmentEntryMutex.Unlock()
 	fake.GetAttachmentEntryStub = nil
 	if fake.getAttachmentEntryReturnsOnCall == nil {
 		fake.getAttachmentEntryReturnsOnCall = make(map[int]struct {
-			result1 *models.Attachment
+			result1 *models.PartAttachment
 			result2 error
 		})
 	}
 	fake.getAttachmentEntryReturnsOnCall[i] = struct {
-		result1 *models.Attachment
+		result1 *models.PartAttachment
 		result2 error
 	}{result1, result2}
 }

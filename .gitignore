@@ -34,3 +34,6 @@ pnpm-debug.log*
 
 config.toml
 qr.png
+
+# PartKeepr data directory
+data/

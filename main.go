@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/rand"
 	"crypto/rsa"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -70,6 +71,10 @@ func main() {
 		logrus.WithError(err).Fatal("Failed to initialize database connection")
 	}
 
+	if err := initDirectories(conf); err != nil {
+		logrus.WithError(err).Fatal("Failed to initialize directory structure for local files")
+	}
+
 	if len(os.Args) > 1 {
 		subcmd := os.Args[1]
 		var cmd command.Command
@@ -111,6 +116,20 @@ func main() {
 
 	router := initRouting(dbInstance, privateKey, conf)
 	router.Run(conf.GetString("listen"))
+}
+
+func initDirectories(conf *viper.Viper) error {
+	baseDir := conf.GetString(confKeyDataDir)
+	dirs := []string{
+		filepath.Join(baseDir, "thumb", "PartAttachment"),
+		filepath.Join(baseDir, "thumb", "storagelocation"),
+	}
+	for _, dir := range dirs {
+		if err := os.MkdirAll(dir, 0777); err != nil {
+			return fmt.Errorf("failed to create directory %#v: %w", dir, err)
+		}
+	}
+	return nil
 }
 
 func initLogger(conf *viper.Viper) error {
@@ -179,6 +198,8 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 		apiRouter.GET("/manufacturers", handleTeaPottJeeey)     // Get a list of manufacturers
 		apiRouter.GET("/distributors", handleTeaPottJeeey)      // Get list of distributors
 		apiRouter.GET("/storage-locations", handleTeaPottJeeey) // Get list of available storage locations
+		// Attachments and images
+		apiRouter.GET("/attachments/:id/thumb", routes.MakeGetThumbnailImageHandler(dbInstance)) // Get thumbnail for attachment
 	}
 	return router
 }
@@ -227,6 +248,7 @@ func initDB(conf *viper.Viper) (db.DB, error) {
 		conf.GetString(confKeyDBPass),
 		conf.GetString(confKeyDBName),
 		"file://dbmigrations",
+		conf.GetString(confKeyDataDir),
 	)
 }
 
