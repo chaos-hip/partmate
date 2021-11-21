@@ -37,7 +37,7 @@ var (
 	LEFT OUTER JOIN
 		%s AS attachments
 	ON
-		attachments.part_id = (SELECT id FROM %s AS a2 WHERE a2.part_id = parts.id AND a2.mimetype IN ('image/jpeg', 'image/png') ORDER BY a2.created ASC LIMIT 1)
+		attachments.id = (SELECT id FROM %s AS a2 WHERE a2.part_id = parts.id AND a2.mimetype IN ('image/jpeg', 'image/png') ORDER BY a2.created ASC LIMIT 1)
 	LEFT OUTER JOIN
 		%s AS att_links
 	ON

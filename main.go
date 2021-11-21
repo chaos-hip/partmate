@@ -175,6 +175,9 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 	// Static files
 	router.Static("/ui", "public")
 
+	// Unsecured attachment downloads
+	router.GET("/api/attachments/:id/thumb", routes.MakeGetThumbnailImageHandler(dbInstance)) // Get thumbnail for attachment
+
 	apiRouter := router.Group("/api")
 	{
 		apiRouter.Use(auth.MakeAuthMiddleware(dbInstance, &privateKey.PublicKey))
@@ -199,7 +202,7 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 		apiRouter.GET("/distributors", handleTeaPottJeeey)      // Get list of distributors
 		apiRouter.GET("/storage-locations", handleTeaPottJeeey) // Get list of available storage locations
 		// Attachments and images
-		apiRouter.GET("/attachments/:id/thumb", routes.MakeGetThumbnailImageHandler(dbInstance)) // Get thumbnail for attachment
+
 	}
 	return router
 }

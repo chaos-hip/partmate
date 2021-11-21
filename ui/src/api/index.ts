@@ -1,4 +1,4 @@
-import { Part } from '@/models/part';
+import { Part, PartObj } from '@/models/part';
 import store from '../store';
 
 interface LoginResponse {
@@ -66,17 +66,46 @@ export async function login(username: string, password: string) {
     store.commit('loggedIn', data.token);
 }
 
+interface SearchPayload {
+    term?: string;
+    offset: number;
+    limit: number;
+}
+
+function prepareRequestHeaders(): HeadersInit {
+    const out = new Headers({
+        'Content-Type': 'application/json',
+    });
+    if (store.state.jwt) {
+        out.set('Authorization', `Bearer ${store.state.jwt}`);
+    }
+    return out;
+}
+
 /**
  * Searches for parts matching a given search term
  *
  * @param term Search term
  * @returns A list of parts matching the search term
  */
-export async function searchParts(term: string): Promise<Array<Part>> {
-    return [new Part({
-        id: "FooBarBaz",
-        name: "Some Name",
-        description: "Some description",
-        comment: "Some comment"
-    })];
+export async function searchParts(term: string, offset: number, limit: number): Promise<Array<Part>> {
+    const payload: SearchPayload = {
+        term,
+        offset: offset >= 0 ? offset : 0,
+        limit: limit >= 0 ? (limit <= 100 ? limit : 100) : 0,
+    };
+    const res = await fetch(
+        '/api/parts/search',
+        {
+            method: 'POST',
+            headers: prepareRequestHeaders(),
+            body: JSON.stringify(payload),
+        }
+    );
+    if (res.status != 200) {
+        const err = await makeApiError(res);
+        throw err;
+    }
+    const returnedData = (await res.json()) as Array<PartObj>;
+    return returnedData.map(item => new Part(item));
 }

@@ -7,26 +7,64 @@
         </ion-buttons>
         <ion-title>{{ t("title") }}</ion-title>
       </ion-toolbar>
+      <ion-toolbar>
+        <ion-searchbar
+          animated
+          autocomplete="off"
+          :placeholder="t('search.placeholder')"
+          enterkeyhint="send"
+          debounce="500"
+          :value="searchTerm"
+          @ionInput="searchTerm = $event.target.value"
+          @change="doSearch(true)"
+          @ionClear="
+            searchTerm = '';
+            doSearch($event);
+          "
+        ></ion-searchbar>
+      </ion-toolbar>
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">FOO</ion-title>
-        </ion-toolbar>
-      </ion-header>
+      <ion-refresher
+        slot="fixed"
+        @ionRefresh="refresh($event)"
+        id="gallery-refresher"
+      >
+        <ion-refresher-content
+          :pulling-icon="chevronDownCircleOutline"
+          pulling-text="Ziehen zum neu laden..."
+          refreshing-spinner="circles"
+          refreshing-text="Lade..."
+        ></ion-refresher-content>
+      </ion-refresher>
       <ion-list>
         <ion-item v-for="part in searchResult" :key="part.id">
           <ion-thumbnail slot="start">
-            <img
-              src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw=="
-            />
+            <img :src="part.getThumbnailPath()" />
           </ion-thumbnail>
           <ion-label>
-            {{ part.name }}
+            <h2>{{ part.name }}</h2>
+            <p>{{ part.description }}</p>
+            <ion-badge color="tertiary" class="storage">
+              {{ part.storage.name }}
+            </ion-badge>
           </ion-label>
+          <ion-badge slot="end" :color="part.lowStock ? 'danger' : 'medium'">{{
+            part.stockLevel
+          }}</ion-badge>
         </ion-item>
       </ion-list>
+      <ion-infinite-scroll
+        @ionInfinite="paginate($event)"
+        threshold="100px"
+        :disabled="!stillScrolling"
+      >
+        <ion-infinite-scroll-content
+          loading-spinner="bubbles"
+          :loading-text="t('loading')"
+        ></ion-infinite-scroll-content>
+      </ion-infinite-scroll>
     </ion-content>
   </ion-page>
 </template>
@@ -45,10 +83,17 @@ import {
   IonItem,
   IonThumbnail,
   IonLabel,
-  toastController
+  toastController,
+  IonBadge,
+  IonInfiniteScroll,
+  IonInfiniteScrollContent,
+  IonSearchbar,
+  IonRefresher,
+  IonRefresherContent,
 } from '@ionic/vue';
 import { defineComponent, ref } from '@vue/runtime-core';
 import { useI18n } from 'vue-i18n';
+import { chevronDownCircleOutline } from 'ionicons/icons';
 import { searchParts } from '../api';
 
 export default defineComponent({
@@ -65,14 +110,35 @@ export default defineComponent({
     IonItem,
     IonThumbnail,
     IonLabel,
+    IonBadge,
+    IonInfiniteScroll,
+    IonInfiniteScrollContent,
+    IonSearchbar,
+    IonRefresher,
+    IonRefresherContent,
   },
   methods: {
-    async doSearch() {
+    async doSearch(clear?: boolean) {
+      if (clear) {
+        this.searchResult = [];
+      }
       try {
-        this.searchResult = await searchParts("");
+        const res = await searchParts(this.searchTerm, this.searchResult.length, this.pageSize);
+        this.stillScrolling = res.length > 0;
+        this.searchResult.push(...res);
       } catch (err) {
         this.showError(this.t('err.search'), this.t((err as Error).message));
       }
+    },
+    async paginate(ev: CustomEvent) {
+      await this.doSearch();
+      const target = ev.target as any;
+      target.complete();
+    },
+    async refresh(ev: CustomEvent) {
+      await this.doSearch(true);
+      const target = ev.target as any;
+      target.complete();
     },
     async showError(title: string, message: string) {
       const toast = await toastController.create({
@@ -90,7 +156,7 @@ export default defineComponent({
     },
   },
   mounted() {
-    this.doSearch();
+    this.doSearch(true);
   },
   setup() {
     const { t } = useI18n({
@@ -99,10 +165,17 @@ export default defineComponent({
     })
 
     const searchResult = ref(([] as Part[]));
+    const searchTerm = ref("");
+    const stillScrolling = ref(true);
+    const pageSize = ref(20);
 
     return {
       t,
       searchResult,
+      searchTerm,
+      stillScrolling,
+      pageSize,
+      chevronDownCircleOutline,
     }
   }
 });
@@ -110,9 +183,19 @@ export default defineComponent({
 
 <i18n locale="de" lang="yaml">
   title: 'Suche'
+  loading: 'Lade...'
+  search:
+    placeholder: 'Nach Teilen suchen...'
+    parts: 'Teile'
+    locations: 'Lager'
 </i18n>
 <i18n locale="en" lang="yaml">
   title: 'Search'
+  loading: 'Loading...'
+  search:
+    placeholder: 'Search for parts...'
+    parts: 'Parts'
+    locations: 'Storage'
 </i18n>
 
 <style scoped>
@@ -139,5 +222,11 @@ export default defineComponent({
 
 #container a {
   text-decoration: none;
+}
+
+.storage {
+  background-color: rgba(46, 91, 216, 0.4);
+  font-weight: normal;
+  font-style: italic;
 }
 </style>
