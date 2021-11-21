@@ -47,10 +47,13 @@ type DB interface {
 
 	//-- Stock 📈📉 -------------------------------------------
 
+	// AddPartStock adds one or more instances to the amount of parts present of the selected part type
 	AddPartStock(id, price, comment string, amount uint) error
+	// RemovePartStock removes one or more parts of the selected part type from the inventory
 	RemovePartStock(id, comment string, amount uint) error
 
 	//-- Database 🧨🎢 ----------------------------------------
 
+	// Close closes the database connection
 	Close()
 }
