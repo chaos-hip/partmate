@@ -19,12 +19,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	thumbnailSize = 512
+)
+
 func createThumbnail(att models.PartAttachment) error {
 	originalImage, err := imaging.Open(att.StorageLocation(), imaging.AutoOrientation(true))
 	if err != nil {
 		return fmt.Errorf("failed to load original image: %w", err)
 	}
-	thumbnail := imaging.Fill(originalImage, 256, 256, imaging.Center, imaging.Lanczos)
+	thumbnail := imaging.Fill(originalImage, thumbnailSize, thumbnailSize, imaging.Center, imaging.Lanczos)
 	outFile, err := os.Create(att.ThumbnailLocation())
 	if err != nil {
 		return fmt.Errorf("failed to create thumbnail file: %w", err)
