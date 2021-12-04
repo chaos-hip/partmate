@@ -35,6 +35,7 @@ var (
 	WHERE
 		l1.link = ?
 	ORDER BY
+		l2.auto_generated ASC,
 		l2.link
 	`,
 		linkTableName,

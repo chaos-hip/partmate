@@ -215,7 +215,7 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{baseURL}}/api/parts/:id/link/:linkId",
+							"raw": "{{baseURL}}/api/parts/:id/links/:linkId",
 							"host": [
 								"{{baseURL}}"
 							],
@@ -223,7 +223,7 @@
 								"api",
 								"parts",
 								":id",
-								"link",
+								"links",
 								":linkId"
 							],
 							"variable": [
@@ -319,6 +319,33 @@
 		{
 			"name": "Link management",
 			"item": [
+				{
+					"name": "Get Links for part ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/parts/:id/links",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"parts",
+								":id",
+								"links"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "test",
+									"description": "ID of the part to load (Link)"
+								}
+							]
+						}
+					},
+					"response": []
+				},
 				{
 					"name": "Create link",
 					"request": {
