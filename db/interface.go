@@ -39,6 +39,9 @@ type DB interface {
 	// GetLinkByID returns the link with the given ID
 	// Mainly this is used internally to fetch the DB ID of entities
 	GetLinkByID(id string) (*models.Link, error)
+	// GetLinksByLinkID returns a list of links that have the same target as the given link, denoting all links a specific
+	// item has in the database
+	GetLinksByLinkID(id string) ([]*models.Link, error)
 
 	//-- Attachments 📎 --------------------------------------
 

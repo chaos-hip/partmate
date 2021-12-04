@@ -185,23 +185,46 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 		// Users
 		apiRouter.POST("/user", routes.MakeUserCreateHandler(dbInstance))
 		// Part handling
-		apiRouter.GET("/parts/:id", handleTeaPottJeeey)
-		apiRouter.GET("/parts/:id/qr", handleTeaPottJeeey)
-		apiRouter.POST("/parts/search", routes.MakePartsSearchHandler(dbInstance))
-		apiRouter.POST("/parts/:id/attachments", handleTeaPottJeeey) // manage Attachments of Parts
+		apiRouter.GET("/parts/:id", handleTeaPottJeeey)                                                                  // Get details about a given part
+		apiRouter.GET("/parts/:id/qr", handleTeaPottJeeey)                                                               // Get the QR code for a part
+		apiRouter.POST("/parts/search", routes.MakePartsSearchHandler(dbInstance))                                       // Search for attachments
+		apiRouter.POST("/parts/:id/attachments", handleTeaPottJeeey)                                                     // Add part attachment
+		apiRouter.GET("/parts/:id/attachments" /*routes.MakePartAttachmentListHandler(dbInstance)*/, handleTeaPottJeeey) // List attachments for a part
+
+		// Stock management for parts
+		apiRouter.POST("/parts/:id/stockadd", handleTeaPottJeeey)    // Increase the current stock of a part
+		apiRouter.POST("/parts/:id/stockremove", handleTeaPottJeeey) // Decrease the current stock of a part
+
 		// Link handling
-		apiRouter.POST("/links", routes.MakeLinkCreateHandler(dbInstance))       // create Link
-		apiRouter.DELETE("/links/:id", routes.MakeLinkDeleteHandler(dbInstance)) // delete Link
-		apiRouter.POST("/parts/:id/link/:linkID", routes.MakeLinkCreateByPathHandler(dbInstance))
-		// Inc or Dec Stock count
-		apiRouter.POST("/parts/:id/stockadd", handleTeaPottJeeey)
-		apiRouter.POST("/parts/:id/stockremove", handleTeaPottJeeey)
+		apiRouter.GET("/parts/:id/links", routes.MakeLinkListHandler(dbInstance))                  // List links for a part
+		apiRouter.POST("/links", routes.MakeLinkCreateHandler(dbInstance))                         // create Link
+		apiRouter.DELETE("/links/:id", routes.MakeLinkDeleteHandler(dbInstance))                   // delete Link
+		apiRouter.POST("/parts/:id/links/:linkID", routes.MakeLinkCreateByPathHandler(dbInstance)) // create link for a part
+
+		// Venue management
+		apiRouter.GET("/venues", handleTeaPottJeeey)             // List registered venues
+		apiRouter.POST("/venues", handleTeaPottJeeey)            // Start/Create a venue (or venue template)
+		apiRouter.GET("/venues/:id", handleTeaPottJeeey)         // Get info about a venue
+		apiRouter.POST("/venues/:id/finish", handleTeaPottJeeey) // End a venue
+		apiRouter.DELETE("/venues/:id", handleTeaPottJeeey)      // Delete a venue
+
+		// Managing items on a venue
+		apiRouter.GET("/venues/:id/items", handleTeaPottJeeey)                  // Get list of items taken to the venue
+		apiRouter.GET("/venues/:id/items/:id", handleTeaPottJeeey)              // Get info about an item taken to the venue
+		apiRouter.POST("/venues/:id/items/:id/check-out", handleTeaPottJeeey)   // Check-out an item on a venue (lend to someone)
+		apiRouter.POST("/venues/:id/items/:id/check-in", handleTeaPottJeeey)    // Check-in an item on a venue (returned by someone)
+		apiRouter.POST("/venues/:id/items/:id/inspected", handleTeaPottJeeey)   // Mark an item as inspected (checked when the venue ends)
+		apiRouter.DELETE("/venues/:id/items/:id/inspected", handleTeaPottJeeey) // Remove inspection marker from an item
+
+		// Reporting / Printing
+		apiRouter.POST("/storage-locations/:id/reports/contents", handleTeaPottJeeey) // Create a list with the contents of a storage location
+		apiRouter.POST("/venues/:id/reports/summary", handleTeaPottJeeey)             // Summary about a venue
+
 		// Lists
 		apiRouter.GET("/categories", handleTeaPottJeeey)        // Get a list of all categories
 		apiRouter.GET("/manufacturers", handleTeaPottJeeey)     // Get a list of manufacturers
 		apiRouter.GET("/distributors", handleTeaPottJeeey)      // Get list of distributors
 		apiRouter.GET("/storage-locations", handleTeaPottJeeey) // Get list of available storage locations
-		// Attachments and images
 
 	}
 	return router

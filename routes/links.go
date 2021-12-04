@@ -10,6 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+//-- Helpers -----------------------------------------------------------------------------------------------------------
+
 func doCreateLink(c *gin.Context, dbInstance db.DB, input models.LinkDTO) {
 	if err := input.Validate(); err != nil {
 		c.AbortWithStatusJSON(
@@ -44,6 +46,39 @@ func doCreateLink(c *gin.Context, dbInstance db.DB, input models.LinkDTO) {
 		return
 	}
 	c.JSON(http.StatusOK, outLink.ToDTO())
+}
+
+//-- Handlers ----------------------------------------------------------------------------------------------------------
+
+// MakeLinkListHandler returns a handler function that lists the links belonging to an item that is linkable
+// Linkable items are parts, storage locations and attachments
+func MakeLinkListHandler(dbInstance db.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := strings.TrimSpace(c.Param("id"))
+		if id == "" {
+			c.AbortWithStatusJSON(
+				http.StatusBadRequest,
+				errors.NewResponse(errors.TypeIllegalData, "No link ID passed", nil),
+			)
+			return
+		}
+		links, err := dbInstance.GetLinksByLinkID(id)
+		if err != nil {
+			c.AbortWithStatusJSON(
+				http.StatusInternalServerError,
+				errors.NewResponse(errors.TypeDBError, "Error fetching links", err),
+			)
+			return
+		}
+		out := []models.LinkDTO{}
+		for _, l := range links {
+			// Only part links allowed in the result
+			if l.PartID != nil {
+				out = append(out, l.ToDTO())
+			}
+		}
+		c.JSON(http.StatusOK, out)
+	}
 }
 
 // MakeLinkCreateByPathHandler creates a handler function that does the same as MakeLinkCreateHandler, but with the

@@ -14,6 +14,34 @@ const (
 	linkTableName = "mate_links"
 )
 
+var (
+	queryGetLinksByLinkID = fmt.Sprintf(`SELECT
+		l2.link AS link,
+		l2.partID as partID,
+		l2.partAttachmentID AS partAttachmentID,
+		l2.storageID AS storageID,
+		l2.auto_generated AS auto_generated,
+		l2.createdAt AS createdAt
+	FROM
+		%s l1
+	LEFT OUTER JOIN
+		%s l2
+	ON
+		(l2.partID = l1.partID OR (l2.partID IS NULL AND l1.partID IS NULL))
+	AND
+		(l2.partAttachmentID = l1.partAttachmentID OR (l2.partAttachmentID IS NULL AND l1.partAttachmentID IS NULL))
+	AND
+		(l2.storageID = l1.storageID OR (l2.storageID IS NULL AND l1.storageID IS NULL))
+	WHERE
+		l1.link = ?
+	ORDER BY
+		l2.link
+	`,
+		linkTableName,
+		linkTableName,
+	)
+)
+
 // GetLinkByID returns the link with the given ID
 // Mainly this is used internally to fetch the DB ID of entities
 func (d *DB) GetLinkByID(id string) (*models.Link, error) {
@@ -27,6 +55,20 @@ func (d *DB) GetLinkByID(id string) (*models.Link, error) {
 		return nil, fmt.Errorf("failed to fetch link: %w", err)
 	}
 	return &out, nil
+}
+
+// GetLinksByLinkID returns a list of links that have the same target as the given link, denoting all links a specific
+// item has in the database
+func (d *DB) GetLinksByLinkID(id string) ([]*models.Link, error) {
+	out := []*models.Link{}
+	if err := d.db.Select(&out, queryGetLinksByLinkID, id); err != nil {
+		if err == sql.ErrNoRows {
+			// Nothing found
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to fetch links: %w", err)
+	}
+	return out, nil
 }
 
 // DeleteLinkByID will delete the link with the given ID

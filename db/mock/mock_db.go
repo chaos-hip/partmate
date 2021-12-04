@@ -103,6 +103,19 @@ type MockDB struct {
 		result1 *models.Link
 		result2 error
 	}
+	GetLinksByLinkIDStub        func(string) ([]*models.Link, error)
+	getLinksByLinkIDMutex       sync.RWMutex
+	getLinksByLinkIDArgsForCall []struct {
+		arg1 string
+	}
+	getLinksByLinkIDReturns struct {
+		result1 []*models.Link
+		result2 error
+	}
+	getLinksByLinkIDReturnsOnCall map[int]struct {
+		result1 []*models.Link
+		result2 error
+	}
 	GetPartByLinkStub        func(string) (*models.Part, error)
 	getPartByLinkMutex       sync.RWMutex
 	getPartByLinkArgsForCall []struct {
@@ -627,6 +640,70 @@ func (fake *MockDB) GetLinkByIDReturnsOnCall(i int, result1 *models.Link, result
 	}{result1, result2}
 }
 
+func (fake *MockDB) GetLinksByLinkID(arg1 string) ([]*models.Link, error) {
+	fake.getLinksByLinkIDMutex.Lock()
+	ret, specificReturn := fake.getLinksByLinkIDReturnsOnCall[len(fake.getLinksByLinkIDArgsForCall)]
+	fake.getLinksByLinkIDArgsForCall = append(fake.getLinksByLinkIDArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetLinksByLinkIDStub
+	fakeReturns := fake.getLinksByLinkIDReturns
+	fake.recordInvocation("GetLinksByLinkID", []interface{}{arg1})
+	fake.getLinksByLinkIDMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *MockDB) GetLinksByLinkIDCallCount() int {
+	fake.getLinksByLinkIDMutex.RLock()
+	defer fake.getLinksByLinkIDMutex.RUnlock()
+	return len(fake.getLinksByLinkIDArgsForCall)
+}
+
+func (fake *MockDB) GetLinksByLinkIDCalls(stub func(string) ([]*models.Link, error)) {
+	fake.getLinksByLinkIDMutex.Lock()
+	defer fake.getLinksByLinkIDMutex.Unlock()
+	fake.GetLinksByLinkIDStub = stub
+}
+
+func (fake *MockDB) GetLinksByLinkIDArgsForCall(i int) string {
+	fake.getLinksByLinkIDMutex.RLock()
+	defer fake.getLinksByLinkIDMutex.RUnlock()
+	argsForCall := fake.getLinksByLinkIDArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *MockDB) GetLinksByLinkIDReturns(result1 []*models.Link, result2 error) {
+	fake.getLinksByLinkIDMutex.Lock()
+	defer fake.getLinksByLinkIDMutex.Unlock()
+	fake.GetLinksByLinkIDStub = nil
+	fake.getLinksByLinkIDReturns = struct {
+		result1 []*models.Link
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *MockDB) GetLinksByLinkIDReturnsOnCall(i int, result1 []*models.Link, result2 error) {
+	fake.getLinksByLinkIDMutex.Lock()
+	defer fake.getLinksByLinkIDMutex.Unlock()
+	fake.GetLinksByLinkIDStub = nil
+	if fake.getLinksByLinkIDReturnsOnCall == nil {
+		fake.getLinksByLinkIDReturnsOnCall = make(map[int]struct {
+			result1 []*models.Link
+			result2 error
+		})
+	}
+	fake.getLinksByLinkIDReturnsOnCall[i] = struct {
+		result1 []*models.Link
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *MockDB) GetPartByLink(arg1 string) (*models.Part, error) {
 	fake.getPartByLinkMutex.Lock()
 	ret, specificReturn := fake.getPartByLinkReturnsOnCall[len(fake.getPartByLinkArgsForCall)]
@@ -901,6 +978,8 @@ func (fake *MockDB) Invocations() map[string][][]interface{} {
 	defer fake.getAttachmentEntryMutex.RUnlock()
 	fake.getLinkByIDMutex.RLock()
 	defer fake.getLinkByIDMutex.RUnlock()
+	fake.getLinksByLinkIDMutex.RLock()
+	defer fake.getLinksByLinkIDMutex.RUnlock()
 	fake.getPartByLinkMutex.RLock()
 	defer fake.getPartByLinkMutex.RUnlock()
 	fake.getUserByNameMutex.RLock()
