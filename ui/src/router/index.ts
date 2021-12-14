@@ -28,8 +28,9 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/Search.vue')
   },
   {
-    path: '/example/:id',
-    component: () => import('../views/Folder.vue')
+    name: 'ScanView',
+    path: '/scan',
+    component: () => import('../views/Scan.vue')
   }
 ]
 

@@ -120,7 +120,7 @@ export default defineComponent({
       },
       {
         title: t('menu.scan'),
-        url: '/example/Scan',
+        url: '/scan',
         iosIcon: cameraOutline,
         mdIcon: cameraSharp
       }
