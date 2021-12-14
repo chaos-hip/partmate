@@ -7,7 +7,7 @@
         </ion-buttons>
         <ion-title>{{ t("title") }}</ion-title>
         <ion-buttons slot="primary">
-          <ion-button @click="scanBarcode()">
+          <ion-button>
             <ion-icon slot="icon-only" :icon="addSharp"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -33,7 +33,6 @@ import {
 import { defineComponent } from '@vue/runtime-core';
 import { useI18n } from 'vue-i18n';
 import { addSharp } from 'ionicons/icons';
-import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx'
 
 export default defineComponent({
   name: 'PartLinkOverview',
@@ -52,10 +51,6 @@ export default defineComponent({
     parent: Part,
   },
   methods: {
-    async scanBarcode() {
-      const data = await this.barcodeScanner.scan();
-      console.log('Data: ', data);
-    }
   },
   setup() {
     const { t } = useI18n({
@@ -63,12 +58,9 @@ export default defineComponent({
       useScope: 'local'
     })
 
-    const barcodeScanner = new BarcodeScanner();
-
     return {
       t,
       addSharp,
-      barcodeScanner,
     }
   }
 });
