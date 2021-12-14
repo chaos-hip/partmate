@@ -6,6 +6,15 @@
           <ion-menu-button color="primary"></ion-menu-button>
         </ion-buttons>
         <ion-title>{{ t("title") }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button @click="scanQRCode()">
+            <ion-icon
+              slot="icon-only"
+              :ios="cameraOutline"
+              :md="cameraSharp"
+            ></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
       <ion-toolbar>
         <ion-searchbar
@@ -26,6 +35,16 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
+      <ion-modal
+        :is-open="qrModalIsOpen"
+        @onDidDismiss="handleScanCancel"
+        keyboard-close
+      >
+        <scan-view
+          @scanCancel="handleScanCancel"
+          @scanResult="handleScanResult"
+        ></scan-view>
+      </ion-modal>
       <ion-refresher
         slot="fixed"
         @ionRefresh="refresh($event)"
@@ -100,12 +119,16 @@ import {
   IonRefresher,
   IonRefresherContent,
   IonNavLink,
+  IonIcon,
+  IonButton,
+  IonModal,
 } from '@ionic/vue';
 import { defineComponent, ref } from '@vue/runtime-core';
 import { useI18n } from 'vue-i18n';
-import { chevronDownCircleOutline } from 'ionicons/icons';
+import { chevronDownCircleOutline, cameraOutline, cameraSharp } from 'ionicons/icons';
 import { searchParts } from '../api';
 import PartOverview from '@/components/PartOverview.vue';
+import ScanView from '@/components/QRScanner.vue';
 
 export default defineComponent({
   name: 'SearchComponent',
@@ -128,8 +151,22 @@ export default defineComponent({
     IonRefresher,
     IonRefresherContent,
     IonNavLink,
+    IonIcon,
+    IonButton,
+    IonModal,
+    ScanView,
   },
   methods: {
+    scanQRCode() {
+      this.qrModalIsOpen = true;
+    },
+    handleScanCancel() {
+      this.qrModalIsOpen = false;
+    },
+    handleScanResult(text: string, result: any) {
+      this.qrModalIsOpen = false;
+      console.dir(text);
+    },
     async doSearch(clear?: boolean) {
       if (clear) {
         this.searchResult = [];
@@ -181,6 +218,8 @@ export default defineComponent({
     const stillScrolling = ref(true);
     const pageSize = ref(20);
 
+    const qrModalIsOpen = ref(false);
+
     return {
       t,
       searchResult,
@@ -189,6 +228,9 @@ export default defineComponent({
       pageSize,
       chevronDownCircleOutline,
       PartOverview,
+      cameraSharp,
+      cameraOutline,
+      qrModalIsOpen,
     }
   }
 });

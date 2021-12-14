@@ -27,7 +27,6 @@ import {
 } from '@ionic/vue';
 import { defineComponent } from '@vue/runtime-core';
 import { useI18n } from 'vue-i18n';
-import { useQRScanner } from '@/composables/useQRScanner';
 
 export default defineComponent({
   name: 'ScanView',
@@ -43,7 +42,7 @@ export default defineComponent({
   },
   methods: {
     foo() {
-      this.scanCode();
+      debugger;
     }
   },
   setup() {
@@ -52,11 +51,8 @@ export default defineComponent({
       useScope: 'local'
     });
 
-    const { scanCode } = useQRScanner();
-
     return {
       t,
-      scanCode,
     }
   }
 });
