@@ -43,7 +43,7 @@ export default defineComponent({
   mounted() {
     const config = {
       fps: 10,
-      qrbox: 250,
+      qrbox: 300,
     }
     const scanner = new Html5Qrcode('qrScanRegion', false);
     scanner.start({ facingMode: "environment" }, config, this.onScanSuccess, undefined);
