@@ -398,6 +398,32 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get link information",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/links/:id",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"links",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "test",
+									"description": "ID of the part to load (Link)"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
