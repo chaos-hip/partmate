@@ -20,7 +20,12 @@ const routes: Array<RouteRecordRaw> = [
   {
     name: 'PartViewer',
     path: '/part/:id',
-    component: () => import('../views/Search.vue')
+    component: () => import('../views/Part.vue')
+  },
+  {
+    name: 'PartLinks',
+    path: '/part/:id/links',
+    component: () => import('../views/PartLinks.vue')
   },
   {
     name: 'StorageViewer',

@@ -1,4 +1,5 @@
 import { Part, PartObj } from '@/models/part';
+import { LinkInfo } from '@/models/link';
 import store from '../store';
 
 interface LoginResponse {
@@ -31,6 +32,10 @@ export class ApiError extends Error {
 }
 
 async function makeApiError(res: Response): Promise<ApiError> {
+    if (res.status == 403) {
+        // Logged out again
+        store.commit('loggedOut');
+    }
     const obj = (await res.json()) as ApiErrorObj;
     return new ApiError(obj, res);
 }
@@ -72,6 +77,15 @@ interface SearchPayload {
     limit: number;
 }
 
+/**
+ * Checks if the given link is valid
+ * @param link The link to check
+ * @returns `true` if the link is a valid one
+ */
+function isValidLink(link: string): boolean {
+    return (/^[a-z0-9]+$/i).test(link);
+}
+
 function prepareRequestHeaders(): HeadersInit {
     const out = new Headers({
         'Content-Type': 'application/json',
@@ -108,4 +122,34 @@ export async function searchParts(term: string, offset: number, limit: number): 
     }
     const returnedData = (await res.json()) as Array<PartObj>;
     return returnedData.map(item => new Part(item));
+}
+
+/**
+ * Gets the part with the given ID
+ * @param id ID of the part to load
+ * @returns The part having the given ID
+ */
+export async function getPartById(id: string): Promise<Part> {
+    if (!isValidLink(id)) {
+        throw new Error('Invalid part ID');
+    }
+    const res = await fetch(`/api/parts/${id}`, { method: 'GET', headers: prepareRequestHeaders() });
+    if (res.status !== 200) {
+        throw await makeApiError(res);
+    }
+    return new Part(await res.json());
+}
+
+/**
+ * Gets information about what kind of object is behind a link
+ */
+export async function getLinkInfo(linkId: string): Promise<LinkInfo> {
+    if (!isValidLink(linkId)) {
+        throw new Error('Invalid link ID');
+    }
+    const res = await fetch(`/api/links/${linkId}`, { method: 'GET', headers: prepareRequestHeaders() });
+    if (res.status !== 200) {
+        throw await makeApiError(res);
+    }
+    return await res.json() as LinkInfo;
 }

@@ -3,16 +3,13 @@
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button
-            defaultHref="/search"
-            :text="isPlatform('ios') ? t('back') : ''"
-          ></ion-back-button>
+          <ion-back-button default-href="/search"></ion-back-button>
         </ion-buttons>
-        <ion-title>{{ part.name }}</ion-title>
+        <ion-title>{{ part ? part.name : "" }}</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content fullscreen>
-      <ion-card>
+      <ion-card v-if="!loading && part">
         <img :src="part.getThumbnailPath()" class="partPreview" />
         <ion-card-header>
           <ion-card-subtitle color="primary">{{
@@ -28,16 +25,16 @@
           <ion-icon slot="start" :icon="documentsSharp"></ion-icon>
           <ion-label>{{ t("part.attachments") }}</ion-label>
         </ion-item>
-        <ion-nav-link
-          :component="PartLinkOverview"
-          :component-props="{ parent: part }"
+        <ion-item
+          detail
+          lines="none"
+          @click="$router.push(`/part/${partId}/links`)"
         >
-          <ion-item detail lines="none">
-            <ion-icon slot="start" :icon="linkSharp"></ion-icon>
-            <ion-label>{{ t("part.links") }}</ion-label>
-          </ion-item>
-        </ion-nav-link>
+          <ion-icon slot="start" :icon="linkSharp"></ion-icon>
+          <ion-label>{{ t("part.links") }}</ion-label>
+        </ion-item>
       </ion-card>
+      <ion-loading :is-open="loading" :message="t('loading')"></ion-loading>
     </ion-content>
   </ion-page>
 </template>
@@ -59,16 +56,17 @@ import {
   IonCardSubtitle,
   IonItem,
   IonLabel,
-  IonNavLink,
+  IonLoading,
+  IonIcon,
   isPlatform,
 } from '@ionic/vue';
-import { defineComponent } from '@vue/runtime-core';
-import { useI18n } from 'vue-i18n';
+import { defineComponent, ref, Ref } from '@vue/runtime-core';
 import { documentsSharp, linkSharp } from 'ionicons/icons';
-import PartLinkOverview from '@/components/PartLinkOverview.vue';
+import { getPartById } from '@/api';
+import { errorDisplay } from '@/composables/errorDisplay';
 
 export default defineComponent({
-  name: 'PartOverview',
+  name: 'part-overview',
   components: {
     IonPage,
     IonToolbar,
@@ -84,45 +82,83 @@ export default defineComponent({
     IonCardSubtitle,
     IonItem,
     IonLabel,
-    IonNavLink,
+    IonLoading,
+    IonIcon,
   },
   props: {
-    part: Part,
+    id: String,
+    backButtonLabel: String,
+  },
+  mounted() {
+    this.loadPart();
+  },
+  computed: {
+    partId() {
+      return this.id || this.$route.params.id || '';
+    }
+  },
+  watch: {
+    partId(newVal: string) {
+      if (newVal) {
+        this.loadPart();
+      }
+    }
   },
   methods: {
+    async loadPart() {
+      this.part = null;
+      if (!this.partId) {
+        return;
+      }
+      this.loading = true;
+      try {
+        const p = await getPartById(this.partId as string);
+        (this.part as unknown) = p;
+      } catch (err) {
+        this.showError(String(err), 'err.load');
+      }
+      this.loading = false;
+    },
   },
   setup() {
-    const { t } = useI18n({
-      inheritLocale: true,
-      useScope: 'local'
-    })
+    const { t, dismissError, showError } = errorDisplay();
+
+    const part: Ref<Part> | Ref<null> = ref(null);
+    const loading = ref(false);
 
     return {
       t,
+      showError,
+      dismissError,
       documentsSharp,
       linkSharp,
       isPlatform,
-      PartLinkOverview,
+      part,
+      loading,
     }
   }
 });
 </script>
 
 <i18n locale="de" lang="yaml">
-back: Suche
+loading: Lade...
 part:
     new: 'Neues Teil'
     subtitle: 'Teil'
     attachments: 'Dateien'
     links: 'Verknüpfungen'
+err:
+  load: Teileinfo konnte nicht geladen werden
 </i18n>
 <i18n locale="en" lang="yaml">
-back: Search
+loading: Loading...
 part:
     new: 'New Part'
     subtitle: 'Part'
     attachments: 'Files'
     links: 'Links'
+err:
+  load: Failed to load part information
 </i18n>
 
 <style scoped>

@@ -34,7 +34,7 @@
                 @keyup="onPassKeyUp"
               ></ion-input>
             </ion-item>
-            <ion-item>
+            <ion-item lines="none">
               <ion-button slot="end" color="primary" @click="doLogin">{{
                 t("btn.login")
               }}</ion-button>
@@ -174,4 +174,7 @@ export default defineComponent({
 </i18n>
 
 <style scoped>
+ion-item {
+  --background: transparent;
+}
 </style>

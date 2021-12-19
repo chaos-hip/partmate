@@ -81,6 +81,35 @@ func MakeLinkListHandler(dbInstance db.DB) gin.HandlerFunc {
 	}
 }
 
+// MakeGetLinkInfoHandler returns a handler that responds with information about the link passed-in
+func MakeGetLinkInfoHandler(dbInstance db.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := strings.TrimSpace(c.Param("id"))
+		if id == "" {
+			c.AbortWithStatusJSON(
+				http.StatusBadRequest,
+				errors.NewResponse(errors.TypeIllegalData, "No link ID passed", nil),
+			)
+			return
+		}
+		link, err := dbInstance.GetLinkByID(id)
+		if err != nil {
+			c.AbortWithStatusJSON(
+				http.StatusInternalServerError,
+				errors.NewResponse(errors.TypeDBError, "Error fetching link", err),
+			)
+			return
+		}
+		if link == nil {
+			// Using it like this will automatically set the type to "unknown"
+			link = &models.Link{
+				Link: id,
+			}
+		}
+		c.JSON(http.StatusOK, link.ToDTO())
+	}
+}
+
 // MakeLinkCreateByPathHandler creates a handler function that does the same as MakeLinkCreateHandler, but with the
 // parameters taken from the path
 func MakeLinkCreateByPathHandler(dbInstance db.DB) gin.HandlerFunc {

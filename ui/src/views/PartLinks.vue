@@ -3,7 +3,7 @@
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button defaultHref="/search"></ion-back-button>
+          <ion-back-button></ion-back-button>
         </ion-buttons>
         <ion-title>{{ t("title") }}</ion-title>
         <ion-buttons slot="primary">

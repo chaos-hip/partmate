@@ -185,7 +185,7 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 		// Users
 		apiRouter.POST("/user", routes.MakeUserCreateHandler(dbInstance))
 		// Part handling
-		apiRouter.GET("/parts/:id", handleTeaPottJeeey)                                                                  // Get details about a given part
+		apiRouter.GET("/parts/:id", routes.MakeGetPartByLinkHandler(dbInstance))                                         // Get details about a given part
 		apiRouter.GET("/parts/:id/qr", handleTeaPottJeeey)                                                               // Get the QR code for a part
 		apiRouter.POST("/parts/search", routes.MakePartsSearchHandler(dbInstance))                                       // Search for attachments
 		apiRouter.POST("/parts/:id/attachments", handleTeaPottJeeey)                                                     // Add part attachment
@@ -197,6 +197,7 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 
 		// Link handling
 		apiRouter.GET("/parts/:id/links", routes.MakeLinkListHandler(dbInstance))                  // List links for a part
+		apiRouter.GET("/links/:id", routes.MakeGetLinkInfoHandler(dbInstance))                     // Get infos about where a link points at
 		apiRouter.POST("/links", routes.MakeLinkCreateHandler(dbInstance))                         // create Link
 		apiRouter.DELETE("/links/:id", routes.MakeLinkDeleteHandler(dbInstance))                   // delete Link
 		apiRouter.POST("/parts/:id/links/:linkID", routes.MakeLinkCreateByPathHandler(dbInstance)) // create link for a part

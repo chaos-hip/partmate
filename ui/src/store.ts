@@ -1,5 +1,6 @@
 import { createStore } from 'vuex';
 import { User } from './models/user';
+import router from '@/router';
 
 const storageKey = 'activeUser';
 
@@ -36,6 +37,7 @@ const store = createStore({
             state.jwt = '';
             state.user = null;
             localStorage.removeItem(storageKey);
+            router.push('/login');
         }
     }
 })

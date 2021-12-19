@@ -83,6 +83,9 @@ export default defineComponent({
   computed: {
     userName() {
       return this.$store.state.user ? this.$store.state.user.name : '';
+    },
+    loggedIn() {
+      return this.$store.state.user != null;
     }
   },
   components: {
@@ -102,7 +105,6 @@ export default defineComponent({
   methods: {
     doLogout() {
       this.$store.commit('loggedOut');
-      this.$router.push('/login');
     }
   },
   setup() {
@@ -160,6 +162,11 @@ export default defineComponent({
     logout: 'Ausloggen'
     search: 'Suche'
     scan: 'Scannen'
+  'Not authenticated. You have to log-in to use this API': |
+    Du bist nicht eingeloggt.
+    <br>Bitte melde dich erneut an.
+  btn:
+    dismiss: Schließen
 </i18n>
 <i18n locale="en" lang="yaml">
   menu:
@@ -168,6 +175,11 @@ export default defineComponent({
     logout: 'Logout'
     search: 'Search'
     scan: 'Scan'
+  'Not authenticated. You have to log-in to use this API': |
+    Your are not logged in.
+    <br>Please authenticate again.
+  btn:
+    dismiss: Dismiss
 </i18n>
 
 <style scoped>
