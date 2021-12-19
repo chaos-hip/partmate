@@ -1,5 +1,5 @@
 import { Part, PartObj } from '@/models/part';
-import { LinkInfo } from '@/models/link';
+import { LinkInfo, LinkType } from '@/models/link';
 import store from '../store';
 
 interface LoginResponse {
@@ -142,6 +142,9 @@ export async function getPartById(id: string): Promise<Part> {
 
 /**
  * Gets information about what kind of object is behind a link
+ *
+ * @param linkId The link ID to get more information about
+ * @returns Information about the selected link
  */
 export async function getLinkInfo(linkId: string): Promise<LinkInfo> {
     if (!isValidLink(linkId)) {
@@ -152,4 +155,33 @@ export async function getLinkInfo(linkId: string): Promise<LinkInfo> {
         throw await makeApiError(res);
     }
     return await res.json() as LinkInfo;
+}
+
+/**
+ * Creates a new link in the database linking to the entity given
+ *
+ * @param link The link ID the new link will have
+ * @param targetType The kind of entity the link will target
+ * @param target The link ID the target has right now
+ */
+export async function createLink(link: string, targetType: LinkType, target: string): Promise<void> {
+    if (!isValidLink(link)) {
+        throw new Error('Invalid link ID');
+    }
+    if (!isValidLink(target)) {
+        throw new Error('Invalid target ID');
+    }
+    const payload = {
+        link,
+        targetType,
+        target,
+    }
+    const res = await fetch(`/api/links`, {
+        method: 'POST',
+        headers: prepareRequestHeaders(),
+        body: JSON.stringify(payload),
+    });
+    if (res.status !== 200) {
+        throw await makeApiError(res);
+    }
 }

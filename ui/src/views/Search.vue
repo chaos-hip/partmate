@@ -2,17 +2,22 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-buttons slot="start">
+        <ion-buttons slot="start" v-if="!selectOnly">
           <ion-menu-button color="primary"></ion-menu-button>
         </ion-buttons>
-        <ion-title>{{ t("title") }}</ion-title>
+        <ion-title>{{
+          this.selectOnly ? t("selectOnlyTitle") : t("title")
+        }}</ion-title>
         <ion-buttons slot="end">
-          <ion-button @click="scanQRCode()">
+          <ion-button @click="scanQRCode()" v-if="!selectOnly">
             <ion-icon
               slot="icon-only"
               :ios="cameraOutline"
               :md="cameraSharp"
             ></ion-icon>
+          </ion-button>
+          <ion-button @click="$emit('cancelled')" v-if="selectOnly">
+            {{ t("btn.cancel") }}
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
@@ -64,7 +69,7 @@
           lines="inset"
           button
           v-for="part in searchResult"
-          @click="showPart(part.id)"
+          @click="partSelected(part.id)"
           :key="part.id"
         >
           <ion-thumbnail slot="start">
@@ -129,7 +134,7 @@ import { LinkInfo, navigateToLink } from '@/models/link';
 import { errorDisplay } from '@/composables/errorDisplay';
 
 export default defineComponent({
-  name: 'SearchComponent',
+  name: 'SearchView',
   components: {
     IonButtons,
     IonContent,
@@ -153,9 +158,18 @@ export default defineComponent({
     IonModal,
     ScanView,
   },
+  props: {
+    /**
+     * Set to `true` in order to use the search for selecting a part or storage location
+     */
+    selectOnly: Boolean,
+  },
   methods: {
-    showPart(id: string) {
-      this.$router.push(`/part/${id}`);
+    partSelected(id: string) {
+      if (!this.selectOnly) {
+        this.$router.push(`/part/${id}`);
+      }
+      this.$emit('part-selected', id);
     },
     scanQRCode() {
       this.qrModalIsOpen = true;
@@ -223,10 +237,12 @@ export default defineComponent({
 
 <i18n locale="de" lang="yaml">
   title: 'Suche'
+  selectOnlyTitle: Auswählen
   loading: 'Lade...'
   btn:
     dismiss: Schließen
     back: Suche
+    cancel: Abbrechen
   search:
     placeholder: 'Nach Teilen suchen...'
     parts: 'Teile'
@@ -234,10 +250,12 @@ export default defineComponent({
 </i18n>
 <i18n locale="en" lang="yaml">
   title: 'Search'
+  selectOnlyTitle: Choose
   loading: 'Loading...'
   btn:
     dismiss: Close
     back: Search
+    cancel: Cancel
   search:
     placeholder: 'Search for parts...'
     parts: 'Parts'
