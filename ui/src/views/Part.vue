@@ -143,10 +143,10 @@ export default defineComponent({
 <i18n locale="de" lang="yaml">
 loading: Lade...
 part:
-    new: 'Neues Teil'
-    subtitle: 'Teil'
-    attachments: 'Dateien'
-    links: 'Verknüpfungen'
+    new: Neues Teil
+    subtitle: Teil
+    attachments: Dateien
+    links: Links
 err:
   load: Teileinfo konnte nicht geladen werden
 </i18n>

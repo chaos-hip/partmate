@@ -5,9 +5,9 @@
         <ion-buttons slot="start" v-if="!selectOnly">
           <ion-menu-button color="primary"></ion-menu-button>
         </ion-buttons>
-        <ion-title>{{
-          this.selectOnly ? t("selectOnlyTitle") : t("title")
-        }}</ion-title>
+        <ion-title>
+          {{ this.selectOnly ? t("selectOnlyTitle") : t("title") }}
+        </ion-title>
         <ion-buttons slot="end">
           <ion-button @click="scanQRCode()" v-if="!selectOnly">
             <ion-icon
@@ -127,7 +127,7 @@ import {
 } from '@ionic/vue';
 import { defineComponent, ref } from '@vue/runtime-core';
 import { chevronDownCircleOutline, cameraOutline, cameraSharp } from 'ionicons/icons';
-import { searchParts } from '../api';
+import { searchParts } from '@/api';
 import PartOverview from '@/views/Part.vue';
 import ScanView from '@/components/QRScanner.vue';
 import { LinkInfo, navigateToLink } from '@/models/link';

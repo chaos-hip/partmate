@@ -3,7 +3,7 @@
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button></ion-back-button>
+          <ion-back-button default-href="/search"></ion-back-button>
         </ion-buttons>
         <ion-title>{{ t("title") }}</ion-title>
         <ion-buttons slot="primary">
@@ -67,7 +67,7 @@ export default defineComponent({
 </script>
 
 <i18n locale="de" lang="yaml">
-title: Verknüpfungen
+title: Links
 </i18n>
 <i18n locale="en" lang="yaml">
 title: Links

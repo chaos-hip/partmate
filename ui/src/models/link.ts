@@ -1,6 +1,5 @@
 import router from "@/router"
 
-
 export enum LinkType {
     Part = "part",                          // Link target is a part
     StorageLocation = "storageLocation",    // Link target is a storage location
@@ -31,6 +30,7 @@ export function navigateToLink(info: LinkInfo) {
             router.push(`/attachment/${info.link}`);
             break;
         default:
+            // Unknown link
             router.push(`/link/${info.link}`);
     }
 }
