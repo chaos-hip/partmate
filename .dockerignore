@@ -1,2 +1,3 @@
 docker/volumes
 ui/node_modules
+data/
