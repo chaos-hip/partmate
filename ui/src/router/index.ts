@@ -31,11 +31,6 @@ const routes: Array<RouteRecordRaw> = [
     name: 'StorageViewer',
     path: '/storage/:id',
     component: () => import('../views/Search.vue')
-  },
-  {
-    name: 'ScanView',
-    path: '/scan',
-    component: () => import('../views/Scan.vue')
   }
 ]
 

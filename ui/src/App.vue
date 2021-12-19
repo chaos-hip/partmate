@@ -120,12 +120,6 @@ export default defineComponent({
         iosIcon: searchOutline,
         mdIcon: searchSharp
       },
-      {
-        title: t('menu.scan'),
-        url: '/scan',
-        iosIcon: cameraOutline,
-        mdIcon: cameraSharp
-      }
     ];
 
     const path = window.location.pathname.split('example/')[1];
