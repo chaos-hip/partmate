@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	partTableName = "Part"
+	partTableName         = "Part"
+	partCategoryTableName = "PartCategory"
 )
 
 var (

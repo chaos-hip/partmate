@@ -195,6 +195,9 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 		apiRouter.POST("/parts/:id/stockadd", handleTeaPottJeeey)    // Increase the current stock of a part
 		apiRouter.POST("/parts/:id/stockremove", handleTeaPottJeeey) // Decrease the current stock of a part
 
+		// Storage locations
+		apiRouter.POST("/storage/search", routes.MakeStorageSearchHandler(dbInstance)) // Paginated search for storage locations
+
 		// Link handling
 		apiRouter.GET("/parts/:id/links", routes.MakeLinkListHandler(dbInstance))                  // List links for a part
 		apiRouter.GET("/links/:id", routes.MakeGetLinkInfoHandler(dbInstance))                     // Get infos about where a link points at
@@ -222,10 +225,9 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 		apiRouter.POST("/venues/:id/reports/summary", handleTeaPottJeeey)             // Summary about a venue
 
 		// Lists
-		apiRouter.GET("/categories", handleTeaPottJeeey)        // Get a list of all categories
-		apiRouter.GET("/manufacturers", handleTeaPottJeeey)     // Get a list of manufacturers
-		apiRouter.GET("/distributors", handleTeaPottJeeey)      // Get list of distributors
-		apiRouter.GET("/storage-locations", handleTeaPottJeeey) // Get list of available storage locations
+		apiRouter.GET("/categories", handleTeaPottJeeey)    // Get a list of all categories
+		apiRouter.GET("/manufacturers", handleTeaPottJeeey) // Get a list of manufacturers
+		apiRouter.GET("/distributors", handleTeaPottJeeey)  // Get list of distributors
 
 	}
 	return router

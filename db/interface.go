@@ -22,6 +22,12 @@ type DB interface {
 	// ordered by name
 	SearchParts(search models.Search) ([]models.Part, error)
 
+	//-- Storage locations 📦 --------------------------------
+
+	// SearchStorageLocations searches for storage locations matching the provided search term.
+	// The result is provided as paginated list
+	SearchStorageLocations(search models.Search) ([]models.StorageLocation, error)
+
 	//-- Users 👤 --------------------------------------------
 
 	// GetUserByName returns the user with the given username or nothing if the user does not exist

@@ -168,6 +168,19 @@ type MockDB struct {
 		result1 []models.Part
 		result2 error
 	}
+	SearchStorageLocationsStub        func(models.Search) ([]models.StorageLocation, error)
+	searchStorageLocationsMutex       sync.RWMutex
+	searchStorageLocationsArgsForCall []struct {
+		arg1 models.Search
+	}
+	searchStorageLocationsReturns struct {
+		result1 []models.StorageLocation
+		result2 error
+	}
+	searchStorageLocationsReturnsOnCall map[int]struct {
+		result1 []models.StorageLocation
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -959,6 +972,70 @@ func (fake *MockDB) SearchPartsReturnsOnCall(i int, result1 []models.Part, resul
 	}{result1, result2}
 }
 
+func (fake *MockDB) SearchStorageLocations(arg1 models.Search) ([]models.StorageLocation, error) {
+	fake.searchStorageLocationsMutex.Lock()
+	ret, specificReturn := fake.searchStorageLocationsReturnsOnCall[len(fake.searchStorageLocationsArgsForCall)]
+	fake.searchStorageLocationsArgsForCall = append(fake.searchStorageLocationsArgsForCall, struct {
+		arg1 models.Search
+	}{arg1})
+	stub := fake.SearchStorageLocationsStub
+	fakeReturns := fake.searchStorageLocationsReturns
+	fake.recordInvocation("SearchStorageLocations", []interface{}{arg1})
+	fake.searchStorageLocationsMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *MockDB) SearchStorageLocationsCallCount() int {
+	fake.searchStorageLocationsMutex.RLock()
+	defer fake.searchStorageLocationsMutex.RUnlock()
+	return len(fake.searchStorageLocationsArgsForCall)
+}
+
+func (fake *MockDB) SearchStorageLocationsCalls(stub func(models.Search) ([]models.StorageLocation, error)) {
+	fake.searchStorageLocationsMutex.Lock()
+	defer fake.searchStorageLocationsMutex.Unlock()
+	fake.SearchStorageLocationsStub = stub
+}
+
+func (fake *MockDB) SearchStorageLocationsArgsForCall(i int) models.Search {
+	fake.searchStorageLocationsMutex.RLock()
+	defer fake.searchStorageLocationsMutex.RUnlock()
+	argsForCall := fake.searchStorageLocationsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *MockDB) SearchStorageLocationsReturns(result1 []models.StorageLocation, result2 error) {
+	fake.searchStorageLocationsMutex.Lock()
+	defer fake.searchStorageLocationsMutex.Unlock()
+	fake.SearchStorageLocationsStub = nil
+	fake.searchStorageLocationsReturns = struct {
+		result1 []models.StorageLocation
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *MockDB) SearchStorageLocationsReturnsOnCall(i int, result1 []models.StorageLocation, result2 error) {
+	fake.searchStorageLocationsMutex.Lock()
+	defer fake.searchStorageLocationsMutex.Unlock()
+	fake.SearchStorageLocationsStub = nil
+	if fake.searchStorageLocationsReturnsOnCall == nil {
+		fake.searchStorageLocationsReturnsOnCall = make(map[int]struct {
+			result1 []models.StorageLocation
+			result2 error
+		})
+	}
+	fake.searchStorageLocationsReturnsOnCall[i] = struct {
+		result1 []models.StorageLocation
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *MockDB) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -988,6 +1065,8 @@ func (fake *MockDB) Invocations() map[string][][]interface{} {
 	defer fake.removePartStockMutex.RUnlock()
 	fake.searchPartsMutex.RLock()
 	defer fake.searchPartsMutex.RUnlock()
+	fake.searchStorageLocationsMutex.RLock()
+	defer fake.searchStorageLocationsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
