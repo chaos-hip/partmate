@@ -93,6 +93,8 @@ import {
   IonSearchbar,
   IonRefresher,
   IonRefresherContent,
+  IonButtons,
+  IonButton,
 } from '@ionic/vue';
 import { defineComponent, ref } from '@vue/runtime-core';
 import { chevronDownCircleOutline, cameraOutline, cameraSharp } from 'ionicons/icons';
@@ -118,6 +120,8 @@ export default defineComponent({
     IonSearchbar,
     IonRefresher,
     IonRefresherContent,
+    IonButtons,
+    IonButton,
   },
   props: {
     /**

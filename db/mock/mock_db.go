@@ -129,6 +129,19 @@ type MockDB struct {
 		result1 *models.Part
 		result2 error
 	}
+	GetStorageLocationByLinkStub        func(string) (*models.StorageLocation, error)
+	getStorageLocationByLinkMutex       sync.RWMutex
+	getStorageLocationByLinkArgsForCall []struct {
+		arg1 string
+	}
+	getStorageLocationByLinkReturns struct {
+		result1 *models.StorageLocation
+		result2 error
+	}
+	getStorageLocationByLinkReturnsOnCall map[int]struct {
+		result1 *models.StorageLocation
+		result2 error
+	}
 	GetUserByNameStub        func(string) (*models.User, error)
 	getUserByNameMutex       sync.RWMutex
 	getUserByNameArgsForCall []struct {
@@ -781,6 +794,70 @@ func (fake *MockDB) GetPartByLinkReturnsOnCall(i int, result1 *models.Part, resu
 	}{result1, result2}
 }
 
+func (fake *MockDB) GetStorageLocationByLink(arg1 string) (*models.StorageLocation, error) {
+	fake.getStorageLocationByLinkMutex.Lock()
+	ret, specificReturn := fake.getStorageLocationByLinkReturnsOnCall[len(fake.getStorageLocationByLinkArgsForCall)]
+	fake.getStorageLocationByLinkArgsForCall = append(fake.getStorageLocationByLinkArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetStorageLocationByLinkStub
+	fakeReturns := fake.getStorageLocationByLinkReturns
+	fake.recordInvocation("GetStorageLocationByLink", []interface{}{arg1})
+	fake.getStorageLocationByLinkMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *MockDB) GetStorageLocationByLinkCallCount() int {
+	fake.getStorageLocationByLinkMutex.RLock()
+	defer fake.getStorageLocationByLinkMutex.RUnlock()
+	return len(fake.getStorageLocationByLinkArgsForCall)
+}
+
+func (fake *MockDB) GetStorageLocationByLinkCalls(stub func(string) (*models.StorageLocation, error)) {
+	fake.getStorageLocationByLinkMutex.Lock()
+	defer fake.getStorageLocationByLinkMutex.Unlock()
+	fake.GetStorageLocationByLinkStub = stub
+}
+
+func (fake *MockDB) GetStorageLocationByLinkArgsForCall(i int) string {
+	fake.getStorageLocationByLinkMutex.RLock()
+	defer fake.getStorageLocationByLinkMutex.RUnlock()
+	argsForCall := fake.getStorageLocationByLinkArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *MockDB) GetStorageLocationByLinkReturns(result1 *models.StorageLocation, result2 error) {
+	fake.getStorageLocationByLinkMutex.Lock()
+	defer fake.getStorageLocationByLinkMutex.Unlock()
+	fake.GetStorageLocationByLinkStub = nil
+	fake.getStorageLocationByLinkReturns = struct {
+		result1 *models.StorageLocation
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *MockDB) GetStorageLocationByLinkReturnsOnCall(i int, result1 *models.StorageLocation, result2 error) {
+	fake.getStorageLocationByLinkMutex.Lock()
+	defer fake.getStorageLocationByLinkMutex.Unlock()
+	fake.GetStorageLocationByLinkStub = nil
+	if fake.getStorageLocationByLinkReturnsOnCall == nil {
+		fake.getStorageLocationByLinkReturnsOnCall = make(map[int]struct {
+			result1 *models.StorageLocation
+			result2 error
+		})
+	}
+	fake.getStorageLocationByLinkReturnsOnCall[i] = struct {
+		result1 *models.StorageLocation
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *MockDB) GetUserByName(arg1 string) (*models.User, error) {
 	fake.getUserByNameMutex.Lock()
 	ret, specificReturn := fake.getUserByNameReturnsOnCall[len(fake.getUserByNameArgsForCall)]
@@ -1059,6 +1136,8 @@ func (fake *MockDB) Invocations() map[string][][]interface{} {
 	defer fake.getLinksByLinkIDMutex.RUnlock()
 	fake.getPartByLinkMutex.RLock()
 	defer fake.getPartByLinkMutex.RUnlock()
+	fake.getStorageLocationByLinkMutex.RLock()
+	defer fake.getStorageLocationByLinkMutex.RUnlock()
 	fake.getUserByNameMutex.RLock()
 	defer fake.getUserByNameMutex.RUnlock()
 	fake.removePartStockMutex.RLock()

@@ -1,6 +1,8 @@
 package mysql
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"git.chaos-hip.de/RepairCafe/PartMATE/models"
@@ -59,6 +61,54 @@ var (
 		linkTableName)
 
 	queryGetStorageByIDs = fmt.Sprintf(`%s WHERE storage.id IN (?);`, queryBaseStorage)
+
+	queryGetStorageByLinkID = fmt.Sprintf(
+		`SELECT
+		storage.id AS id,
+		storage.name AS name,
+		links.link AS link,
+		storage.category_id AS category_id,
+		category.name AS category_name,
+		category.description AS category_description,
+		category.categoryPath AS category_path,
+		categoryLinks.link AS category_link,
+		images.id AS image_id,
+		imageLinks.link AS image_link
+	FROM
+		%s AS links
+	LEFT OUTER JOIN
+		%s AS storage
+	ON
+		storage.id = links.storageID
+	LEFT OUTER JOIN
+		%s as images
+	ON
+		images.storageLocation_id = storage.id
+	LEFT OUTER JOIN
+		%s AS imageLinks
+	ON
+		imageLinks.link = (SELECT link FROM %s AS l3 WHERE l3.storageImageID = images.id ORDER BY l3.auto_generated LIMIT 1)
+	LEFT OUTER JOIN
+		%s AS category
+	ON
+		category.id = storage.category_id
+	LEFT OUTER JOIN
+		%s AS categoryLinks
+	ON
+		categoryLinks.link = (SELECT link FROM %s AS l4 WHERE l4.storageCategoryID = category.id ORDER BY l4.auto_generated LIMIT 1)
+	WHERE
+		links.link = ?
+	AND
+		links.storageID IS NOT NULL`,
+		linkTableName,
+		storageLocationTableName,
+		storageLocationImageTableName,
+		linkTableName,
+		linkTableName,
+		storageLocationCategoryTableName,
+		linkTableName,
+		linkTableName,
+	)
 
 	querySearchStorage = fmt.Sprintf(`%s
 	WHERE
@@ -146,4 +196,19 @@ func (d *DB) getStorageLocationsByIDs(ids []int) ([]models.StorageLocation, erro
 		out = append(out, *loc)
 	}
 	return out, nil
+}
+
+// GetStorageLocationByLink returns the storage location that belongs to the given ID
+func (d *DB) GetStorageLocationByLink(id string) (*models.StorageLocation, error) {
+	res := &models.StorageLocation{}
+	if err := d.db.Get(res, queryGetStorageByLinkID, id); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to fetch part: %w", err)
+	}
+	if err := d.doCreateLinksForStorage(res); err != nil {
+		return nil, err
+	}
+	return res, nil
 }

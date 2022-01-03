@@ -197,6 +197,7 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 
 		// Storage locations
 		apiRouter.POST("/storage/search", routes.MakeStorageSearchHandler(dbInstance)) // Paginated search for storage locations
+		apiRouter.GET("/storage/:id", routes.MakeGetStorageByLinkHandler(dbInstance))  // Get details about a single storage location
 
 		// Link handling
 		apiRouter.GET("/parts/:id/links", routes.MakeLinkListHandler(dbInstance))                  // List links for a part

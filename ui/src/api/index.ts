@@ -154,6 +154,22 @@ export async function searchStorageLocation(term: string, offset: number, limit:
 }
 
 /**
+ * Gets the storage location with the given ID
+ * @param id ID of the storage location to load
+ * @returns The storage location having the given ID
+ */
+export async function getStorageById(id: string): Promise<StorageLocation> {
+    if (!isValidLink(id)) {
+        throw new Error('Invalid storage location ID');
+    }
+    const res = await fetch(`/api/storage/${id}`, { method: 'GET', headers: prepareRequestHeaders() });
+    if (res.status !== 200) {
+        throw await makeApiError(res);
+    }
+    return new StorageLocation(await res.json());
+}
+
+/**
  * Gets the part with the given ID
  * @param id ID of the part to load
  * @returns The part having the given ID

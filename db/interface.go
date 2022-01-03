@@ -28,6 +28,9 @@ type DB interface {
 	// The result is provided as paginated list
 	SearchStorageLocations(search models.Search) ([]models.StorageLocation, error)
 
+	// GetStorageLocationByLink returns the storage location that belongs to the given ID
+	GetStorageLocationByLink(id string) (*models.StorageLocation, error)
+
 	//-- Users 👤 --------------------------------------------
 
 	// GetUserByName returns the user with the given username or nothing if the user does not exist
