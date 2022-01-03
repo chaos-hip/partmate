@@ -2,7 +2,7 @@ import router from "@/router"
 
 export enum LinkType {
     Part = "part",                          // Link target is a part
-    StorageLocation = "storageLocation",    // Link target is a storage location
+    StorageLocation = "storage",            // Link target is a storage location
     Attachment = "partAttachment",          // Link target is a part attachment
     Unmapped = "unmapped",                  // The link has not been used yet
 }

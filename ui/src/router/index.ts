@@ -15,7 +15,21 @@ const routes: Array<RouteRecordRaw> = [
   {
     name: 'Search',
     path: '/search',
-    component: () => import('../views/Search.vue')
+    component: () => import('../views/Search.vue'),
+    children: [
+      {
+        path: '',
+        redirect: '/search/parts'
+      },
+      {
+        path: 'parts',
+        component: () => import('../views/PartSearch.vue'),
+      },
+      {
+        path: 'storage',
+        component: () => import('../views/StorageSearch.vue'),
+      }
+    ]
   },
   {
     name: 'LinkViewer',

@@ -1,7 +1,4 @@
-export interface StorageObj {
-    id?: string;
-    name?: string;
-}
+import { StorageObj, StorageLocation } from "./storage";
 
 export interface PartObj {
     id?: string;
@@ -16,17 +13,6 @@ export interface PartObj {
     lowStock?: boolean;
     image?: string;
     storage?: StorageObj;
-}
-
-export class StorageLocation {
-    id = "";
-    name = "";
-
-    constructor(obj?: StorageObj) {
-        if (obj) {
-            Object.assign(this, obj);
-        }
-    }
 }
 
 export class Part {

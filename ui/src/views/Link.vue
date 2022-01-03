@@ -14,11 +14,18 @@
         @onDidDismiss="handleSearchCancel"
         keyboard-close
       >
-        <search-view
+        <part-search-view
+          v-if="searchedLinkType == LinkType.Part"
           :selectOnly="true"
           @partSelected="handleSelect"
           @cancelled="handleSearchCancel"
-        ></search-view>
+        ></part-search-view>
+        <storage-search-view
+          v-if="searchedLinkType == LinkType.StorageLocation"
+          :selectOnly="true"
+          @storageSelected="handleSelect"
+          @cancelled="handleSearchCancel"
+        ></storage-search-view>
       </ion-modal>
       <ion-card>
         <ion-card-header>
@@ -70,7 +77,8 @@ import {
 import { defineComponent, ref } from '@vue/runtime-core';
 import { hardwareChipOutline, cubeOutline, linkOutline } from 'ionicons/icons';
 import { LinkType } from '@/models/link';
-import SearchView from '@/views/Search.vue';
+import PartSearchView from '@/views/PartSearch.vue';
+import StorageSearchView from '@/views/StorageSearch.vue';
 import { errorDisplay } from '@/composables/errorDisplay';
 import { createLink } from '@/api';
 
@@ -93,7 +101,8 @@ export default defineComponent({
     IonLabel,
     IonItem,
     IonModal,
-    SearchView,
+    PartSearchView,
+    StorageSearchView,
   },
   computed: {
     linkId() {

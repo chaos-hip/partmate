@@ -1,4 +1,5 @@
 import { Part, PartObj } from '@/models/part';
+import { StorageObj, StorageLocation } from '@/models/storage';
 import { LinkInfo, LinkType } from '@/models/link';
 import store from '../store';
 
@@ -122,6 +123,34 @@ export async function searchParts(term: string, offset: number, limit: number): 
     }
     const returnedData = (await res.json()) as Array<PartObj>;
     return returnedData.map(item => new Part(item));
+}
+
+/**
+ * Searches for storage locations matching a given search term
+ *
+ * @param term Search term
+ * @returns A list of storage locations matching the search term
+ */
+export async function searchStorageLocation(term: string, offset: number, limit: number): Promise<Array<StorageLocation>> {
+    const payload: SearchPayload = {
+        term,
+        offset: offset >= 0 ? offset : 0,
+        limit: limit >= 0 ? (limit <= 100 ? limit : 100) : 0,
+    };
+    const res = await fetch(
+        '/api/storage/search',
+        {
+            method: 'POST',
+            headers: prepareRequestHeaders(),
+            body: JSON.stringify(payload),
+        }
+    );
+    if (res.status != 200) {
+        const err = await makeApiError(res);
+        throw err;
+    }
+    const returnedData = (await res.json()) as Array<StorageObj>;
+    return returnedData.map(item => new StorageLocation(item));
 }
 
 /**

@@ -1,133 +1,75 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true">
-      <ion-toolbar>
-        <ion-buttons slot="start" v-if="!selectOnly">
-          <ion-menu-button color="primary"></ion-menu-button>
-        </ion-buttons>
-        <ion-title>
-          {{ this.selectOnly ? t("selectOnlyTitle") : t("title") }}
-        </ion-title>
-        <ion-buttons slot="end">
-          <ion-button @click="scanQRCode()" v-if="!selectOnly">
-            <ion-icon
-              slot="icon-only"
-              :ios="cameraOutline"
-              :md="cameraSharp"
-            ></ion-icon>
-          </ion-button>
-          <ion-button @click="$emit('cancelled')" v-if="selectOnly">
-            {{ t("btn.cancel") }}
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-      <ion-toolbar>
-        <ion-searchbar
-          animated
-          autocomplete="off"
-          :placeholder="t('search.placeholder')"
-          enterkeyhint="send"
-          debounce="500"
-          :value="searchTerm"
-          @ionInput="searchTerm = $event.target.value"
-          @change="doSearch(true)"
-          @ionClear="
-            searchTerm = '';
-            doSearch($event);
-          "
-        ></ion-searchbar>
-      </ion-toolbar>
-    </ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start" v-if="!selectOnly">
+        <ion-menu-button color="primary"></ion-menu-button>
+      </ion-buttons>
+      <ion-title>
+        {{ t("title") }}
+      </ion-title>
+      <ion-buttons slot="end">
+        <ion-button @click="scanQRCode()">
+          <ion-icon
+            slot="icon-only"
+            :ios="cameraOutline"
+            :md="cameraSharp"
+          ></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+    <ion-modal
+      :is-open="qrModalIsOpen"
+      @onDidDismiss="handleScanCancel"
+      keyboard-close
+      :initialBreakpoint="0.5"
+      :breakpoints="[0.5, 1]"
+    >
+      <scan-view
+        @scanCancel="handleScanCancel"
+        @scanResult="handleScanResult"
+      ></scan-view>
+    </ion-modal>
+    <ion-tabs @ionTabsDidChange="afterTabChange">
+      <ion-router-outlet></ion-router-outlet>
 
-    <ion-content :fullscreen="true">
-      <ion-modal
-        :is-open="qrModalIsOpen"
-        @onDidDismiss="handleScanCancel"
-        keyboard-close
-        :initialBreakpoint="0.5"
-        :breakpoints="[0.5, 1]"
-      >
-        <scan-view
-          @scanCancel="handleScanCancel"
-          @scanResult="handleScanResult"
-        ></scan-view>
-      </ion-modal>
-      <ion-refresher
-        slot="fixed"
-        @ionRefresh="refresh($event)"
-        id="gallery-refresher"
-      >
-        <ion-refresher-content
-          :pulling-icon="chevronDownCircleOutline"
-          pulling-text="Ziehen zum neu laden..."
-          refreshing-spinner="circles"
-          refreshing-text="Lade..."
-        ></ion-refresher-content>
-      </ion-refresher>
-      <ion-list>
-        <ion-item
-          lines="inset"
-          button
-          v-for="part in searchResult"
-          @click="partSelected(part.id)"
-          :key="part.id"
-        >
-          <ion-thumbnail slot="start">
-            <img :src="part.getThumbnailPath()" />
-          </ion-thumbnail>
-          <ion-label>
-            <h2>{{ part.name }}</h2>
-            <p>{{ part.description }}</p>
-            <ion-badge color="tertiary" class="storage">
-              {{ part.storage.name }}
-            </ion-badge>
-          </ion-label>
-          <ion-badge slot="end" :color="part.lowStock ? 'danger' : 'medium'">{{
-            part.stockLevel
-          }}</ion-badge>
-        </ion-item>
-      </ion-list>
-      <ion-infinite-scroll
-        @ionInfinite="paginate($event)"
-        threshold="100px"
-        :disabled="!stillScrolling"
-      >
-        <ion-infinite-scroll-content
-          loading-spinner="bubbles"
-          :loading-text="t('loading')"
-        ></ion-infinite-scroll-content>
-      </ion-infinite-scroll>
-    </ion-content>
+      <ion-tab-bar slot="bottom">
+        <ion-tab-button tab="parts" href="/search/parts">
+          <ion-icon :icon="hardwareChipOutline"></ion-icon>
+          <ion-label>{{ t("tab.parts") }}</ion-label>
+        </ion-tab-button>
+        <ion-tab-button tab="storage" href="/search/storage">
+          <ion-icon :icon="cubeOutline"></ion-icon>
+          <ion-label>{{ t("tab.storage") }}</ion-label>
+        </ion-tab-button>
+      </ion-tab-bar>
+    </ion-tabs>
   </ion-page>
 </template>
 
 <script lang="ts">
 import { Part } from '@/models/part';
 import {
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonMenuButton,
   IonPage,
-  IonTitle,
+  IonTabs,
+  IonTabBar,
   IonToolbar,
-  IonList,
-  IonItem,
-  IonThumbnail,
-  IonLabel,
-  IonBadge,
-  IonInfiniteScroll,
-  IonInfiniteScrollContent,
-  IonSearchbar,
-  IonRefresher,
-  IonRefresherContent,
+  IonTabButton,
   IonIcon,
-  IonButton,
+  IonLabel,
+  IonRouterOutlet,
   IonModal,
+  IonButton,
+  IonTitle,
+  IonButtons,
+  IonMenuButton,
 } from '@ionic/vue';
 import { defineComponent, ref } from '@vue/runtime-core';
-import { chevronDownCircleOutline, cameraOutline, cameraSharp } from 'ionicons/icons';
-import { searchParts } from '@/api';
+import {
+  hardwareChipOutline,
+  cubeOutline,
+  cameraOutline,
+  cameraSharp,
+} from 'ionicons/icons';
 import PartOverview from '@/views/Part.vue';
 import ScanView from '@/components/QRScanner.vue';
 import { LinkInfo, navigateToLink } from '@/models/link';
@@ -136,26 +78,19 @@ import { errorDisplay } from '@/composables/errorDisplay';
 export default defineComponent({
   name: 'SearchView',
   components: {
-    IonButtons,
-    IonContent,
-    IonHeader,
-    IonMenuButton,
     IonPage,
-    IonTitle,
+    IonTabs,
     IonToolbar,
-    IonList,
-    IonItem,
-    IonThumbnail,
-    IonLabel,
-    IonBadge,
-    IonInfiniteScroll,
-    IonInfiniteScrollContent,
-    IonSearchbar,
-    IonRefresher,
-    IonRefresherContent,
+    IonTabBar,
+    IonTabButton,
     IonIcon,
-    IonButton,
+    IonLabel,
+    IonRouterOutlet,
     IonModal,
+    IonButton,
+    IonTitle,
+    IonButtons,
+    IonMenuButton,
     ScanView,
   },
   props: {
@@ -165,6 +100,9 @@ export default defineComponent({
     selectOnly: Boolean,
   },
   methods: {
+    afterTabChange(...rest: any[]) {
+      console.dir(rest);
+    },
     partSelected(id: string) {
       if (!this.selectOnly) {
         this.$router.push(`/part/${id}`);
@@ -181,31 +119,6 @@ export default defineComponent({
       this.qrModalIsOpen = false;
       navigateToLink(link);
     },
-    async doSearch(clear?: boolean) {
-      if (clear) {
-        this.searchResult = [];
-      }
-      try {
-        const res = await searchParts(this.searchTerm, this.searchResult.length, this.pageSize);
-        this.stillScrolling = res.length > 0;
-        this.searchResult.push(...res);
-      } catch (err) {
-        this.showError(this.t((err as Error).message));
-      }
-    },
-    async paginate(ev: CustomEvent) {
-      await this.doSearch();
-      const target = ev.target as any;
-      target.complete();
-    },
-    async refresh(ev: CustomEvent) {
-      await this.doSearch(true);
-      const target = ev.target as any;
-      target.complete();
-    },
-  },
-  mounted() {
-    this.doSearch(true);
   },
   setup() {
     const { t, dismissError, showError } = errorDisplay();
@@ -221,14 +134,15 @@ export default defineComponent({
       t,
       showError,
       dismissError,
+      hardwareChipOutline,
+      cubeOutline,
+      cameraOutline,
+      cameraSharp,
       searchResult,
       searchTerm,
       stillScrolling,
       pageSize,
-      chevronDownCircleOutline,
       PartOverview,
-      cameraSharp,
-      cameraOutline,
       qrModalIsOpen,
     }
   }
@@ -236,30 +150,16 @@ export default defineComponent({
 </script>
 
 <i18n locale="de" lang="yaml">
-  title: 'Suche'
-  selectOnlyTitle: Auswählen
-  loading: 'Lade...'
-  btn:
-    dismiss: Schließen
-    back: Suche
-    cancel: Abbrechen
-  search:
-    placeholder: 'Nach Teilen suchen...'
-    parts: 'Teile'
-    locations: 'Lager'
+  title: Suche
+  tab:
+    parts: Teile
+    storage: Lager
 </i18n>
 <i18n locale="en" lang="yaml">
-  title: 'Search'
-  selectOnlyTitle: Choose
-  loading: 'Loading...'
-  btn:
-    dismiss: Close
-    back: Search
-    cancel: Cancel
-  search:
-    placeholder: 'Search for parts...'
-    parts: 'Parts'
-    locations: 'Storage'
+  title: Search
+  tab:
+    parts: Parts
+    storage: Storage
 </i18n>
 
 <style scoped>
