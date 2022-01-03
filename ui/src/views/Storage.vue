@@ -23,10 +23,15 @@
           @click="$router.push(`/storage/${storageId}/links`)"
         >
           <ion-icon slot="start" :icon="linkSharp"></ion-icon>
-          <ion-label>{{ t("part.links") }}</ion-label>
+          <ion-label>{{ t("storage.links") }}</ion-label>
         </ion-item>
       </ion-card>
       <ion-loading :is-open="loading" :message="t('loading')"></ion-loading>
+      <ion-list v-if="!loading && storage">
+        <ion-list-header>
+          <ion-label>{{ t("storage.contents") }}</ion-label>
+        </ion-list-header>
+      </ion-list>
     </ion-content>
   </ion-page>
 </template>
@@ -49,6 +54,8 @@ import {
   IonLabel,
   IonLoading,
   IonIcon,
+  IonList,
+  IonListHeader,
   isPlatform,
 } from '@ionic/vue';
 import { defineComponent, ref, Ref } from '@vue/runtime-core';
@@ -74,6 +81,8 @@ export default defineComponent({
     IonLabel,
     IonLoading,
     IonIcon,
+    IonList,
+    IonListHeader,
   },
   props: {
     id: String,
@@ -132,21 +141,17 @@ export default defineComponent({
 
 <i18n locale="de" lang="yaml">
 loading: Lade...
-part:
-    new: Neues Teil
-    subtitle: Teil
-    attachments: Dateien
+storage:
     links: Links
+    contents: 'Teile in dieser Location'
 err:
   load: Teileinfo konnte nicht geladen werden
 </i18n>
 <i18n locale="en" lang="yaml">
 loading: Loading...
-part:
-    new: 'New Part'
-    subtitle: 'Part'
-    attachments: 'Files'
+storage:
     links: 'Links'
+    contents: 'Parts in this location'
 err:
   load: Failed to load part information
 </i18n>
