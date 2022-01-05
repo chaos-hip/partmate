@@ -27,7 +27,8 @@ var (
 		category.categoryPath AS category_path,
 		categoryLinks.link AS category_link,
 		images.id AS image_id,
-		imageLinks.link AS image_link
+		imageLinks.link AS image_link,
+		(SELECT COUNT(*) FROM %s AS parts WHERE parts.storageLocation_id = storage.id) AS parts_contained
 	FROM
 		%s AS storage
 	LEFT OUTER JOIN
@@ -50,6 +51,7 @@ var (
 		%s AS categoryLinks
 	ON
 		categoryLinks.link = (SELECT link FROM %s AS l4 WHERE l4.storageCategoryID = category.id ORDER BY l4.auto_generated LIMIT 1)`,
+		partTableName,
 		storageLocationTableName,
 		linkTableName,
 		linkTableName,
@@ -73,7 +75,8 @@ var (
 		category.categoryPath AS category_path,
 		categoryLinks.link AS category_link,
 		images.id AS image_id,
-		imageLinks.link AS image_link
+		imageLinks.link AS image_link,
+		(SELECT COUNT(*) FROM %s AS parts WHERE parts.storageLocation_id = storage.id) AS parts_contained
 	FROM
 		%s AS links
 	LEFT OUTER JOIN
@@ -100,6 +103,7 @@ var (
 		links.link = ?
 	AND
 		links.storageID IS NOT NULL`,
+		partTableName,
 		linkTableName,
 		storageLocationTableName,
 		storageLocationImageTableName,

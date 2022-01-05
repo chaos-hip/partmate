@@ -196,8 +196,9 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 		apiRouter.POST("/parts/:id/stockremove", handleTeaPottJeeey) // Decrease the current stock of a part
 
 		// Storage locations
-		apiRouter.POST("/storage/search", routes.MakeStorageSearchHandler(dbInstance)) // Paginated search for storage locations
-		apiRouter.GET("/storage/:id", routes.MakeGetStorageByLinkHandler(dbInstance))  // Get details about a single storage location
+		apiRouter.POST("/storage/search", routes.MakeStorageSearchHandler(dbInstance))               // Paginated search for storage locations
+		apiRouter.GET("/storage/:id", routes.MakeGetStorageByLinkHandler(dbInstance))                // Get details about a single storage location
+		apiRouter.GET("/storage/:id/contents", routes.MakeGetPartsByStorageLocationLink(dbInstance)) // Get a paginated list of parts located in a storage location
 
 		// Link handling
 		apiRouter.GET("/parts/:id/links", routes.MakeLinkListHandler(dbInstance))                  // List links for a part

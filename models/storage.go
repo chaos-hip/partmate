@@ -41,6 +41,7 @@ type StorageLocation struct {
 	StorageCategory
 	ImageID   sql.NullInt64  `db:"image_id"`   // Internal ID of the attachment used as image for this location
 	ImageLink sql.NullString `db:"image_link"` // Link pointing to the image used for this location
+	NumParts  uint           `db:"parts_contained"`
 }
 
 // ToDTO converts the storage location to its DTO representation
@@ -53,6 +54,7 @@ func (s *StorageLocation) ToDTO() *StorageLocationDTO {
 	out := StorageLocationDTO{
 		Name:     s.Name,
 		Category: *s.StorageCategory.ToDTO(),
+		NumParts: s.NumParts,
 	}
 	if s.Link.Valid {
 		out.Link = s.Link.String
@@ -69,6 +71,7 @@ type StorageLocationDTO struct {
 	Name      string             `json:"name"`
 	ImageLink string             `json:"image,omitempty"`
 	Category  StorageCategoryDTO `json:"category,omitempty"`
+	NumParts  uint               `json:"partsContained"`
 }
 
 // StorageCategoryDTO is the data transfer object for a storage category

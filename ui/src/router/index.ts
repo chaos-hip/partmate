@@ -39,18 +39,24 @@ const routes: Array<RouteRecordRaw> = [
   {
     name: 'PartViewer',
     path: '/part/:id',
-    component: () => import('../views/Part.vue')
+    component: () => import('../views/Part.vue'),
+  },
+  {
+    name: 'PartLinksViewer',
+    path: '/link/:id/links',
+    component: () => import('../views/LinkEditor.vue'),
   },
   {
     name: 'StorageViewer',
     path: '/storage/:id',
-    component: () => import('../views/Storage.vue')
+    component: () => import('../views/Storage.vue'),
   },
   {
-    name: 'PartLinks',
-    path: '/part/:id/links',
-    component: () => import('../views/PartLinks.vue')
-  },
+    name: 'StorageContentsViewer',
+    path: '/storage/:id/contents',
+    component: () => import('../views/StorageContents.vue'),
+  }
+
 ]
 
 const router = createRouter({

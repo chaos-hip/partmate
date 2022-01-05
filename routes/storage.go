@@ -8,6 +8,7 @@ import (
 	"git.chaos-hip.de/RepairCafe/PartMATE/errors"
 	"git.chaos-hip.de/RepairCafe/PartMATE/models"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/cast"
 )
 
 func MakeStorageSearchHandler(dbInstance db.DB) gin.HandlerFunc {
@@ -62,5 +63,42 @@ func MakeGetStorageByLinkHandler(dbInstance db.DB) gin.HandlerFunc {
 			return
 		}
 		c.JSON(http.StatusOK, res.ToDTO())
+	}
+}
+
+func MakeGetPartsByStorageLocationLink(dbInstance db.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var search models.Search
+		id := strings.TrimSpace(c.Param("id"))
+		if id == "" {
+			c.AbortWithStatusJSON(
+				http.StatusBadRequest,
+				errors.NewResponse(errors.TypeIllegalData, "No storage ID passed", nil),
+			)
+			return
+		}
+		search.StorageLocationLink = id
+		if strVal, ok := c.GetQuery("limit"); ok {
+			search.Limit = cast.ToUint(strVal)
+		}
+		if strVal, ok := c.GetQuery("offset"); ok {
+			search.Offset = cast.ToUint(strVal)
+		}
+
+		res, err := dbInstance.SearchParts(search)
+		if err != nil {
+			c.AbortWithStatusJSON(
+				http.StatusInternalServerError,
+				errors.NewResponse(errors.TypeDBError, "Failed to list contents of storage location", err),
+			)
+			return
+		}
+		dtos := []models.PartDTO{}
+		for _, p := range res {
+			dto := p.ToDTO()
+			dto.Storage = nil
+			dtos = append(dtos, dto)
+		}
+		c.JSON(http.StatusOK, dtos)
 	}
 }

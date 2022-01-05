@@ -28,7 +28,7 @@
         <ion-item
           detail
           lines="none"
-          @click="$router.push(`/part/${partId}/links`)"
+          @click="$router.push(`/link/${partId}/links`)"
         >
           <ion-icon slot="start" :icon="linkSharp"></ion-icon>
           <ion-label>{{ t("part.links") }}</ion-label>
@@ -95,13 +95,6 @@ export default defineComponent({
   computed: {
     partId() {
       return this.id || this.$route.params.id || '';
-    }
-  },
-  watch: {
-    partId(newVal: string) {
-      if (newVal) {
-        this.loadPart();
-      }
     }
   },
   methods: {

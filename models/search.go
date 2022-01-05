@@ -7,5 +7,6 @@ type PaginationInfo struct {
 
 type Search struct {
 	PaginationInfo
-	Term string `json:"term"`
+	Term                string `json:"term"`
+	StorageLocationLink string `json:"storage"`
 }

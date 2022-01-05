@@ -135,7 +135,7 @@ export async function searchStorageLocation(term: string, offset: number, limit:
     const payload: SearchPayload = {
         term,
         offset: offset >= 0 ? offset : 0,
-        limit: limit >= 0 ? (limit <= 100 ? limit : 100) : 0,
+        limit: limit >= 0 ? (limit <= 100 ? limit : 100) : 10,
     };
     const res = await fetch(
         '/api/storage/search',
@@ -167,6 +167,27 @@ export async function getStorageById(id: string): Promise<StorageLocation> {
         throw await makeApiError(res);
     }
     return new StorageLocation(await res.json());
+}
+
+/**
+ * Gets the contents of the given storage location
+ * @param id ID of the storage location to get the contents for
+ * @param offset The number of records to skip when returning the paginated result
+ * @param limit The number of items to return per page
+ * @returns A list of parts contained in the current storage location
+ */
+export async function getStorageContentsByStorageId(id: string, offset: number, limit: number): Promise<Array<Part>> {
+    if (!isValidLink(id)) {
+        throw new Error('Invalid storage location ID');
+    }
+    offset = offset >= 0 ? Number(offset) : 0;
+    limit = limit >= 0 ? (limit <= 100 ? Number(limit) : 100) : 10;
+    const res = await fetch(`/api/storage/${id}/contents?limit=${limit}&offset=${offset}`, { method: 'GET', headers: prepareRequestHeaders() });
+    if (res.status !== 200) {
+        throw await makeApiError(res);
+    }
+    const returnedData = (await res.json()) as Array<PartObj>;
+    return returnedData.map(item => new Part(item));
 }
 
 /**

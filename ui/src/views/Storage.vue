@@ -5,33 +5,52 @@
         <ion-buttons slot="start">
           <ion-back-button default-href="/search/storage"></ion-back-button>
         </ion-buttons>
-        <ion-title>{{ storage ? storage.name : "" }}</ion-title>
+        <ion-title>
+          {{ storage ? storage.name : "" }}
+        </ion-title>
+        <ion-buttons slot="end">
+          <ion-button>
+            <ion-icon
+              slot="icon-only"
+              :ios="ellipsisHorizontal"
+              :md="ellipsisVertical"
+            ></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content fullscreen>
       <ion-card v-if="!loading && storage">
         <ion-card-header>
-          <ion-card-subtitle color="primary">{{
-            storage.category.fullPath
-          }}</ion-card-subtitle>
-          <ion-card-title>{{ storage.name }}</ion-card-title>
+          <ion-card-subtitle color="primary">
+            {{ storage.category.fullPath }}
+          </ion-card-subtitle>
+          <ion-card-title>
+            {{ storage.name }}
+          </ion-card-title>
           <p>{{ storage.description }}</p>
         </ion-card-header>
         <ion-item
           detail
           lines="none"
-          @click="$router.push(`/storage/${storageId}/links`)"
+          @click="$router.push(`/link/${storage.id}/links`)"
         >
           <ion-icon slot="start" :icon="linkSharp"></ion-icon>
           <ion-label>{{ t("storage.links") }}</ion-label>
         </ion-item>
+        <ion-item
+          detail
+          lines="none"
+          @click="$router.push(`/storage/${storage.id}/contents`)"
+        >
+          <ion-icon slot="start" :icon="hardwareChipOutline"></ion-icon>
+          <ion-label>{{ t("storage.contents") }}</ion-label>
+          <ion-note slot="end" color="medium">
+            {{ storage.partsContained }}
+          </ion-note>
+        </ion-item>
       </ion-card>
       <ion-loading :is-open="loading" :message="t('loading')"></ion-loading>
-      <ion-list v-if="!loading && storage">
-        <ion-list-header>
-          <ion-label>{{ t("storage.contents") }}</ion-label>
-        </ion-list-header>
-      </ion-list>
     </ion-content>
   </ion-page>
 </template>
@@ -54,12 +73,12 @@ import {
   IonLabel,
   IonLoading,
   IonIcon,
-  IonList,
-  IonListHeader,
+  IonButton,
+  IonNote,
   isPlatform,
 } from '@ionic/vue';
 import { defineComponent, ref, Ref } from '@vue/runtime-core';
-import { documentsSharp, linkSharp } from 'ionicons/icons';
+import { linkSharp, hardwareChipOutline, ellipsisVertical, ellipsisHorizontal } from 'ionicons/icons';
 import { getStorageById } from '@/api';
 import { errorDisplay } from '@/composables/errorDisplay';
 
@@ -81,8 +100,8 @@ export default defineComponent({
     IonLabel,
     IonLoading,
     IonIcon,
-    IonList,
-    IonListHeader,
+    IonButton,
+    IonNote,
   },
   props: {
     id: String,
@@ -94,13 +113,6 @@ export default defineComponent({
   computed: {
     storageId() {
       return this.id || this.$route.params.id || '';
-    }
-  },
-  watch: {
-    storageId(newVal: string) {
-      if (newVal) {
-        this.loadStorageLocation();
-      }
     }
   },
   methods: {
@@ -129,8 +141,10 @@ export default defineComponent({
       t,
       showError,
       dismissError,
-      documentsSharp,
       linkSharp,
+      hardwareChipOutline,
+      ellipsisVertical,
+      ellipsisHorizontal,
       isPlatform,
       storage,
       loading,
@@ -143,17 +157,17 @@ export default defineComponent({
 loading: Lade...
 storage:
     links: Links
-    contents: 'Teile in dieser Location'
+    contents: Teile
 err:
-  load: Teileinfo konnte nicht geladen werden
+  load: Lagerort konnte nicht geladen werden
 </i18n>
 <i18n locale="en" lang="yaml">
 loading: Loading...
 storage:
     links: 'Links'
-    contents: 'Parts in this location'
+    contents: Parts
 err:
-  load: Failed to load part information
+  load: Failed to load storage location information
 </i18n>
 
 <style scoped>

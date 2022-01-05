@@ -40,27 +40,12 @@
         ></ion-refresher-content>
       </ion-refresher>
       <ion-list>
-        <ion-item
-          lines="inset"
-          button
+        <part-list-item
           v-for="part in searchResult"
+          :part="part"
           @click="partSelected(part.id)"
           :key="part.id"
-        >
-          <ion-thumbnail slot="start">
-            <img :src="part.getThumbnailPath()" />
-          </ion-thumbnail>
-          <ion-label>
-            <h2>{{ part.name }}</h2>
-            <p>{{ part.description }}</p>
-            <ion-badge color="tertiary" class="storage">
-              {{ part.storage.name }}
-            </ion-badge>
-          </ion-label>
-          <ion-badge slot="end" :color="part.lowStock ? 'danger' : 'medium'">{{
-            part.stockLevel
-          }}</ion-badge>
-        </ion-item>
+        ></part-list-item>
       </ion-list>
       <ion-infinite-scroll
         @ionInfinite="paginate($event)"
@@ -78,16 +63,13 @@
 
 <script lang="ts">
 import { Part } from '@/models/part';
+import PartListItem from '@/components/PartListItem.vue';
 import {
   IonContent,
   IonHeader,
   IonPage,
   IonToolbar,
   IonList,
-  IonItem,
-  IonThumbnail,
-  IonLabel,
-  IonBadge,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
   IonSearchbar,
@@ -101,7 +83,6 @@ import { chevronDownCircleOutline, cameraOutline, cameraSharp } from 'ionicons/i
 import { searchParts } from '@/api';
 import PartOverview from '@/views/Part.vue';
 import { errorDisplay } from '@/composables/errorDisplay';
-import { navigateToLink } from '@/models/link';
 
 export default defineComponent({
   name: 'PartSearchView',
@@ -111,10 +92,6 @@ export default defineComponent({
     IonPage,
     IonToolbar,
     IonList,
-    IonItem,
-    IonThumbnail,
-    IonLabel,
-    IonBadge,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
     IonSearchbar,
@@ -122,6 +99,7 @@ export default defineComponent({
     IonRefresherContent,
     IonButtons,
     IonButton,
+    PartListItem,
   },
   props: {
     /**
@@ -239,11 +217,5 @@ export default defineComponent({
 
 #container a {
   text-decoration: none;
-}
-
-.storage {
-  background-color: rgba(46, 91, 216, 0.4);
-  font-weight: normal;
-  font-style: italic;
 }
 </style>

@@ -8,6 +8,7 @@ export interface StorageObj {
     name?: string;
     image?: string;
     category?: StorageCategoryObj;
+    partsContained?: number;
 }
 
 export class StorageLocationCategory {
@@ -31,6 +32,7 @@ export class StorageLocation {
     name = "";
     image = "";
     category = new StorageLocationCategory();
+    partsContained = 0;
 
     constructor(obj?: StorageObj) {
         if (obj) {

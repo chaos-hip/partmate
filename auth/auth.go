@@ -67,7 +67,7 @@ func MakeAuthMiddleware(repo db.DB, pubkey *rsa.PublicKey) gin.HandlerFunc {
 			return
 		}
 		// Try to decode the JWT
-		parsedToken, err := jwt.ParseWithClaims(token, &jwt.StandardClaims{}, func(t *jwt.Token) (interface{}, error) {
+		parsedToken, err := jwt.ParseWithClaims(token, &jwt.RegisteredClaims{}, func(t *jwt.Token) (interface{}, error) {
 			return pubkey, nil
 		})
 		if err != nil {
@@ -76,7 +76,7 @@ func MakeAuthMiddleware(repo db.DB, pubkey *rsa.PublicKey) gin.HandlerFunc {
 			return
 		}
 		// JWT is valid - load the user from the DB
-		claims := parsedToken.Claims.(*jwt.StandardClaims)
+		claims := parsedToken.Claims.(*jwt.RegisteredClaims)
 		user, err := repo.GetUserByName(claims.Subject)
 		if err != nil {
 			logrus.WithError(err).Errorf("Failed to retrieve user by name %#v", claims.Subject)
