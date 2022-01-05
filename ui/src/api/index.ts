@@ -251,3 +251,37 @@ export async function createLink(link: string, targetType: LinkType, target: str
         throw await makeApiError(res);
     }
 }
+
+/**
+ * Deletes a link from the PartMATE database
+ * @param link The link to delete from the database
+ */
+export async function deleteLink(link: string): Promise<void> {
+    if (!isValidLink(link)) {
+        throw new Error('Invalid link ID');
+    }
+    const res = await fetch(`/api/links/${link}`, {
+        method: 'DELETE',
+        headers: prepareRequestHeaders(),
+    });
+    if (res.status !== 204) {
+        throw await makeApiError(res);
+    }
+}
+
+/**
+ * Returns a list of links that link to the same target(s) the given link ID links to
+ *
+ * @param link The link ID to get the associated links for
+ * @returns A list of other links that point to the same target(s) as the current one does
+ */
+export async function getLinksByParentLink(link: string): Promise<Array<LinkInfo>> {
+    if (!isValidLink(link)) {
+        throw new Error('Invalid link ID');
+    }
+    const res = await fetch(`/api/links/${link}/links`, { method: 'GET', headers: prepareRequestHeaders() });
+    if (res.status !== 200) {
+        throw await makeApiError(res);
+    }
+    return (await res.json()) as Array<LinkInfo>;
+}

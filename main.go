@@ -201,7 +201,7 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 		apiRouter.GET("/storage/:id/contents", routes.MakeGetPartsByStorageLocationLink(dbInstance)) // Get a paginated list of parts located in a storage location
 
 		// Link handling
-		apiRouter.GET("/parts/:id/links", routes.MakeLinkListHandler(dbInstance))                  // List links for a part
+		apiRouter.GET("/links/:id/links", routes.MakeLinkListHandler(dbInstance))                  // List links for a part
 		apiRouter.GET("/links/:id", routes.MakeGetLinkInfoHandler(dbInstance))                     // Get infos about where a link points at
 		apiRouter.POST("/links", routes.MakeLinkCreateHandler(dbInstance))                         // create Link
 		apiRouter.DELETE("/links/:id", routes.MakeLinkDeleteHandler(dbInstance))                   // delete Link
