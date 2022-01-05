@@ -7,13 +7,25 @@
         </ion-buttons>
         <ion-title>{{ t("title") }}</ion-title>
         <ion-buttons slot="primary">
-          <ion-button>
+          <ion-button @click="scanQRCode()">
             <ion-icon slot="icon-only" :icon="addSharp"></ion-icon>
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content fullscreen>
+      <ion-modal
+        :is-open="qrModalIsOpen"
+        @onDidDismiss="handleScanCancel"
+        keyboard-close
+        :initialBreakpoint="0.5"
+        :breakpoints="[0.5, 1]"
+      >
+        <scan-view
+          @scanCancel="handleScanCancel"
+          @scanResult="handleScanResult"
+        ></scan-view>
+      </ion-modal>
       <ion-text v-if="!loading && linkList.length == 0">
         {{ t("msg.emptyResult") }}
       </ion-text>
@@ -60,12 +72,22 @@ import {
   IonContent,
   IonButton,
   IonIcon,
+  IonLoading,
+  IonItemSliding,
+  IonItemOption,
+  IonItemOptions,
+  IonList,
+  IonItem,
+  IonText,
+  IonModal,
+  toastController,
 } from '@ionic/vue';
 import { defineComponent, ref, Ref } from '@vue/runtime-core';
 import { addSharp, linkOutline } from 'ionicons/icons';
-import { LinkInfo } from '@/models/link';
-import { deleteLink, getLinksByParentLink } from '@/api';
+import { LinkInfo, LinkType } from '@/models/link';
+import { createLink, deleteLink, getLinksByParentLink } from '@/api';
 import { errorDisplay } from '@/composables/errorDisplay';
+import ScanView from '@/components/QRScanner.vue';
 
 export default defineComponent({
   name: 'PartLinkOverview',
@@ -79,6 +101,15 @@ export default defineComponent({
     IonContent,
     IonButton,
     IonIcon,
+    IonLoading,
+    IonItemSliding,
+    IonItemOption,
+    IonItemOptions,
+    IonList,
+    IonItem,
+    IonText,
+    IonModal,
+    ScanView,
   },
   props: {
     id: String,
@@ -123,16 +154,44 @@ export default defineComponent({
       } else {
         this.reloadData();
       }
-    }
+    },
+    scanQRCode() {
+      this.qrModalIsOpen = true;
+    },
+    handleScanCancel() {
+      this.qrModalIsOpen = false;
+    },
+    async handleScanResult(link: LinkInfo) {
+      this.qrModalIsOpen = false;
+      if (link.targetType == LinkType.Unmapped) {
+        try {
+          await createLink(link.link, this.linkList[0].targetType, this.parentLink)
+        } catch (err) {
+          this.showError(String(err), 'err.link');
+        }
+      } else {
+        const toast = await toastController.create({
+          duration: 2000,
+          color: 'danger',
+          message: this.t('err.qrCodeAlreadyUsed'),
+          position: 'bottom',
+        });
+        await toast.present();
+      }
+      this.reloadData();
+    },
   },
   mounted() {
-    this.reloadData();
+    this.$nextTick(function () {
+      this.reloadData();
+    });
   },
   setup() {
     const { t, dismissError, showError } = errorDisplay();
 
     const linkList: Ref<Array<LinkInfo>> = ref([]);
     const loading = ref(false);
+    const qrModalIsOpen = ref(false);
 
     return {
       t,
@@ -142,6 +201,7 @@ export default defineComponent({
       linkList,
       loading,
       linkOutline,
+      qrModalIsOpen,
     }
   }
 });
@@ -155,6 +215,12 @@ msg:
     Dieses Element verfügt über keine Links.
 btn:
   delete: Löschen
+  dismiss: Schließen
+err:
+  qrCodeAlreadyUsed: |
+    Der gescannte Code wird bereits anderweitig verwendet
+  load: Beim Laden der Daten ist ein Fehler aufgetreten
+  link: Link konnte nicht erstellt werden
 </i18n>
 <i18n locale="en" lang="yaml">
 title: Links
@@ -165,6 +231,12 @@ msg:
     Click '+' to add some
 btn:
   delete: Delete
+  dismiss: Dismiss
+err:
+  qrCodeAlreadyUsed: |
+    The code you scanned was already used elsewhere
+  load: An error ocurred while loading data
+  link: Failed to create link
 </i18n>
 
 <style scoped>

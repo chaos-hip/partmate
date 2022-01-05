@@ -103,12 +103,6 @@ export default defineComponent({
     afterTabChange(...rest: any[]) {
       console.dir(rest);
     },
-    partSelected(id: string) {
-      if (!this.selectOnly) {
-        this.$router.push(`/part/${id}`);
-      }
-      this.$emit('part-selected', id);
-    },
     scanQRCode() {
       this.qrModalIsOpen = true;
     },

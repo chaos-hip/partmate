@@ -37,3 +37,6 @@ qr.png
 
 # PartKeepr data directory
 data/
+
+# Publicly served directory
+public/

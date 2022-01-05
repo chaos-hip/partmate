@@ -173,7 +173,7 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 	})
 
 	// Static files
-	router.Static("/ui", "public")
+	router.Static("ui", "public")
 
 	// Unsecured attachment downloads
 	router.GET("/api/attachments/:id/thumb", routes.MakeGetThumbnailImageHandler(dbInstance)) // Get thumbnail for attachment

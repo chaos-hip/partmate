@@ -4,7 +4,7 @@ export enum LinkType {
     Part = "part",                          // Link target is a part
     StorageLocation = "storage",            // Link target is a storage location
     Attachment = "partAttachment",          // Link target is a part attachment
-    Unmapped = "unmapped",                  // The link has not been used yet
+    Unmapped = "unknown",                  // The link has not been used yet
 }
 
 export interface LinkInfo {

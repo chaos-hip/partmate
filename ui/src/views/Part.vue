@@ -4,6 +4,7 @@
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-back-button default-href="/search"></ion-back-button>
+          <ion-menu-button color="primary"></ion-menu-button>
         </ion-buttons>
         <ion-title>{{ part ? part.name : "" }}</ion-title>
       </ion-toolbar>
@@ -59,6 +60,7 @@ import {
   IonLoading,
   IonIcon,
   isPlatform,
+  IonMenuButton,
 } from '@ionic/vue';
 import { defineComponent, ref, Ref } from '@vue/runtime-core';
 import { documentsSharp, linkSharp } from 'ionicons/icons';
@@ -84,13 +86,16 @@ export default defineComponent({
     IonLabel,
     IonLoading,
     IonIcon,
+    IonMenuButton,
   },
   props: {
     id: String,
     backButtonLabel: String,
   },
   mounted() {
-    this.loadPart();
+    this.$nextTick(function () {
+      this.loadPart();
+    });
   },
   computed: {
     partId() {

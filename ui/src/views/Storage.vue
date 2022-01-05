@@ -4,6 +4,7 @@
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-back-button default-href="/search/storage"></ion-back-button>
+          <ion-menu-button color="primary"></ion-menu-button>
         </ion-buttons>
         <ion-title>
           {{ storage ? storage.name : "" }}
@@ -108,7 +109,9 @@ export default defineComponent({
     backButtonLabel: String,
   },
   mounted() {
-    this.loadStorageLocation();
+    this.$nextTick(function () {
+      this.loadStorageLocation();
+    });
   },
   computed: {
     storageId() {
