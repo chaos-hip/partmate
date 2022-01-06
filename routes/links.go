@@ -3,12 +3,17 @@ package routes
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"git.chaos-hip.de/RepairCafe/PartMATE/db"
 	"git.chaos-hip.de/RepairCafe/PartMATE/errors"
 	"git.chaos-hip.de/RepairCafe/PartMATE/models"
 	"github.com/gin-gonic/gin"
+)
+
+var (
+	regexIsValidLink = regexp.MustCompile(`^[a-zA-Z0-9_\.\-]{1,64}$`)
 )
 
 //-- Helpers -----------------------------------------------------------------------------------------------------------
@@ -49,8 +54,6 @@ func doCreateLink(c *gin.Context, dbInstance db.DB, input models.LinkDTO) {
 	c.JSON(http.StatusOK, outLink.ToDTO())
 }
 
-//-- Handlers ----------------------------------------------------------------------------------------------------------
-
 func getBaseURLFromRequest(c *gin.Context) string {
 	proto := "http"
 	if val := c.Request.Header.Get("X-Forwarded-Proto"); val != "" {
@@ -63,6 +66,8 @@ func getBaseURLFromRequest(c *gin.Context) string {
 	return "" // This will force a relative URL
 }
 
+//-- Handlers ----------------------------------------------------------------------------------------------------------
+
 func MakeLinkRedirectHandler(dbInstance db.DB, defaultBaseURL string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var baseURL = defaultBaseURL
@@ -70,10 +75,10 @@ func MakeLinkRedirectHandler(dbInstance db.DB, defaultBaseURL string) gin.Handle
 			baseURL = getBaseURLFromRequest(c)
 		}
 		id := strings.TrimSpace(c.Param("id"))
-		if id == "" {
+		if id == "" || !regexIsValidLink.MatchString(id) {
 			c.AbortWithStatusJSON(
 				http.StatusBadRequest,
-				errors.NewResponse(errors.TypeIllegalData, "No link ID passed", nil),
+				errors.NewResponse(errors.TypeIllegalData, "No or illegal link ID passed", nil),
 			)
 			return
 		}
