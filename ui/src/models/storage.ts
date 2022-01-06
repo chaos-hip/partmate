@@ -43,8 +43,13 @@ export class StorageLocation {
         }
     }
 
+    getBase(): string {
+        const base = document.querySelector('base');
+        return base ? base.href : '';
+    }
+
     getThumbnailPath() {
-        return '/assets/img/noThumb.png';
+        return `${this.getBase()}assets/img/noThumb.png`;
         // return this.image ? `/api/attachments/${this.image}/thumb` : '/assets/img/noThumb.png';
     }
 }
