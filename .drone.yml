@@ -18,17 +18,17 @@ steps:
       repo: docker.chaos-hip.de/repaircafe/partmate
       tags: latest
       registry: docker.chaos-hip.de
-  # - name: deploy
-  #   image: appleboy/drone-ssh
-  #   settings:
-  #     host:
-  #       from_secret: ssh_host
-  #     username:
-  #       from_secret: ssh_user
-  #     key:
-  #       from_secret: ssh_key
-  #     script_stop: true
-  #     script:
-  #       - cd /home/whity/git/tardis/docker/avocado
-  #       - bash -c "docker-compose pull wedding-api"
-  #       - docker-compose up -d --build
+  - name: deploy
+    image: appleboy/drone-ssh
+    settings:
+      host:
+        from_secret: ssh_host
+      username:
+        from_secret: ssh_user
+      key:
+        from_secret: ssh_key
+      script_stop: true
+      script:
+        - cd /home/whity/git/docker/chaos
+        - bash -c "docker-compose pull partmate"
+        - docker-compose up -d --build
