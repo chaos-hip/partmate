@@ -20,7 +20,6 @@
         id="qrFileInput"
         accept="image/*"
         @change="onFileChosen"
-        capture
       />
     </ion-content>
   </ion-page>
