@@ -6,10 +6,22 @@
         <ion-buttons slot="end">
           <ion-button @click="onCloseClick">{{ t("btn.close") }}</ion-button>
         </ion-buttons>
+        <ion-buttons slot="start">
+          <ion-button @click="onScanFromFileClick">
+            <ion-icon :icon="documentOutline"> </ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="false">
       <div id="qrScanRegion"></div>
+      <input
+        type="file"
+        id="qrFileInput"
+        accept="image/*"
+        @change="onFileChosen"
+        capture
+      />
     </ion-content>
   </ion-page>
 </template>
@@ -26,12 +38,14 @@ import {
   loadingController,
   toastController,
   IonicSafeString,
+  IonIcon,
 } from '@ionic/vue';
 import { defineComponent, ref, Ref } from '@vue/runtime-core';
 import { useI18n } from 'vue-i18n';
-import { alertCircleOutline } from 'ionicons/icons';
+import { alertCircleOutline, documentOutline } from 'ionicons/icons';
 import { Html5Qrcode } from 'html5-qrcode';
 import { getLinkInfo } from '@/api';
+import { Html5QrcodeCameraScanConfig } from 'html5-qrcode/esm/html5-qrcode';
 
 export default defineComponent({
   name: 'ScanView',
@@ -43,28 +57,89 @@ export default defineComponent({
     IonTitle,
     IonContent,
     IonButton,
+    IonIcon,
   },
   mounted() {
-    const config = {
-      fps: 10,
-      qrbox: 300,
-    }
-    const scanner = new Html5Qrcode('qrScanRegion', false);
-    scanner.start({ facingMode: "environment" }, config, this.onScanSuccess, undefined);
-    (this.scanner as unknown) = scanner;
+    this.$nextTick(function () {
+      this.startScanning();
+    });
   },
   beforeUnmount() {
     this.$emit('scan-cancel');
     this.stopScanning();
   },
   methods: {
+    async startScanning() {
+      const config: Html5QrcodeCameraScanConfig = {
+        fps: 10,
+        qrbox: 300,
+      }
+      const scanner = new Html5Qrcode('qrScanRegion', false);
+      try {
+        await scanner.start({ facingMode: "environment" }, config, this.onScanSuccess, undefined);
+      } catch (err) {
+        const toast = await toastController.create({
+          header: this.t('err.startScanning'),
+          message: new IonicSafeString(String(err)),
+          position: 'bottom',
+          icon: alertCircleOutline,
+          color: 'danger',
+          buttons: [
+            {
+              side: 'end',
+              text: this.t('btn.dismiss'),
+              handler: () => {
+                toast.dismiss();
+              }
+            }
+          ],
+        });
+        await toast.present();
+      }
+      (this.scanner as unknown) = scanner;
+    },
+    /**
+     * Tries to scan the code from a file provided by the user
+     */
+    onScanFromFileClick() {
+      const input = document.querySelector('#qrFileInput') as HTMLInputElement;
+      input.click();
+    },
+    async onFileChosen(ev: CustomEvent) {
+      const input = ev.target as HTMLInputElement;
+      if (!input.files || input.files.length == 0 || !this.scanner) {
+        // Nothing selected
+        return;
+      }
+      const scanner = (this.scanner as Html5Qrcode);
+      try {
+        scanner.stop();
+        const decodedText = await scanner.scanFile(input.files[0]);
+        this.onScanSuccess(decodedText);
+      } catch (err) {
+        this.scanner = null;
+        const toast = await toastController.create({
+          message: this.t('err.scanFromFile'),
+          position: 'bottom',
+          icon: alertCircleOutline,
+          color: 'danger',
+          duration: 2000,
+        });
+        await toast.present();
+        this.startScanning();
+      }
+    },
     getLinkId(link: string): string {
       const arr = (/([a-z0-9]+)\/?$/i).exec(link);
       return (arr && arr.length > 1) ? arr[1] : '';
     },
-    stopScanning() {
+    async stopScanning() {
       if (this.scanner !== null) {
-        (this.scanner as Html5Qrcode).stop();
+        try {
+          await (this.scanner as Html5Qrcode).stop();
+        } catch (err) {
+          // Do nothing
+        }
         this.scanner = null;
       }
     },
@@ -122,6 +197,7 @@ export default defineComponent({
       scanner,
       waitingForResult,
       alertCircleOutline,
+      documentOutline,
     }
   }
 });
@@ -136,6 +212,8 @@ link:
   loading: Lade...
 err:
   loadLinkInfo: Fehler beim Laden der Link-Infos
+  startScanning: Konnte Scanner nicht starten
+  scanFromFile: Im Bild wurde kein Code gefunden
 </i18n>
 <i18n locale="en" lang="yaml">
 title: Scan
@@ -146,6 +224,8 @@ link:
   loading: Loading...
 err:
   loadLinkInfo: Error while loading link infos
+  startScanning: Failed to start scanner
+  scanFromFile: No code found in file
 </i18n>
 
 <style scoped>
@@ -156,5 +236,10 @@ err:
   align-content: center;
   align-items: center;
   flex-wrap: nowrap;
+}
+
+#qrFileInput {
+  display: block;
+  opacity: 0;
 }
 </style>
