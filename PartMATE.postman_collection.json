@@ -1,0 +1,505 @@
+{
+	"info": {
+		"_postman_id": "a5fd7496-ed63-40e2-9ac3-5d13b85fe91d",
+		"name": "PartMATE",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Correct response\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.response.to.have.status(200);",
+									"    pm.expect(jsonData.token).to.be.not.empty;",
+									"    pm.globals.set(\"partmateJwt\", jsonData.token);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user\": \"whity\",\n    \"password\": \"changeme\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/login",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"whity\",\n    \"password\": \"changeme\",\n    \"permissions\": [\"foo\", \"bar\", \"baz\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/user",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Part management",
+			"item": [
+				{
+					"name": "Search parts",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"term\": \"lcd\",\n    \"limit\": 10,\n    \"offset\": 0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/parts/search",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"parts",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get part by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/parts/:id",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"parts",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "ID of the part to load (Link)"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get QR code for part",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/parts/:id/qr",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"parts",
+								":id",
+								"qr"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "ID of the part to load (Link)"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload new attachment for part",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "filename",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/parts/:id/attachments",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"parts",
+								":id",
+								"attachments"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "External ID of the part the attachment will be attached to"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create link for part (shortcut)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/parts/:id/links/:linkId",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"parts",
+								":id",
+								"links",
+								":linkId"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "giysXW76K7xNPeLXC46u4V",
+									"description": "ID of the part"
+								},
+								{
+									"key": "linkId",
+									"value": "fooBar",
+									"description": "ID of the new link to generate (optional)"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add stock",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 10,\n    \"comment\": \"Lorem ipsum\",\n    \"price\": \"10.33\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/parts/:id/stockadd",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"parts",
+								":id",
+								"stockadd"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "ID of the part"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove stock",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 10,\n    \"comment\": \"Lorem ipsum\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/parts/:id/stockremove",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"parts",
+								":id",
+								"stockremove"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "ID of the part"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Link management",
+			"item": [
+				{
+					"name": "Get Links for part ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/parts/:id/links",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"parts",
+								":id",
+								"links"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "test",
+									"description": "ID of the part to load (Link)"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create link",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"link\": \"EinLinkDerDeinenNamenTrägt\",\n    \"targetType\": \"part\",\n    \"target\": \"giysXW76K7xNPeLXC46u4V\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/links",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"links"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete link",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/links/:id",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"links",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "aaaaaaaaa",
+									"description": "ID of the link to be deleted"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get link information",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/links/:id",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"links",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "test",
+									"description": "ID of the part to load (Link)"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Attachments",
+			"item": [
+				{
+					"name": "Get thumbnail for attachment",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/attachments/:id/thumb",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"attachments",
+								":id",
+								"thumb"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "Q2QfDFAMjbtwEKwwiyyKSB",
+									"description": "ID (Link) for the attachment"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{partmateJwt}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

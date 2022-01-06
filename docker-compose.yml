@@ -1,0 +1,50 @@
+# This compose file contains everything needed for launching PartMATE locally
+version: '3.8'
+
+services:
+  mariadb:
+    build:
+      context: ./docker/mariadb/
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: '${MARIA_ROOT_PASSWORD}'
+    volumes:
+      - ${DOCKER_VOLUME_DIR}/mariadb:/var/lib/mysql
+    labels:
+      - 'traefik.enable=false'
+    ports:
+      - '3306:3306'
+    networks:
+      - net
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - '8080:8080'
+    networks:
+      - net
+  partmate:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+    volumes:
+      - ${DOCKER_VOLUME_DIR}/partmate/config:/opt/app/config
+      - ${DOCKER_VOLUME_DIR}/partmate/data:/opt/app/data
+    ports:
+      - '3000:3000'
+    networks:
+      - net
+    environment:
+      PARTMATE_DB_HOST: mariadb
+      PARTMATE_DB_USER: root # Since this is for local testing only, this should be enough
+      PARTMATE_DB_PASSWORD: '${MARIA_ROOT_PASSWORD}'
+      PARTMATE_PARTKEEPR_DATA_DIR: /partmate/data
+      PARTMATE_LOG_LEVEL: debug
+
+networks:
+  net:
+    internal: false
