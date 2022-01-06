@@ -72,10 +72,7 @@ func MakeLinkListHandler(dbInstance db.DB) gin.HandlerFunc {
 		}
 		out := []models.LinkDTO{}
 		for _, l := range links {
-			// Only part links allowed in the result
-			if l.PartID != nil {
-				out = append(out, l.ToDTO())
-			}
+			out = append(out, l.ToDTO())
 		}
 		c.JSON(http.StatusOK, out)
 	}
