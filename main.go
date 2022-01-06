@@ -36,6 +36,7 @@ const (
 	confKeyJWTPrivateKey = "jwt.key"
 	confKeyJWTIssuer     = "jwt.issuer"
 	confKeyJWTKeyLength  = "jwt.keylength"
+	confKeyBaseURL       = "http.baseurl" // The base URL used for absolute paths or redirects
 )
 
 /*
@@ -154,6 +155,9 @@ func initLogger(conf *viper.Viper) error {
 }
 
 func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper) *gin.Engine {
+
+	baseURL := conf.GetString(confKeyBaseURL)
+
 	router := gin.Default()
 
 	// Load templates
@@ -177,6 +181,9 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 
 	// Unsecured attachment downloads
 	router.GET("/api/attachments/:id/thumb", routes.MakeGetThumbnailImageHandler(dbInstance)) // Get thumbnail for attachment
+
+	// Unsecured link redirection
+	router.GET("/l/:id", routes.MakeLinkRedirectHandler(dbInstance, baseURL)) // Redirect to the correct UI view based on the incoming link
 
 	apiRouter := router.Group("/api")
 	{

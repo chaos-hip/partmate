@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -49,6 +50,61 @@ func doCreateLink(c *gin.Context, dbInstance db.DB, input models.LinkDTO) {
 }
 
 //-- Handlers ----------------------------------------------------------------------------------------------------------
+
+func getBaseURLFromRequest(c *gin.Context) string {
+	proto := "http"
+	if val := c.Request.Header.Get("X-Forwarded-Proto"); val != "" {
+		proto = val
+	}
+	// ToDo: Secure this when not using a proxy in front
+	if val := c.Request.Header.Get("X-Forwarded-Host"); val != "" {
+		return fmt.Sprintf("%s://%s", proto, val)
+	}
+	return "" // This will force a relative URL
+}
+
+func MakeLinkRedirectHandler(dbInstance db.DB, defaultBaseURL string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var baseURL = defaultBaseURL
+		if baseURL == "" {
+			baseURL = getBaseURLFromRequest(c)
+		}
+		id := strings.TrimSpace(c.Param("id"))
+		if id == "" {
+			c.AbortWithStatusJSON(
+				http.StatusBadRequest,
+				errors.NewResponse(errors.TypeIllegalData, "No link ID passed", nil),
+			)
+			return
+		}
+		link, err := dbInstance.GetLinkByID(id)
+		if err != nil {
+			c.AbortWithStatusJSON(
+				http.StatusInternalServerError,
+				errors.NewResponse(errors.TypeDBError, "Error fetching links", err),
+			)
+			return
+		}
+		fmt.Printf("%s/ui/part/%s\n", baseURL, id)
+		if link == nil {
+			// Redirect to link page
+			c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("%s/ui/link/%s", baseURL, id))
+			return
+		}
+
+		switch link.GetTargetType() {
+		case models.TargetTypePart:
+			c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("%s/ui/part/%s", baseURL, link.Link))
+		case models.TargetTypeStorage:
+			c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("%s/ui/storage/%s", baseURL, link.Link))
+		default:
+			c.AbortWithStatusJSON(
+				http.StatusNotImplemented,
+				errors.NewResponse(errors.TypeIllegalData, "You provided a link to an unsupported target type", nil),
+			)
+		}
+	}
+}
 
 // MakeLinkListHandler returns a handler function that lists the links belonging to an item that is linkable
 // Linkable items are parts, storage locations and attachments
