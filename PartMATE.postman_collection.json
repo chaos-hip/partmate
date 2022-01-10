@@ -34,7 +34,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"user\": \"whity\",\n    \"password\": \"changeme\"\n}",
+							"raw": "{\n    \"user\": \"{{user}}\",\n    \"password\": \"{{password}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -61,7 +61,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"whity\",\n    \"password\": \"changeme\",\n    \"permissions\": [\"foo\", \"bar\", \"baz\"]\n}",
+							"raw": "{\n    \"name\": \"foo\",\n    \"password\": \"changeme\",\n    \"permissions\": [\"part.attachment:read\"]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -80,6 +80,60 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get available permissions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/permissions",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set user permissions",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    \"link:create\",\n    \"link:delete\",\n    \"link:read\",\n    \"part.attachment:create\",\n    \"part.attachment:read\",\n    \"part.stock:manage\",\n    \"report.storageContents:view\",\n    \"report.venueSummary:view\",\n    \"user:create\",\n    \"user.permission:grant\",\n    \"user.password:admin\",\n    \"user.password:set\",\n    \"venue:create\",\n    \"venue:delete\",\n    \"venue:finish\",\n    \"venue:read\",\n    \"venue.item:checkin\",\n    \"venue.item:checkout\",\n    \"venue.item:inspected\"\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/user/:name/permissions",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"user",
+								":name",
+								"permissions"
+							],
+							"variable": [
+								{
+									"key": "name",
+									"value": "whity",
+									"description": "User name of the user to overwrite the permissions for"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -93,7 +147,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"term\": \"lcd\",\n    \"limit\": 10,\n    \"offset\": 0\n}",
+							"raw": "{\n    \"term\": \"\",\n    \"storage\": \"AfJmqHwCD3xMYjkBAn7ote\", \n    \"limit\": 10,\n    \"offset\": 0\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -320,25 +374,25 @@
 			"name": "Link management",
 			"item": [
 				{
-					"name": "Get Links for part ID",
+					"name": "Get Links for link ID",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseURL}}/api/parts/:id/links",
+							"raw": "{{baseURL}}/api/links/:id/links",
 							"host": [
 								"{{baseURL}}"
 							],
 							"path": [
 								"api",
-								"parts",
+								"links",
 								":id",
 								"links"
 							],
 							"variable": [
 								{
 									"key": "id",
-									"value": "test",
+									"value": "foo",
 									"description": "ID of the part to load (Link)"
 								}
 							]
@@ -424,6 +478,34 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Link redirect",
+					"protocolProfileBehavior": {
+						"followRedirects": false
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/l/:id",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"l",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "foo",
+									"description": "Link ID"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -463,6 +545,130 @@
 									"key": "id",
 									"value": "Q2QfDFAMjbtwEKwwiyyKSB",
 									"description": "ID (Link) for the attachment"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Storage management",
+			"item": [
+				{
+					"name": "Search storage locations",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"term\": \"\",\n    \"limit\": 10,\n    \"offset\": 0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/storage/search",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"storage",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get storage location by link",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"term\": \"Container\",\n    \"limit\": 10,\n    \"offset\": 0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/storage/:id",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"storage",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "YvuaRtCo6damzu3yUHr8VB",
+									"description": "ID of the storage location to load (link)"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get storage location contents by link",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"term\": \"Container\",\n    \"limit\": 10,\n    \"offset\": 0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/storage/:id/contents",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"storage",
+								":id",
+								"contents"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "1",
+									"description": "Page size to return",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "2",
+									"description": "Position in the result to begin with",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "YvuaRtCo6damzu3yUHr8VB",
+									"description": "ID of the storage location to load (link)"
 								}
 							]
 						}
