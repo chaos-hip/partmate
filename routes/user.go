@@ -127,11 +127,14 @@ func MakeLoginHandler(db db.DB, privateKey *rsa.PrivateKey, issuer string) gin.H
 			return
 		}
 		// All fine - we can assume the user to be logged in. Create a JWT and send it back
-		claims := jwt.RegisteredClaims{
-			Issuer:    issuer,
-			Subject:   user.Username,
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
+		claims := models.PermissionClaims{
+			RegisteredClaims: jwt.RegisteredClaims{
+				Issuer:    issuer,
+				Subject:   user.Username,
+				IssuedAt:  jwt.NewNumericDate(time.Now()),
+				ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
+			},
+			Permissions: user.Permissions(),
 		}
 		token := jwt.NewWithClaims(jwt.SigningMethodRS512, &claims)
 		jwt, err := token.SignedString(privateKey)

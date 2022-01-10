@@ -7,6 +7,7 @@ import (
 
 	"git.chaos-hip.de/RepairCafe/PartMATE/auth/hash"
 	"git.chaos-hip.de/RepairCafe/PartMATE/models/permission"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/sirupsen/logrus"
 )
 
@@ -35,11 +36,12 @@ func (u *User) CheckPassword(input string) bool {
 func (u *User) ToDTO() UserDTO {
 	return UserDTO{
 		Username:    u.Username,
-		Permissions: u.loadPermissions(),
+		Permissions: u.Permissions(),
 	}
 }
 
-func (u *User) loadPermissions() []string {
+// Permissions returns the decoded permission slice
+func (u *User) Permissions() []string {
 	perms := []string{}
 	if err := json.Unmarshal([]byte(u.RawPermissions), &perms); err != nil {
 		logrus.WithError(err).Errorf("Failed to decode permissions for user %#v", u.Username)
@@ -53,7 +55,7 @@ func (u *User) Can(perms ...string) bool {
 	if u.permissions == nil {
 		// Load the permissions into the map
 		u.permissions = make(map[string]bool)
-		tmpPerm := u.loadPermissions()
+		tmpPerm := u.Permissions()
 		for _, perm := range tmpPerm {
 			u.permissions[perm] = true
 		}
@@ -122,4 +124,10 @@ func (u *UserDTO) ValidatePermissions() error {
 		return fmt.Errorf("invalid permissions: %+v", invalidPermissions)
 	}
 	return nil
+}
+
+// PermissionClaims is a JWT claim struct that has an added permissions array
+type PermissionClaims struct {
+	jwt.RegisteredClaims
+	Permissions []string `json:"perm,omitempty"`
 }
