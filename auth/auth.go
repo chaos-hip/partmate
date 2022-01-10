@@ -17,6 +17,8 @@ import (
 const (
 	contextKey    = "partmate::user"
 	authHeaderKey = "Authorization"
+
+	errNoPermission = "Sorry, you do not have the permissions needed to use this API endpoint"
 )
 
 func userToContext(c *gin.Context, u *models.User) {
@@ -40,7 +42,7 @@ func returnAccessDenied(c *gin.Context, details string) {
 		// Return a JSON-based error
 		res := &errors.ErrorResponse{
 			Type:    errors.TypeForbidden,
-			Message: "Not authenticated. You have to log-in to use this API",
+			Message: "Access denied",
 		}
 		if details != "" {
 			res.Details = gin.H{
@@ -89,5 +91,29 @@ func MakeAuthMiddleware(repo db.DB, pubkey *rsa.PublicKey) gin.HandlerFunc {
 			return
 		}
 		userToContext(c, user)
+	}
+}
+
+// MakePermissionMiddleware creates a middleware that will make sure that the incoming user has the given permissions
+// before the request itself is handled. If the user does not have the correct permission, a HTTP 403 error is returned
+func MakePermissionMiddleware(permissions ...string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		user := UserFromContext(c)
+		if user == nil {
+			logrus.Errorf("No user present during permission check")
+			returnAccessDenied(c, errNoPermission)
+			return
+		}
+		if !user.Can(permissions...) {
+			logrus.Errorf(
+				"[%s %s] User %#v does not have access to this endpoint. Permissions required: %+v",
+				c.Request.Method,
+				c.FullPath(),
+				user.Username,
+				permissions,
+			)
+			returnAccessDenied(c, errNoPermission)
+			return
+		}
 	}
 }
