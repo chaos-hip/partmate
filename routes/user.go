@@ -10,6 +10,7 @@ import (
 	"git.chaos-hip.de/RepairCafe/PartMATE/db"
 	"git.chaos-hip.de/RepairCafe/PartMATE/errors"
 	"git.chaos-hip.de/RepairCafe/PartMATE/models"
+	"git.chaos-hip.de/RepairCafe/PartMATE/models/permission"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/sirupsen/logrus"
@@ -152,5 +153,67 @@ func MakeLoginHandler(db db.DB, privateKey *rsa.PrivateKey, issuer string) gin.H
 func MakeUserGetCurrentHandler(db db.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
+	}
+}
+
+func MakeUserSetPermissionsHandler(db db.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		permissions := []string{}
+		if err := c.BindJSON(&permissions); err != nil {
+			c.AbortWithStatusJSON(
+				http.StatusBadRequest,
+				errors.NewResponse(errors.TypeIllegalData, "Illegal permission list", err),
+			)
+			return
+		}
+		user := models.UserDTO{
+			Username:    strings.TrimSpace(c.Param("name")), // Username is from the path
+			Permissions: permissions,
+		}
+		if err := user.ValidatePermissions(); err != nil {
+			c.AbortWithStatusJSON(
+				http.StatusBadRequest,
+				errors.NewResponse(errors.TypeValidationFailed, "Permission list is invalid", err),
+			)
+			return
+		}
+		// check if the user exists
+		if u, err := db.GetUserByName(user.Username); err != nil || u == nil {
+			if err != nil {
+				c.AbortWithStatusJSON(
+					http.StatusBadRequest,
+					errors.NewResponse(errors.TypeValidationFailed, "Failed to read user data", err),
+				)
+				return
+			}
+			c.AbortWithStatusJSON(
+				http.StatusNotFound,
+				errors.NewResponse(errors.TypeValidationFailed, "User does not exist", err),
+			)
+			return
+		}
+
+		dbModel, err := user.ToUser()
+		if err != nil {
+			c.AbortWithStatusJSON(
+				http.StatusInternalServerError,
+				errors.NewResponse(errors.TypeIllegalData, "Failed to map user into database model", err),
+			)
+			return
+		}
+		if err := db.SetUserPermissions(*dbModel); err != nil {
+			c.AbortWithStatusJSON(
+				http.StatusInternalServerError,
+				errors.NewResponse(errors.TypeDBError, "Failed to update user permissions", err),
+			)
+			return
+		}
+		c.Status(http.StatusNoContent)
+	}
+}
+
+func MakeGetAvailablePermissions() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, permission.AvailablePermissions())
 	}
 }

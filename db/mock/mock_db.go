@@ -194,6 +194,17 @@ type MockDB struct {
 		result1 []models.StorageLocation
 		result2 error
 	}
+	SetUserPermissionsStub        func(models.User) error
+	setUserPermissionsMutex       sync.RWMutex
+	setUserPermissionsArgsForCall []struct {
+		arg1 models.User
+	}
+	setUserPermissionsReturns struct {
+		result1 error
+	}
+	setUserPermissionsReturnsOnCall map[int]struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -1113,6 +1124,67 @@ func (fake *MockDB) SearchStorageLocationsReturnsOnCall(i int, result1 []models.
 	}{result1, result2}
 }
 
+func (fake *MockDB) SetUserPermissions(arg1 models.User) error {
+	fake.setUserPermissionsMutex.Lock()
+	ret, specificReturn := fake.setUserPermissionsReturnsOnCall[len(fake.setUserPermissionsArgsForCall)]
+	fake.setUserPermissionsArgsForCall = append(fake.setUserPermissionsArgsForCall, struct {
+		arg1 models.User
+	}{arg1})
+	stub := fake.SetUserPermissionsStub
+	fakeReturns := fake.setUserPermissionsReturns
+	fake.recordInvocation("SetUserPermissions", []interface{}{arg1})
+	fake.setUserPermissionsMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *MockDB) SetUserPermissionsCallCount() int {
+	fake.setUserPermissionsMutex.RLock()
+	defer fake.setUserPermissionsMutex.RUnlock()
+	return len(fake.setUserPermissionsArgsForCall)
+}
+
+func (fake *MockDB) SetUserPermissionsCalls(stub func(models.User) error) {
+	fake.setUserPermissionsMutex.Lock()
+	defer fake.setUserPermissionsMutex.Unlock()
+	fake.SetUserPermissionsStub = stub
+}
+
+func (fake *MockDB) SetUserPermissionsArgsForCall(i int) models.User {
+	fake.setUserPermissionsMutex.RLock()
+	defer fake.setUserPermissionsMutex.RUnlock()
+	argsForCall := fake.setUserPermissionsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *MockDB) SetUserPermissionsReturns(result1 error) {
+	fake.setUserPermissionsMutex.Lock()
+	defer fake.setUserPermissionsMutex.Unlock()
+	fake.SetUserPermissionsStub = nil
+	fake.setUserPermissionsReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *MockDB) SetUserPermissionsReturnsOnCall(i int, result1 error) {
+	fake.setUserPermissionsMutex.Lock()
+	defer fake.setUserPermissionsMutex.Unlock()
+	fake.SetUserPermissionsStub = nil
+	if fake.setUserPermissionsReturnsOnCall == nil {
+		fake.setUserPermissionsReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.setUserPermissionsReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *MockDB) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -1146,6 +1218,8 @@ func (fake *MockDB) Invocations() map[string][][]interface{} {
 	defer fake.searchPartsMutex.RUnlock()
 	fake.searchStorageLocationsMutex.RLock()
 	defer fake.searchStorageLocationsMutex.RUnlock()
+	fake.setUserPermissionsMutex.RLock()
+	defer fake.setUserPermissionsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

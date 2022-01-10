@@ -39,3 +39,23 @@ func (d *DB) GetUserByName(name string) (*models.User, error) {
 	}
 	return &u, nil
 }
+
+// SetUserPermissions sets the permissions for the selected user based on the given user struct
+func (d *DB) SetUserPermissions(u models.User) error {
+	if u.RawPermissions == "" {
+		return fmt.Errorf("empty permissions data")
+	}
+	query := fmt.Sprintf("UPDATE %s SET permissions = ? WHERE name = ?", userTableName)
+	res, err := d.db.Exec(query, u.RawPermissions, u.Username)
+	if err != nil {
+		return fmt.Errorf("failed to update user permissions: %w", err)
+	}
+	num, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get affected rows after update: %w", err)
+	}
+	if num == 0 {
+		return fmt.Errorf("user not found")
+	}
+	return nil
+}

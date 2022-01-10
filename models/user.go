@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"git.chaos-hip.de/RepairCafe/PartMATE/auth/hash"
+	"git.chaos-hip.de/RepairCafe/PartMATE/models/permission"
 	"github.com/sirupsen/logrus"
 )
 
@@ -15,9 +16,10 @@ const (
 
 // User is the Struct to identify the User (Table: mate_users)
 type User struct {
-	Username       string `db:"name"`
-	PasswordHash   string `db:"password_hash"` // Swordfish
-	RawPermissions string `db:"permissions"`
+	Username       string          `db:"name"`
+	PasswordHash   string          `db:"password_hash"` // Swordfish
+	RawPermissions string          `db:"permissions"`
+	permissions    map[string]bool `db:"-"` // Decoded permissions - only set the first time they are used
 }
 
 // CheckPassword takes a given password and checks if the password has matches that input
@@ -31,14 +33,37 @@ func (u *User) CheckPassword(input string) bool {
 
 // ToDTO converts the user DB model to its DTO representation
 func (u *User) ToDTO() UserDTO {
+	return UserDTO{
+		Username:    u.Username,
+		Permissions: u.loadPermissions(),
+	}
+}
+
+func (u *User) loadPermissions() []string {
 	perms := []string{}
 	if err := json.Unmarshal([]byte(u.RawPermissions), &perms); err != nil {
 		logrus.WithError(err).Errorf("Failed to decode permissions for user %#v", u.Username)
+		return nil
 	}
-	return UserDTO{
-		Username:    u.Username,
-		Permissions: perms,
+	return perms
+}
+
+// Can checks if the user can execute an operation requiring all of the given permissions
+func (u *User) Can(perms ...string) bool {
+	if u.permissions == nil {
+		// Load the permissions into the map
+		u.permissions = make(map[string]bool)
+		tmpPerm := u.loadPermissions()
+		for _, perm := range tmpPerm {
+			u.permissions[perm] = true
+		}
 	}
+	for _, checkedPerm := range perms {
+		if _, ok := u.permissions[checkedPerm]; !ok {
+			return false
+		}
+	}
+	return true
 }
 
 // UserDTO represents a user in the JSON API
@@ -78,6 +103,23 @@ func (u *UserDTO) Validate() error {
 	}
 	if len(u.Password) < minPasswordLength {
 		return fmt.Errorf("password too short: Please use at least %d characters", minPasswordLength)
+	}
+	if err := u.ValidatePermissions(); err != nil {
+		return err
+	}
+	return nil
+}
+
+// ValidatePermissions checks if the provided user DTO's permissions are valid for storing permissions
+func (u *UserDTO) ValidatePermissions() error {
+	invalidPermissions := []string{}
+	for _, perm := range u.Permissions {
+		if !permission.Exists(perm) {
+			invalidPermissions = append(invalidPermissions, perm)
+		}
+	}
+	if len(invalidPermissions) > 0 {
+		return fmt.Errorf("invalid permissions: %+v", invalidPermissions)
 	}
 	return nil
 }

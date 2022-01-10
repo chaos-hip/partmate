@@ -189,8 +189,13 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 	{
 		apiRouter.Use(auth.MakeAuthMiddleware(dbInstance, &privateKey.PublicKey))
 
+		// List available permissions
+		apiRouter.GET("/permissions", routes.MakeGetAvailablePermissions())
+
 		// Users
 		apiRouter.POST("/user", routes.MakeUserCreateHandler(dbInstance))
+		apiRouter.POST("/user/:name/permissions", routes.MakeUserSetPermissionsHandler(dbInstance))
+
 		// Part handling
 		apiRouter.GET("/parts/:id", routes.MakeGetPartByLinkHandler(dbInstance))                                         // Get details about a given part
 		apiRouter.GET("/parts/:id/qr", handleTeaPottJeeey)                                                               // Get the QR code for a part
