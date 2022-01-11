@@ -78,9 +78,9 @@ func (q *QR) getRecoveryLevel() qr.ErrorCorrectionLevel {
 	case rLevelMedium:
 		return qr.M
 	case rLevelHigh:
-		return qr.H
-	default:
 		return qr.Q
+	default:
+		return qr.H
 	}
 }
 
