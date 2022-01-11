@@ -3,6 +3,7 @@ module git.chaos-hip.de/RepairCafe/PartMATE
 go 1.17
 
 require (
+	github.com/boombuler/barcode v1.0.1
 	github.com/disintegration/imaging v1.6.2
 	github.com/fogleman/gg v1.3.0
 	github.com/gin-gonic/gin v1.7.7
@@ -14,7 +15,6 @@ require (
 	github.com/logrusorgru/aurora/v3 v3.0.0
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.4.1
 	github.com/sirupsen/logrus v1.8.1
-	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/smartystreets/goconvey v1.7.2
 	github.com/spf13/cast v1.4.1
 	github.com/spf13/viper v1.10.1

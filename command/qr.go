@@ -6,10 +6,11 @@ import (
 	"image"
 	"strings"
 
+	"github.com/boombuler/barcode"
+	"github.com/boombuler/barcode/qr"
 	"github.com/fogleman/gg"
 	"github.com/lithammer/shortuuid/v3"
 	"github.com/sirupsen/logrus"
-	qrcode "github.com/skip2/go-qrcode"
 )
 
 const (
@@ -25,7 +26,7 @@ const (
 	qrCodeSizePx = 180
 
 	// Border around each QR code used for cut marks
-	cellBorderWidthPx = 1
+	cellBorderWidthPx = 8
 
 	// Page border around the whole page
 	pageBorderPx = 60
@@ -70,21 +71,22 @@ func NewQR() *QR {
 	return out
 }
 
-func (q *QR) getRecoveryLevel() qrcode.RecoveryLevel {
+func (q *QR) getRecoveryLevel() qr.ErrorCorrectionLevel {
 	switch q.recoveryLevel {
 	case rLevelLow:
-		return qrcode.Low
+		return qr.L
 	case rLevelMedium:
-		return qrcode.Medium
+		return qr.M
 	case rLevelHigh:
-		return qrcode.High
+		return qr.H
 	default:
-		return qrcode.Highest
+		return qr.Q
 	}
 }
 
 func (q *QR) createCodeImage(code string) (image.Image, error) {
-	out := image.NewRGBA(image.Rect(0, 0, qrCodeSizePx+(2*cellBorderWidthPx), qrCodeSizePx+(cellBorderWidthPx*3)))
+	imageSize := qrCodeSizePx + (2 * cellBorderWidthPx)
+	out := image.NewRGBA(image.Rect(0, 0, imageSize, imageSize))
 	bounds := out.Bounds()
 	dc := gg.NewContextForRGBA(out)
 	dc.SetHexColor("cccccc")
@@ -98,11 +100,15 @@ func (q *QR) createCodeImage(code string) (image.Image, error) {
 		base := strings.TrimSuffix(q.baseUrl, "/")
 		url = fmt.Sprintf("%s/l/%s", base, code)
 	}
-	qrCode, err := qrcode.New(url, q.getRecoveryLevel())
+	qrCode, err := qr.Encode(url, q.getRecoveryLevel(), qr.Auto)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate QR code: %w", err)
 	}
-	dc.DrawImage(qrCode.Image(qrCodeSizePx), cellBorderWidthPx, cellBorderWidthPx)
+	qrCode, err = barcode.Scale(qrCode, qrCodeSizePx, qrCodeSizePx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to scale QR code: %w", err)
+	}
+	dc.DrawImage(qrCode, cellBorderWidthPx, cellBorderWidthPx)
 	return out, nil
 }
 
@@ -111,7 +117,7 @@ func (q *QR) Run(args []string) error {
 	if err := q.fs.Parse(args); err != nil {
 		return fmt.Errorf("failed to parse commandline arguments")
 	}
-	cellHeight := qrCodeSizePx + (cellBorderWidthPx * 3)
+	cellHeight := qrCodeSizePx + (cellBorderWidthPx * 2)
 	cellsX := (a4WidthInPx - (2 * pageBorderPx)) / (qrCodeSizePx + (2 * cellBorderWidthPx))
 	cellsY := (a4HeightInPx - (pageBorderPx + pageBorderBottomPx)) / cellHeight
 	logrus.Infof("Generating %dx%d QR codes - %d in total", cellsX, cellsY, cellsX*cellsY)
