@@ -47,7 +47,7 @@ func NewQR() *QR {
 		fs: flag.NewFlagSet("qr", flag.ExitOnError),
 	}
 	out.fs.StringVar(&out.outputFile, "o", "./qr.png", "Output image to write the QR codes to")
-	out.fs.StringVar(&out.baseUrl, "url", "https://i.repaircafe-hilpolstein.de", "The base URL to use (without trailing slash)")
+	out.fs.StringVar(&out.baseUrl, "url", "https://i.repaircafe-hilpoltstein.de", "The base URL to use (without trailing slash)")
 	return out
 }
 
