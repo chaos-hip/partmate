@@ -33,6 +33,14 @@ const (
 	pageBorderBottomPx = 120
 )
 
+// Supported recovery levels
+const (
+	rLevelLow     = "low"
+	rLevelMedium  = "medium"
+	rLevelHigh    = "high"
+	rLevelHighest = "highest"
+)
+
 // QR is a command used to bulk-create a set of
 type QR struct {
 	fs *flag.FlagSet
@@ -40,6 +48,10 @@ type QR struct {
 	outputFile string
 	// The base URL to use for the QR codes
 	baseUrl string
+	// Should the QR code only contain the ID?
+	short bool
+	// The recovery level to use
+	recoveryLevel string
 }
 
 func NewQR() *QR {
@@ -48,7 +60,27 @@ func NewQR() *QR {
 	}
 	out.fs.StringVar(&out.outputFile, "o", "./qr.png", "Output image to write the QR codes to")
 	out.fs.StringVar(&out.baseUrl, "url", "https://i.repaircafe-hilpoltstein.de", "The base URL to use (without trailing slash)")
+	out.fs.BoolVar(&out.short, "short", false, "Set to true if the QR codes should be rendered without the URL")
+	out.fs.StringVar(
+		&out.recoveryLevel,
+		"level",
+		rLevelHighest,
+		fmt.Sprintf("Recovery level to use - one of %+v", []string{rLevelLow, rLevelMedium, rLevelHigh, rLevelHighest}),
+	)
 	return out
+}
+
+func (q *QR) getRecoveryLevel() qrcode.RecoveryLevel {
+	switch q.recoveryLevel {
+	case rLevelLow:
+		return qrcode.Low
+	case rLevelMedium:
+		return qrcode.Medium
+	case rLevelHigh:
+		return qrcode.High
+	default:
+		return qrcode.Highest
+	}
 }
 
 func (q *QR) createCodeImage(code string) (image.Image, error) {
@@ -59,9 +91,14 @@ func (q *QR) createCodeImage(code string) (image.Image, error) {
 	dc.SetLineWidth(1)
 	dc.DrawRectangle(0, 0, float64(bounds.Dx()), float64(bounds.Dy()))
 	dc.Stroke()
-	base := strings.TrimSuffix(q.baseUrl, "/")
-	url := fmt.Sprintf("%s/l/%s", base, code)
-	qrCode, err := qrcode.New(url, qrcode.Highest)
+	var url string
+	if q.short {
+		url = code
+	} else {
+		base := strings.TrimSuffix(q.baseUrl, "/")
+		url = fmt.Sprintf("%s/l/%s", base, code)
+	}
+	qrCode, err := qrcode.New(url, q.getRecoveryLevel())
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate QR code: %w", err)
 	}
@@ -78,6 +115,7 @@ func (q *QR) Run(args []string) error {
 	cellsX := (a4WidthInPx - (2 * pageBorderPx)) / (qrCodeSizePx + (2 * cellBorderWidthPx))
 	cellsY := (a4HeightInPx - (pageBorderPx + pageBorderBottomPx)) / cellHeight
 	logrus.Infof("Generating %dx%d QR codes - %d in total", cellsX, cellsY, cellsX*cellsY)
+	logrus.Infof("Using recovery level %#v", q.recoveryLevel)
 	out := image.NewRGBA(image.Rect(0, 0, a4WidthInPx, a4HeightInPx))
 	dc := gg.NewContextForRGBA(out)
 	dc.SetHexColor("ffffff")
