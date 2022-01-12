@@ -34,10 +34,22 @@
         </ion-card-header>
         <ion-card-content>
           <h2 color="primary">{{ t("card.header") }}</h2>
-          <p>{{ t("card.main1") }}</p>
-          <p>{{ t("card.main2") }}</p>
+          <p v-if="canCreateLink">
+            {{ t("card.main1") }}
+          </p>
+          <p v-if="canCreateLink">
+            {{ t("card.main2") }}
+          </p>
+          <ion-text color="warning" v-if="!canCreateLink">
+            {{ t("card.noPermission") }}
+          </ion-text>
         </ion-card-content>
-        <ion-item lines="full" @click="doSelect(LinkType.Part)" button>
+        <ion-item
+          lines="full"
+          @click="doSelect(LinkType.Part)"
+          button
+          v-if="canCreateLink"
+        >
           <ion-icon slot="start" :icon="hardwareChipOutline"></ion-icon>
           <ion-label>{{ t("option.part") }}</ion-label>
         </ion-item>
@@ -45,6 +57,7 @@
           lines="none"
           @click="doSelect(LinkType.StorageLocation)"
           button
+          v-if="canCreateLink"
         >
           <ion-icon slot="start" :icon="cubeOutline"></ion-icon>
           <ion-label>{{ t("option.storage") }}</ion-label>
@@ -75,6 +88,7 @@ import {
   toastController,
 } from '@ionic/vue';
 import { defineComponent, ref } from '@vue/runtime-core';
+import { Permission } from '@/models/user'
 import { hardwareChipOutline, cubeOutline, linkOutline } from 'ionicons/icons';
 import { LinkType } from '@/models/link';
 import PartSearchView from '@/views/PartSearch.vue';
@@ -107,6 +121,9 @@ export default defineComponent({
   computed: {
     linkId() {
       return (this.$route.params.id as string) || '';
+    },
+    canCreateLink() {
+      return this.$store.state.user && this.$store.state.user.can(Permission.LinkCreate);
     }
   },
   methods: {
@@ -158,6 +175,7 @@ export default defineComponent({
       searchModalOpen,
       searchedLinkType,
       linkOutline,
+      Permission,
     }
   }
 });
@@ -169,6 +187,8 @@ card:
   header: Dieser Link wurde noch nicht verwendet.
   main1: Du kannst ihn mit einem Element in PartMATE verknüpfen.
   main2: "Bitte wähle ein Ziel:"
+  noPermission: |
+    Leider hast du nicht die Berechtigung, Links zu erstellen.
 option:
   part: Gegenstand
   storage: Lagerort
@@ -189,6 +209,8 @@ card:
   header: This link is not being used yet.
   main1: You can connect it to an entity within PartMATE.
   main2: "Please choose a target:"
+  noPermission: |
+    Unfortunately, you do not have the permission to create new links.
 option:
   part: Part
   storage: Storage location

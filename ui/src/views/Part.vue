@@ -24,8 +24,16 @@
         </ion-card-content>
         <ion-item
           detail
-          lines="full"
+          :lines="
+            $store.state.user && $store.state.user.can(Permission.LinkRead)
+              ? 'full'
+              : 'none'
+          "
           @click="$router.push(`/part/${partId}/attachments`)"
+          v-if="
+            $store.state.user &&
+            $store.state.user.can(Permission.PartAttachmentRead)
+          "
         >
           <ion-icon slot="start" :icon="documentsSharp"></ion-icon>
           <ion-label>{{ t("part.attachments") }}</ion-label>
@@ -35,6 +43,7 @@
           detail
           lines="none"
           @click="$router.push(`/link/${partId}/links`)"
+          v-if="$store.state.user && $store.state.user.can(Permission.LinkRead)"
         >
           <ion-icon slot="start" :icon="linkSharp"></ion-icon>
           <ion-label>{{ t("part.links") }}</ion-label>
@@ -47,6 +56,7 @@
 
 <script lang="ts">
 import { Part } from '@/models/part';
+import { Permission } from '@/models/user';
 import {
   IonPage,
   IonToolbar,
@@ -138,6 +148,7 @@ export default defineComponent({
       isPlatform,
       part,
       loading,
+      Permission,
     }
   }
 });
