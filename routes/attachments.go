@@ -71,7 +71,7 @@ func MakeGetThumbnailImageHandler(dbInstance db.DB) gin.HandlerFunc {
 		if link == "" {
 			c.AbortWithStatusJSON(
 				http.StatusBadRequest,
-				errors.NewResponse(errors.TypeIllegalData, "No image ID provided", nil),
+				errors.NewResponse(errors.TypeIllegalData, "No attachment ID provided", nil),
 			)
 			return
 		}
@@ -92,6 +92,35 @@ func MakeGetThumbnailImageHandler(dbInstance db.DB) gin.HandlerFunc {
 		}
 		createThumbIfMissing(*att)
 		c.File(att.ThumbnailLocation())
+	}
+}
+
+func MakePartAttachmentDownloadHandler(dbInstance db.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		link := strings.TrimSpace(c.Params.ByName("id"))
+		if link == "" {
+			c.AbortWithStatusJSON(
+				http.StatusBadRequest,
+				errors.NewResponse(errors.TypeIllegalData, "No attachment ID provided", nil),
+			)
+			return
+		}
+		att, err := dbInstance.GetAttachmentEntry(link)
+		if err != nil {
+			c.AbortWithStatusJSON(
+				http.StatusInternalServerError,
+				errors.NewResponse(errors.TypeDBError, "Failed to read attachment information", err),
+			)
+			return
+		}
+		if att == nil {
+			c.AbortWithStatusJSON(
+				http.StatusNotFound,
+				errors.NewResponse(errors.TypeNotFound, "This is not the attachment you are searching for", nil),
+			)
+			return
+		}
+		c.FileAttachment(att.StorageLocation(), att.OriginalName)
 	}
 }
 

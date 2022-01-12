@@ -22,7 +22,11 @@
         <ion-card-content>
           {{ part.comment }}
         </ion-card-content>
-        <ion-item detail lines="full">
+        <ion-item
+          detail
+          lines="full"
+          @click="$router.push(`/part/${partId}/attachments`)"
+        >
           <ion-icon slot="start" :icon="documentsSharp"></ion-icon>
           <ion-label>{{ t("part.attachments") }}</ion-label>
         </ion-item>

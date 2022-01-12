@@ -2,6 +2,7 @@ import { Part, PartObj } from '@/models/part';
 import { StorageObj, StorageLocation } from '@/models/storage';
 import { LinkInfo, LinkType } from '@/models/link';
 import store from '../store';
+import { PartAttachment, PartAttachmentObj } from '@/models/attachment';
 
 interface LoginResponse {
     token: string;
@@ -284,4 +285,22 @@ export async function getLinksByParentLink(link: string): Promise<Array<LinkInfo
         throw await makeApiError(res);
     }
     return (await res.json()) as Array<LinkInfo>;
+}
+
+/**
+ * Loads a list of attachments associated to the given part
+ *
+ * @param link The link ID of the part to list the attachments for
+ * @returns A list of attachments associated to the given part
+ */
+export async function getAttachmentsByPartLink(link: string): Promise<Array<PartAttachment>> {
+    if (!isValidLink(link)) {
+        throw new Error('Invalid link ID');
+    }
+    const res = await fetch(`/api/parts/${link}/attachments`, { method: 'GET', headers: prepareRequestHeaders() });
+    if (res.status !== 200) {
+        throw await makeApiError(res);
+    }
+    const objList = (await res.json()) as Array<PartAttachmentObj>;
+    return objList.map(item => new PartAttachment(item));
 }

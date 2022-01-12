@@ -182,6 +182,7 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 
 	// Unsecured attachment downloads
 	router.GET("/api/attachments/:id/thumb", routes.MakeGetThumbnailImageHandler(dbInstance)) // Get thumbnail for attachment
+	router.GET("/api/attachments/:id", routes.MakePartAttachmentDownloadHandler(dbInstance))  // Download attachment
 
 	// Unsecured link redirection
 	router.GET("/l/:id", routes.MakeLinkRedirectHandler(dbInstance, baseURL)) // Redirect to the correct UI view based on the incoming link

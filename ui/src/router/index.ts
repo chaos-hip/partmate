@@ -42,7 +42,12 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/Part.vue'),
   },
   {
-    name: 'PartLinksViewer',
+    name: 'PartAttachmentViewer',
+    path: '/part/:id/attachments',
+    component: () => import('../views/PartAttachments.vue'),
+  },
+  {
+    name: 'LinksViewer',
     path: '/link/:id/links',
     component: () => import('../views/LinkEditor.vue'),
   },
