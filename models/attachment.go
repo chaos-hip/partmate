@@ -8,17 +8,18 @@ import (
 
 // PartAttachment is the Struct to identify and modify Attachment-Data
 type PartAttachment struct {
-	BaseDir      string       // Base directory where the attachments are stored
-	InternalID   int          `db:"id"`
-	PartID       int          `db:"part_id"`
-	Type         string       `db:"type"`
-	FileName     string       `db:"filename"`
-	OriginalName string       `db:"originalname"`
-	MimeType     string       `db:"mimetype"`
-	Size         int          `db:"size"`
-	Extension    string       `db:"extension"`
-	Description  *string      `db:"description"`
-	IsImage      sql.NullBool `db:"isImage"`
+	BaseDir      string         // Base directory where the attachments are stored
+	Link         sql.NullString `db:"link"`
+	InternalID   int            `db:"id"`
+	PartID       int            `db:"part_id"`
+	Type         string         `db:"type"`
+	FileName     string         `db:"filename"`
+	OriginalName string         `db:"originalname"`
+	MimeType     string         `db:"mimetype"`
+	Size         int            `db:"size"`
+	Extension    string         `db:"extension"`
+	Description  sql.NullString `db:"description"`
+	IsImage      sql.NullBool   `db:"isImage"`
 }
 
 func (a *PartAttachment) GetExtension() string {
@@ -60,4 +61,22 @@ func (a *PartAttachment) IsImageFile() bool {
 	default:
 		return false
 	}
+}
+
+func (a *PartAttachment) ToDTO() PartAttachmentDTO {
+	return PartAttachmentDTO{
+		Link:             a.Link.String,
+		OriginalFileName: a.OriginalName,
+		Description:      a.Description.String,
+		MimeType:         a.MimeType,
+		Size:             a.Size,
+	}
+}
+
+type PartAttachmentDTO struct {
+	Link             string `json:"id"`
+	OriginalFileName string `json:"name"`
+	Description      string `json:"description"`
+	MimeType         string `json:"mimeType"`
+	Size             int    `json:"fileSize"`
 }

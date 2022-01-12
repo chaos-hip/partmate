@@ -26,7 +26,7 @@ const (
 	qrCodeSizePx = 180
 
 	// Border around each QR code used for cut marks
-	cellBorderWidthPx = 8
+	cellBorderWidthPx = 2
 
 	// Page border around the whole page
 	pageBorderPx = 60

@@ -196,14 +196,17 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 		//-- Users -----------------------------------------------------------------------------------------------------
 
 		// Create a new user
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.UserCreate)).
-			POST("/user", routes.MakeUserCreateHandler(dbInstance))
+		apiRouter.POST(
+			"/user",
+			auth.MakePermissionMiddleware(permission.UserCreate),
+			routes.MakeUserCreateHandler(dbInstance),
+		)
 
 		// Set user permissions
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.UserGrantPermissions)).
-			POST("/user/:name/permissions", routes.MakeUserSetPermissionsHandler(dbInstance))
+		apiRouter.POST("/user/:name/permissions",
+			auth.MakePermissionMiddleware(permission.UserGrantPermissions),
+			routes.MakeUserSetPermissionsHandler(dbInstance),
+		)
 
 		//-- Part handling ---------------------------------------------------------------------------------------------
 
@@ -217,14 +220,16 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 		apiRouter.POST("/parts/search", routes.MakePartsSearchHandler(dbInstance))
 
 		// Add an attachment to a part
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.PartAttachmentCreate)).
-			POST("/parts/:id/attachments", handleTeaPottJeeey)
+		apiRouter.POST("/parts/:id/attachments",
+			auth.MakePermissionMiddleware(permission.PartAttachmentCreate),
+			handleTeaPottJeeey,
+		)
 
 		// List attachments for a part
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.PartAttachmentRead)).
-			GET("/parts/:id/attachments" /*routes.MakePartAttachmentListHandler(dbInstance)*/, handleTeaPottJeeey)
+		apiRouter.GET("/parts/:id/attachments",
+			auth.MakePermissionMiddleware(permission.PartAttachmentRead),
+			routes.MakePartAttachmentListHandler(dbInstance),
+		)
 
 		//-- Stock management for parts --------------------------------------------------------------------------------
 
@@ -250,105 +255,133 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 		//-- Link handling ---------------------------------------------------------------------------------------------
 
 		// List links for a part
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.LinkRead)).
-			GET("/links/:id/links", routes.MakeLinkListHandler(dbInstance))
+		apiRouter.GET("/links/:id/links",
+			auth.MakePermissionMiddleware(permission.LinkRead),
+			routes.MakeLinkListHandler(dbInstance),
+		)
 
 		// Get infos about where a link points at
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.LinkRead)).
-			GET("/links/:id", routes.MakeGetLinkInfoHandler(dbInstance))
+		apiRouter.GET("/links/:id",
+			auth.MakePermissionMiddleware(permission.LinkRead),
+			routes.MakeGetLinkInfoHandler(dbInstance),
+		)
 
 		// Create Link
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.LinkCreate)).
-			POST("/links", routes.MakeLinkCreateHandler(dbInstance))
+		apiRouter.POST("/links",
+			auth.MakePermissionMiddleware(permission.LinkCreate),
+			routes.MakeLinkCreateHandler(dbInstance),
+		)
 
 		// Delete Link
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.LinkDelete)).
-			DELETE("/links/:id", routes.MakeLinkDeleteHandler(dbInstance))
+		apiRouter.DELETE("/links/:id",
+			auth.MakePermissionMiddleware(permission.LinkDelete),
+			routes.MakeLinkDeleteHandler(dbInstance),
+		)
 
 		// Create link for a part
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.LinkCreate)).
-			POST("/parts/:id/links/:linkID", routes.MakeLinkCreateByPathHandler(dbInstance))
+		apiRouter.POST("/parts/:id/links/:linkID",
+			auth.MakePermissionMiddleware(permission.LinkCreate),
+			routes.MakeLinkCreateByPathHandler(dbInstance),
+		)
 
 		//-- Venue management ------------------------------------------------------------------------------------------
 
 		// List registered venues
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.VenueRead)).
-			GET("/venues", handleTeaPottJeeey)
+		apiRouter.GET("/venues",
+			auth.MakePermissionMiddleware(permission.VenueRead),
+			handleTeaPottJeeey,
+		)
 
 		// Start/Create a venue (or venue template)
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.VenueCreate)).
-			POST("/venues", handleTeaPottJeeey)
+		apiRouter.POST("/venues",
+			auth.MakePermissionMiddleware(permission.VenueCreate),
+			handleTeaPottJeeey,
+		)
 
 		// Get info about a venue
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.VenueRead)).
-			GET("/venues/:id", handleTeaPottJeeey)
+		apiRouter.GET("/venues/:id",
+			auth.MakePermissionMiddleware(permission.VenueRead),
+			handleTeaPottJeeey,
+		)
 
 		// End a venue
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.VenueFinish)).
-			POST("/venues/:id/finish", handleTeaPottJeeey)
+		apiRouter.POST("/venues/:id/finish",
+			auth.MakePermissionMiddleware(permission.VenueFinish),
+			handleTeaPottJeeey,
+		)
 
 		// Delete a venue
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.VenueDelete)).
-			DELETE("/venues/:id", handleTeaPottJeeey)
+		apiRouter.DELETE("/venues/:id",
+			auth.MakePermissionMiddleware(permission.VenueDelete),
+			handleTeaPottJeeey,
+		)
 
 		//-- Managing items on a venue ---------------------------------------------------------------------------------
 
 		// Get list of items taken to the venue
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.VenueRead)).
-			GET("/venues/:id/items", handleTeaPottJeeey)
+		apiRouter.GET("/venues/:id/items",
+			auth.MakePermissionMiddleware(permission.VenueRead),
+			handleTeaPottJeeey,
+		)
 
 		// Get info about an item taken to the venue
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.VenueRead)).
-			GET("/venues/:id/items/:id", handleTeaPottJeeey)
+		apiRouter.GET("/venues/:id/items/:id",
+			auth.MakePermissionMiddleware(permission.VenueRead),
+			handleTeaPottJeeey,
+		)
 
 		// Check-out an item on a venue (lend to someone)
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.VenueRead)).
-			POST("/venues/:id/items/:id/check-out", handleTeaPottJeeey)
+		apiRouter.POST("/venues/:id/items/:id/check-out",
+			auth.MakePermissionMiddleware(permission.VenueRead),
+			handleTeaPottJeeey,
+		)
 
 		// Check-in an item on a venue (returned by someone)
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.VenueRead)).
-			POST("/venues/:id/items/:id/check-in", handleTeaPottJeeey)
+		apiRouter.POST("/venues/:id/items/:id/check-in",
+			auth.MakePermissionMiddleware(permission.VenueRead),
+			handleTeaPottJeeey,
+		)
 
 		// Mark an item as inspected (checked when the venue ends)
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.VenueRead)).
-			POST("/venues/:id/items/:id/inspected", handleTeaPottJeeey)
+		apiRouter.POST("/venues/:id/items/:id/inspected",
+			auth.MakePermissionMiddleware(permission.VenueRead),
+			handleTeaPottJeeey,
+		)
 
 		// Remove inspection marker from an item
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.VenueRead)).
-			DELETE("/venues/:id/items/:id/inspected", handleTeaPottJeeey)
+		apiRouter.DELETE("/venues/:id/items/:id/inspected",
+			auth.MakePermissionMiddleware(permission.VenueRead),
+			handleTeaPottJeeey,
+		)
 
 		//-- Reporting / Printing --------------------------------------------------------------------------------------
 
 		// Create a list with the contents of a storage location
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.ReportStorageContents)).
-			POST("/storage-locations/:id/reports/contents", handleTeaPottJeeey)
+		apiRouter.POST("/storage-locations/:id/reports/contents",
+			auth.MakePermissionMiddleware(permission.ReportStorageContents),
+			handleTeaPottJeeey,
+		)
 
 		// Summary about a venue
-		apiRouter.Group("").
-			Use(auth.MakePermissionMiddleware(permission.ReportVenueSummary)).
-			POST("/venues/:id/reports/summary", handleTeaPottJeeey)
+		apiRouter.POST("/venues/:id/reports/summary",
+			auth.MakePermissionMiddleware(permission.ReportVenueSummary),
+			handleTeaPottJeeey,
+		)
 
-		// Lists
-		apiRouter.GET("/categories", handleTeaPottJeeey)    // Get a list of all categories
-		apiRouter.GET("/manufacturers", handleTeaPottJeeey) // Get a list of manufacturers
-		apiRouter.GET("/distributors", handleTeaPottJeeey)  // Get list of distributors
+		//-- Lists -----------------------------------------------------------------------------------------------------
+
+		// Get a list of all categories
+		apiRouter.GET("/categories",
+			handleTeaPottJeeey,
+		)
+		// Get a list of manufacturers
+		apiRouter.GET("/manufacturers",
+			handleTeaPottJeeey,
+		)
+		// Get list of distributors
+		apiRouter.GET("/distributors",
+			handleTeaPottJeeey,
+		)
 
 	}
 	return router

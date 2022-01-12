@@ -94,3 +94,29 @@ func MakeGetThumbnailImageHandler(dbInstance db.DB) gin.HandlerFunc {
 		c.File(att.ThumbnailLocation())
 	}
 }
+
+func MakePartAttachmentListHandler(dbInstance db.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		partLink := strings.TrimSpace(c.Param("id"))
+		if partLink == "" {
+			c.AbortWithStatusJSON(
+				http.StatusBadRequest,
+				errors.NewResponse(errors.TypeIllegalData, "No part ID provided", nil),
+			)
+			return
+		}
+		attList, err := dbInstance.GetAttachmentsByPartLink(partLink)
+		if err != nil {
+			c.AbortWithStatusJSON(
+				http.StatusInternalServerError,
+				errors.NewResponse(errors.TypeDBError, "Failed to read attachment list", err),
+			)
+			return
+		}
+		out := []models.PartAttachmentDTO{}
+		for _, att := range attList {
+			out = append(out, att.ToDTO())
+		}
+		c.JSON(http.StatusOK, out)
+	}
+}

@@ -90,6 +90,19 @@ type MockDB struct {
 		result1 *models.PartAttachment
 		result2 error
 	}
+	GetAttachmentsByPartLinkStub        func(string) ([]models.PartAttachment, error)
+	getAttachmentsByPartLinkMutex       sync.RWMutex
+	getAttachmentsByPartLinkArgsForCall []struct {
+		arg1 string
+	}
+	getAttachmentsByPartLinkReturns struct {
+		result1 []models.PartAttachment
+		result2 error
+	}
+	getAttachmentsByPartLinkReturnsOnCall map[int]struct {
+		result1 []models.PartAttachment
+		result2 error
+	}
 	GetLinkByIDStub        func(string) (*models.Link, error)
 	getLinkByIDMutex       sync.RWMutex
 	getLinkByIDArgsForCall []struct {
@@ -609,6 +622,70 @@ func (fake *MockDB) GetAttachmentEntryReturnsOnCall(i int, result1 *models.PartA
 	}
 	fake.getAttachmentEntryReturnsOnCall[i] = struct {
 		result1 *models.PartAttachment
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *MockDB) GetAttachmentsByPartLink(arg1 string) ([]models.PartAttachment, error) {
+	fake.getAttachmentsByPartLinkMutex.Lock()
+	ret, specificReturn := fake.getAttachmentsByPartLinkReturnsOnCall[len(fake.getAttachmentsByPartLinkArgsForCall)]
+	fake.getAttachmentsByPartLinkArgsForCall = append(fake.getAttachmentsByPartLinkArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetAttachmentsByPartLinkStub
+	fakeReturns := fake.getAttachmentsByPartLinkReturns
+	fake.recordInvocation("GetAttachmentsByPartLink", []interface{}{arg1})
+	fake.getAttachmentsByPartLinkMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *MockDB) GetAttachmentsByPartLinkCallCount() int {
+	fake.getAttachmentsByPartLinkMutex.RLock()
+	defer fake.getAttachmentsByPartLinkMutex.RUnlock()
+	return len(fake.getAttachmentsByPartLinkArgsForCall)
+}
+
+func (fake *MockDB) GetAttachmentsByPartLinkCalls(stub func(string) ([]models.PartAttachment, error)) {
+	fake.getAttachmentsByPartLinkMutex.Lock()
+	defer fake.getAttachmentsByPartLinkMutex.Unlock()
+	fake.GetAttachmentsByPartLinkStub = stub
+}
+
+func (fake *MockDB) GetAttachmentsByPartLinkArgsForCall(i int) string {
+	fake.getAttachmentsByPartLinkMutex.RLock()
+	defer fake.getAttachmentsByPartLinkMutex.RUnlock()
+	argsForCall := fake.getAttachmentsByPartLinkArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *MockDB) GetAttachmentsByPartLinkReturns(result1 []models.PartAttachment, result2 error) {
+	fake.getAttachmentsByPartLinkMutex.Lock()
+	defer fake.getAttachmentsByPartLinkMutex.Unlock()
+	fake.GetAttachmentsByPartLinkStub = nil
+	fake.getAttachmentsByPartLinkReturns = struct {
+		result1 []models.PartAttachment
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *MockDB) GetAttachmentsByPartLinkReturnsOnCall(i int, result1 []models.PartAttachment, result2 error) {
+	fake.getAttachmentsByPartLinkMutex.Lock()
+	defer fake.getAttachmentsByPartLinkMutex.Unlock()
+	fake.GetAttachmentsByPartLinkStub = nil
+	if fake.getAttachmentsByPartLinkReturnsOnCall == nil {
+		fake.getAttachmentsByPartLinkReturnsOnCall = make(map[int]struct {
+			result1 []models.PartAttachment
+			result2 error
+		})
+	}
+	fake.getAttachmentsByPartLinkReturnsOnCall[i] = struct {
+		result1 []models.PartAttachment
 		result2 error
 	}{result1, result2}
 }
@@ -1202,6 +1279,8 @@ func (fake *MockDB) Invocations() map[string][][]interface{} {
 	defer fake.deleteLinkByIDMutex.RUnlock()
 	fake.getAttachmentEntryMutex.RLock()
 	defer fake.getAttachmentEntryMutex.RUnlock()
+	fake.getAttachmentsByPartLinkMutex.RLock()
+	defer fake.getAttachmentsByPartLinkMutex.RUnlock()
 	fake.getLinkByIDMutex.RLock()
 	defer fake.getLinkByIDMutex.RUnlock()
 	fake.getLinksByLinkIDMutex.RLock()

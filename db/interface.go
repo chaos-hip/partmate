@@ -54,9 +54,11 @@ type DB interface {
 	// item has in the database
 	GetLinksByLinkID(id string) ([]*models.Link, error)
 
-	//-- Attachments 📎 --------------------------------------
+	//-- Part Attachments 📎 ---------------------------------
 
 	CreatePartAttachmentEntry(partID, filename, mimeType string) (*models.PartAttachment, error)
+	// GetAttachmentsByPartLink returns a list of attachments belonging to the part identified with the given link
+	GetAttachmentsByPartLink(partLink string) ([]models.PartAttachment, error)
 	GetAttachmentEntry(id string) (*models.PartAttachment, error)
 
 	//-- Stock 📈📉 -------------------------------------------
