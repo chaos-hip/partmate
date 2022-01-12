@@ -29,6 +29,7 @@
         >
           <ion-icon slot="start" :icon="documentsSharp"></ion-icon>
           <ion-label>{{ t("part.attachments") }}</ion-label>
+          <ion-note>{{ part.attachmentCount }}</ion-note>
         </ion-item>
         <ion-item
           detail

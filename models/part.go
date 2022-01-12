@@ -20,21 +20,23 @@ type Part struct {
 	ImageID           sql.NullInt64    `db:"image_id"`   // Internal ID of the attachment used as image for this part
 	ImageLink         sql.NullString   `db:"image_link"` // Link pointing to the image used for this part
 	Storage           *StorageLocation `db:"-"`
+	NumAttachments    int              `db:"num_attachments"`
 }
 
 // ToDTO converts the part into its DTO counterpart
 func (p *Part) ToDTO() PartDTO {
 	out := PartDTO{
-		Name:          p.Name,
-		Description:   p.Description,
-		Comment:       p.Comment,
-		Condition:     p.Condition,
-		StockLevel:    p.StockLevel,
-		MinStockLevel: p.MinStockLevel,
-		Status:        p.Status,
-		NeedsReview:   p.NeedsReview,
-		LowStock:      p.LowStock,
-		Storage:       p.Storage.ToDTO(),
+		Name:           p.Name,
+		Description:    p.Description,
+		Comment:        p.Comment,
+		Condition:      p.Condition,
+		StockLevel:     p.StockLevel,
+		MinStockLevel:  p.MinStockLevel,
+		Status:         p.Status,
+		NeedsReview:    p.NeedsReview,
+		LowStock:       p.LowStock,
+		Storage:        p.Storage.ToDTO(),
+		NumAttachments: p.NumAttachments,
 	}
 	if p.Link.Valid {
 		out.Link = p.Link.String
@@ -47,16 +49,17 @@ func (p *Part) ToDTO() PartDTO {
 
 // PartDTO is the data transfer object for the Part database model
 type PartDTO struct {
-	Link          string              `json:"id"` // The link (external ID) of the part
-	Name          string              `json:"name"`
-	Description   string              `json:"description"`
-	Comment       string              `json:"comment"`
-	Condition     string              `json:"condition"`
-	StockLevel    int                 `json:"stockLevel"`
-	MinStockLevel int                 `json:"minStockLevel"`
-	Status        string              `json:"status"`
-	NeedsReview   bool                `json:"needsReview"`
-	LowStock      bool                `json:"lowStock"`
-	ImageLink     string              `json:"image"` // The link (external ID) of the "cover image" for this part
-	Storage       *StorageLocationDTO `json:"storage"`
+	Link           string              `json:"id"` // The link (external ID) of the part
+	Name           string              `json:"name"`
+	Description    string              `json:"description"`
+	Comment        string              `json:"comment"`
+	Condition      string              `json:"condition"`
+	StockLevel     int                 `json:"stockLevel"`
+	MinStockLevel  int                 `json:"minStockLevel"`
+	Status         string              `json:"status"`
+	NeedsReview    bool                `json:"needsReview"`
+	LowStock       bool                `json:"lowStock"`
+	ImageLink      string              `json:"image"` // The link (external ID) of the "cover image" for this part
+	Storage        *StorageLocationDTO `json:"storage"`
+	NumAttachments int                 `json:"attachmentCount"`
 }

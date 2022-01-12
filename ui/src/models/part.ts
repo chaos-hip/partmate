@@ -13,6 +13,7 @@ export interface PartObj {
     lowStock?: boolean;
     image?: string;
     storage?: StorageObj;
+    attachmentCount?: number;
 }
 
 export class Part {
@@ -29,6 +30,7 @@ export class Part {
     lowStock = false;
     image = "";
     storage = new StorageLocation();
+    attachmentCount = 0;
 
     constructor(obj?: PartObj) {
         if (obj) {

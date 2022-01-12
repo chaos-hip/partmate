@@ -43,6 +43,7 @@ import {
   IonList,
   IonItem,
   IonText,
+  IonLabel,
 } from '@ionic/vue';
 import { defineComponent, ref, Ref } from '@vue/runtime-core';
 import { documentOutline, documentTextOutline, imageOutline, barChartOutline } from 'ionicons/icons';
@@ -66,6 +67,7 @@ export default defineComponent({
     IonList,
     IonItem,
     IonText,
+    IonLabel,
   },
   props: {
     id: String,

@@ -31,7 +31,8 @@ var (
 		parts.lowStock AS lowStock,
 		links.link AS link,
 		attachments.id AS image_id,
-		att_links.link AS image_link
+		att_links.link AS image_link,
+		(SELECT COUNT(*) FROM %s AS att WHERE att.part_id = parts.id) AS num_attachments
 	FROM
 		%s AS parts
 	LEFT OUTER JOIN
@@ -47,6 +48,7 @@ var (
 	ON
 		att_links.link = (SELECT link FROM %s AS l3 WHERE l3.partAttachmentID = attachments.id ORDER BY l3.auto_generated LIMIT 1)
 	`,
+		partAttachmentTableName,
 		partTableName,
 		linkTableName,
 		linkTableName,
@@ -81,7 +83,8 @@ var (
 		parts.lowStock AS lowStock,
 		links.link AS link,
 		attachments.id AS image_id,
-		att_links.link AS image_link
+		att_links.link AS image_link,
+		(SELECT COUNT(*) FROM %s AS att WHERE att.part_id = parts.id) AS num_attachments
 	FROM
 		%s AS links
 	LEFT OUTER JOIN
@@ -100,6 +103,7 @@ var (
 		links.link = ?
 	AND
 		links.partID IS NOT NULL`,
+		partAttachmentTableName,
 		linkTableName,
 		partTableName,
 		partAttachmentTableName,
