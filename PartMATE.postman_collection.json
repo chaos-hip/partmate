@@ -550,6 +550,32 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get Attachments for Part",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/parts/:id/attachments",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"parts",
+								":id",
+								"attachments"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "foobarbaz"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
