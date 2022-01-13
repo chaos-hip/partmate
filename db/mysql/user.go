@@ -55,7 +55,7 @@ func (d *DB) SetUserPermissions(u models.User) error {
 		return fmt.Errorf("failed to get affected rows after update: %w", err)
 	}
 	if num == 0 {
-		return fmt.Errorf("user not found")
+		return fmt.Errorf("user not found or permissions already set")
 	}
 	return nil
 }

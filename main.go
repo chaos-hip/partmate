@@ -187,6 +187,17 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 	// Unsecured link redirection
 	router.GET("/l/:id", routes.MakeLinkRedirectHandler(dbInstance, baseURL)) // Redirect to the correct UI view based on the incoming link
 
+	//-- Login via token ----------------------------------------------------------------------------------------------
+
+	// Redirect to the correct UI view for logging in with a token
+	router.GET("/t/:id", routes.MakeLoginTokenRedirector(baseURL))
+	// Login via token
+	router.POST(
+		"/api/login/token/:id",
+		routes.MakeTokenLoginHandler(dbInstance, privateKey, conf.GetString(confKeyJWTIssuer)),
+	)
+
+	// Secured API access
 	apiRouter := router.Group("/api")
 	{
 		apiRouter.Use(auth.MakeAuthMiddleware(dbInstance, &privateKey.PublicKey))
@@ -207,6 +218,18 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 		apiRouter.POST("/user/:name/permissions",
 			auth.MakePermissionMiddleware(permission.UserGrantPermissions),
 			routes.MakeUserSetPermissionsHandler(dbInstance),
+		)
+
+		// Create a new login token for an existing user
+		apiRouter.POST("/user/:name/tokens",
+			auth.MakePermissionMiddleware(permission.UserLoginTokenAdmin),
+			routes.MakeCreateUserLoginTokenHandler(dbInstance),
+		)
+
+		// List existing tokens for an existing user
+		apiRouter.GET("/user/:name/tokens",
+			auth.MakePermissionMiddleware(permission.UserLoginTokenAdmin),
+			routes.MakeListUserLoginTokensHandler(dbInstance),
 		)
 
 		//-- Part handling ---------------------------------------------------------------------------------------------

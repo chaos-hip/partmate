@@ -40,6 +40,13 @@ type DB interface {
 	// SetUserPermissions sets the permissions for the selected user based on the given user struct
 	SetUserPermissions(models.User) error
 
+	// List all existing login tokens for a given user - optionally returning the expired ones as well
+	ListLoginTokensForUser(username string, expired bool) ([]models.LoginToken, error)
+	// GetNonExpiredLoginTokenByID returns the given login token model if it exists and is not expired yet
+	GetNonExpiredLoginTokenByID(id string) (*models.LoginToken, error)
+	// CreateLoginToken creates a new login token for a user
+	CreateLoginToken(models.LoginToken) error
+
 	//-- Links 🔗 --------------------------------------------
 
 	// DeleteLinkByID will delete the link with the given ID

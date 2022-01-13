@@ -40,6 +40,17 @@ type MockDB struct {
 		result1 *models.Link
 		result2 error
 	}
+	CreateLoginTokenStub        func(models.LoginToken) error
+	createLoginTokenMutex       sync.RWMutex
+	createLoginTokenArgsForCall []struct {
+		arg1 models.LoginToken
+	}
+	createLoginTokenReturns struct {
+		result1 error
+	}
+	createLoginTokenReturnsOnCall map[int]struct {
+		result1 error
+	}
 	CreatePartAttachmentEntryStub        func(string, string, string) (*models.PartAttachment, error)
 	createPartAttachmentEntryMutex       sync.RWMutex
 	createPartAttachmentEntryArgsForCall []struct {
@@ -129,6 +140,19 @@ type MockDB struct {
 		result1 []*models.Link
 		result2 error
 	}
+	GetNonExpiredLoginTokenByIDStub        func(string) (*models.LoginToken, error)
+	getNonExpiredLoginTokenByIDMutex       sync.RWMutex
+	getNonExpiredLoginTokenByIDArgsForCall []struct {
+		arg1 string
+	}
+	getNonExpiredLoginTokenByIDReturns struct {
+		result1 *models.LoginToken
+		result2 error
+	}
+	getNonExpiredLoginTokenByIDReturnsOnCall map[int]struct {
+		result1 *models.LoginToken
+		result2 error
+	}
 	GetPartByLinkStub        func(string) (*models.Part, error)
 	getPartByLinkMutex       sync.RWMutex
 	getPartByLinkArgsForCall []struct {
@@ -166,6 +190,20 @@ type MockDB struct {
 	}
 	getUserByNameReturnsOnCall map[int]struct {
 		result1 *models.User
+		result2 error
+	}
+	ListLoginTokensForUserStub        func(string, bool) ([]models.LoginToken, error)
+	listLoginTokensForUserMutex       sync.RWMutex
+	listLoginTokensForUserArgsForCall []struct {
+		arg1 string
+		arg2 bool
+	}
+	listLoginTokensForUserReturns struct {
+		result1 []models.LoginToken
+		result2 error
+	}
+	listLoginTokensForUserReturnsOnCall map[int]struct {
+		result1 []models.LoginToken
 		result2 error
 	}
 	RemovePartStockStub        func(string, string, uint) error
@@ -372,6 +410,67 @@ func (fake *MockDB) CreateLinkReturnsOnCall(i int, result1 *models.Link, result2
 		result1 *models.Link
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *MockDB) CreateLoginToken(arg1 models.LoginToken) error {
+	fake.createLoginTokenMutex.Lock()
+	ret, specificReturn := fake.createLoginTokenReturnsOnCall[len(fake.createLoginTokenArgsForCall)]
+	fake.createLoginTokenArgsForCall = append(fake.createLoginTokenArgsForCall, struct {
+		arg1 models.LoginToken
+	}{arg1})
+	stub := fake.CreateLoginTokenStub
+	fakeReturns := fake.createLoginTokenReturns
+	fake.recordInvocation("CreateLoginToken", []interface{}{arg1})
+	fake.createLoginTokenMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *MockDB) CreateLoginTokenCallCount() int {
+	fake.createLoginTokenMutex.RLock()
+	defer fake.createLoginTokenMutex.RUnlock()
+	return len(fake.createLoginTokenArgsForCall)
+}
+
+func (fake *MockDB) CreateLoginTokenCalls(stub func(models.LoginToken) error) {
+	fake.createLoginTokenMutex.Lock()
+	defer fake.createLoginTokenMutex.Unlock()
+	fake.CreateLoginTokenStub = stub
+}
+
+func (fake *MockDB) CreateLoginTokenArgsForCall(i int) models.LoginToken {
+	fake.createLoginTokenMutex.RLock()
+	defer fake.createLoginTokenMutex.RUnlock()
+	argsForCall := fake.createLoginTokenArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *MockDB) CreateLoginTokenReturns(result1 error) {
+	fake.createLoginTokenMutex.Lock()
+	defer fake.createLoginTokenMutex.Unlock()
+	fake.CreateLoginTokenStub = nil
+	fake.createLoginTokenReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *MockDB) CreateLoginTokenReturnsOnCall(i int, result1 error) {
+	fake.createLoginTokenMutex.Lock()
+	defer fake.createLoginTokenMutex.Unlock()
+	fake.CreateLoginTokenStub = nil
+	if fake.createLoginTokenReturnsOnCall == nil {
+		fake.createLoginTokenReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.createLoginTokenReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *MockDB) CreatePartAttachmentEntry(arg1 string, arg2 string, arg3 string) (*models.PartAttachment, error) {
@@ -818,6 +917,70 @@ func (fake *MockDB) GetLinksByLinkIDReturnsOnCall(i int, result1 []*models.Link,
 	}{result1, result2}
 }
 
+func (fake *MockDB) GetNonExpiredLoginTokenByID(arg1 string) (*models.LoginToken, error) {
+	fake.getNonExpiredLoginTokenByIDMutex.Lock()
+	ret, specificReturn := fake.getNonExpiredLoginTokenByIDReturnsOnCall[len(fake.getNonExpiredLoginTokenByIDArgsForCall)]
+	fake.getNonExpiredLoginTokenByIDArgsForCall = append(fake.getNonExpiredLoginTokenByIDArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetNonExpiredLoginTokenByIDStub
+	fakeReturns := fake.getNonExpiredLoginTokenByIDReturns
+	fake.recordInvocation("GetNonExpiredLoginTokenByID", []interface{}{arg1})
+	fake.getNonExpiredLoginTokenByIDMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *MockDB) GetNonExpiredLoginTokenByIDCallCount() int {
+	fake.getNonExpiredLoginTokenByIDMutex.RLock()
+	defer fake.getNonExpiredLoginTokenByIDMutex.RUnlock()
+	return len(fake.getNonExpiredLoginTokenByIDArgsForCall)
+}
+
+func (fake *MockDB) GetNonExpiredLoginTokenByIDCalls(stub func(string) (*models.LoginToken, error)) {
+	fake.getNonExpiredLoginTokenByIDMutex.Lock()
+	defer fake.getNonExpiredLoginTokenByIDMutex.Unlock()
+	fake.GetNonExpiredLoginTokenByIDStub = stub
+}
+
+func (fake *MockDB) GetNonExpiredLoginTokenByIDArgsForCall(i int) string {
+	fake.getNonExpiredLoginTokenByIDMutex.RLock()
+	defer fake.getNonExpiredLoginTokenByIDMutex.RUnlock()
+	argsForCall := fake.getNonExpiredLoginTokenByIDArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *MockDB) GetNonExpiredLoginTokenByIDReturns(result1 *models.LoginToken, result2 error) {
+	fake.getNonExpiredLoginTokenByIDMutex.Lock()
+	defer fake.getNonExpiredLoginTokenByIDMutex.Unlock()
+	fake.GetNonExpiredLoginTokenByIDStub = nil
+	fake.getNonExpiredLoginTokenByIDReturns = struct {
+		result1 *models.LoginToken
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *MockDB) GetNonExpiredLoginTokenByIDReturnsOnCall(i int, result1 *models.LoginToken, result2 error) {
+	fake.getNonExpiredLoginTokenByIDMutex.Lock()
+	defer fake.getNonExpiredLoginTokenByIDMutex.Unlock()
+	fake.GetNonExpiredLoginTokenByIDStub = nil
+	if fake.getNonExpiredLoginTokenByIDReturnsOnCall == nil {
+		fake.getNonExpiredLoginTokenByIDReturnsOnCall = make(map[int]struct {
+			result1 *models.LoginToken
+			result2 error
+		})
+	}
+	fake.getNonExpiredLoginTokenByIDReturnsOnCall[i] = struct {
+		result1 *models.LoginToken
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *MockDB) GetPartByLink(arg1 string) (*models.Part, error) {
 	fake.getPartByLinkMutex.Lock()
 	ret, specificReturn := fake.getPartByLinkReturnsOnCall[len(fake.getPartByLinkArgsForCall)]
@@ -1006,6 +1169,71 @@ func (fake *MockDB) GetUserByNameReturnsOnCall(i int, result1 *models.User, resu
 	}
 	fake.getUserByNameReturnsOnCall[i] = struct {
 		result1 *models.User
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *MockDB) ListLoginTokensForUser(arg1 string, arg2 bool) ([]models.LoginToken, error) {
+	fake.listLoginTokensForUserMutex.Lock()
+	ret, specificReturn := fake.listLoginTokensForUserReturnsOnCall[len(fake.listLoginTokensForUserArgsForCall)]
+	fake.listLoginTokensForUserArgsForCall = append(fake.listLoginTokensForUserArgsForCall, struct {
+		arg1 string
+		arg2 bool
+	}{arg1, arg2})
+	stub := fake.ListLoginTokensForUserStub
+	fakeReturns := fake.listLoginTokensForUserReturns
+	fake.recordInvocation("ListLoginTokensForUser", []interface{}{arg1, arg2})
+	fake.listLoginTokensForUserMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *MockDB) ListLoginTokensForUserCallCount() int {
+	fake.listLoginTokensForUserMutex.RLock()
+	defer fake.listLoginTokensForUserMutex.RUnlock()
+	return len(fake.listLoginTokensForUserArgsForCall)
+}
+
+func (fake *MockDB) ListLoginTokensForUserCalls(stub func(string, bool) ([]models.LoginToken, error)) {
+	fake.listLoginTokensForUserMutex.Lock()
+	defer fake.listLoginTokensForUserMutex.Unlock()
+	fake.ListLoginTokensForUserStub = stub
+}
+
+func (fake *MockDB) ListLoginTokensForUserArgsForCall(i int) (string, bool) {
+	fake.listLoginTokensForUserMutex.RLock()
+	defer fake.listLoginTokensForUserMutex.RUnlock()
+	argsForCall := fake.listLoginTokensForUserArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *MockDB) ListLoginTokensForUserReturns(result1 []models.LoginToken, result2 error) {
+	fake.listLoginTokensForUserMutex.Lock()
+	defer fake.listLoginTokensForUserMutex.Unlock()
+	fake.ListLoginTokensForUserStub = nil
+	fake.listLoginTokensForUserReturns = struct {
+		result1 []models.LoginToken
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *MockDB) ListLoginTokensForUserReturnsOnCall(i int, result1 []models.LoginToken, result2 error) {
+	fake.listLoginTokensForUserMutex.Lock()
+	defer fake.listLoginTokensForUserMutex.Unlock()
+	fake.ListLoginTokensForUserStub = nil
+	if fake.listLoginTokensForUserReturnsOnCall == nil {
+		fake.listLoginTokensForUserReturnsOnCall = make(map[int]struct {
+			result1 []models.LoginToken
+			result2 error
+		})
+	}
+	fake.listLoginTokensForUserReturnsOnCall[i] = struct {
+		result1 []models.LoginToken
 		result2 error
 	}{result1, result2}
 }
@@ -1271,6 +1499,8 @@ func (fake *MockDB) Invocations() map[string][][]interface{} {
 	defer fake.closeMutex.RUnlock()
 	fake.createLinkMutex.RLock()
 	defer fake.createLinkMutex.RUnlock()
+	fake.createLoginTokenMutex.RLock()
+	defer fake.createLoginTokenMutex.RUnlock()
 	fake.createPartAttachmentEntryMutex.RLock()
 	defer fake.createPartAttachmentEntryMutex.RUnlock()
 	fake.createUserMutex.RLock()
@@ -1285,12 +1515,16 @@ func (fake *MockDB) Invocations() map[string][][]interface{} {
 	defer fake.getLinkByIDMutex.RUnlock()
 	fake.getLinksByLinkIDMutex.RLock()
 	defer fake.getLinksByLinkIDMutex.RUnlock()
+	fake.getNonExpiredLoginTokenByIDMutex.RLock()
+	defer fake.getNonExpiredLoginTokenByIDMutex.RUnlock()
 	fake.getPartByLinkMutex.RLock()
 	defer fake.getPartByLinkMutex.RUnlock()
 	fake.getStorageLocationByLinkMutex.RLock()
 	defer fake.getStorageLocationByLinkMutex.RUnlock()
 	fake.getUserByNameMutex.RLock()
 	defer fake.getUserByNameMutex.RUnlock()
+	fake.listLoginTokensForUserMutex.RLock()
+	defer fake.listLoginTokensForUserMutex.RUnlock()
 	fake.removePartStockMutex.RLock()
 	defer fake.removePartStockMutex.RUnlock()
 	fake.searchPartsMutex.RLock()

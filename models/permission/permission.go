@@ -39,6 +39,8 @@ const (
 	UserPasswordSet = "user.password:set"
 	// UserPasswordAdmin allows administrating the passwords for all users
 	UserPasswordAdmin = "user.password:admin"
+	// UserLoginTokenAdmin allows administrating the login tokens to all users
+	UserLoginTokenAdmin = "user.token:admin"
 
 	//-- Venues --------------------------------------------------------------------------------------------------------
 
@@ -81,6 +83,7 @@ func Exists(perm string) bool {
 		UserCreate,
 		UserGrantPermissions,
 		UserPasswordAdmin,
+		UserLoginTokenAdmin,
 		UserPasswordSet,
 		VenueCreate,
 		VenueDelete,
@@ -109,6 +112,7 @@ func AvailablePermissions() []string {
 		UserCreate,
 		UserGrantPermissions,
 		UserPasswordAdmin,
+		UserLoginTokenAdmin,
 		UserPasswordSet,
 		VenueCreate,
 		VenueDelete,
