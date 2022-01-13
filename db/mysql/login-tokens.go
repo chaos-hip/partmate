@@ -91,7 +91,17 @@ func (d *DB) CreateLoginToken(token models.LoginToken) error {
 		token.ExpiresAt,
 		token.SessionLengthSeconds,
 	); err != nil {
-		return fmt.Errorf("failed to insert  login token: %w", err)
+		return fmt.Errorf("failed to insert login token: %w", err)
+	}
+	return nil
+}
+
+func (d *DB) DeleteLoginToken(id string) error {
+	if _, err := d.db.Exec(
+		fmt.Sprintf("DELETE FROM %s WHERE token = ?", loginTokensTableName),
+		id,
+	); err != nil {
+		return fmt.Errorf("failed to delete login token: %w", err)
 	}
 	return nil
 }

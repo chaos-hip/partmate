@@ -232,6 +232,12 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 			routes.MakeListUserLoginTokensHandler(dbInstance),
 		)
 
+		// Delete login token by token ID (:name is ignored here)
+		apiRouter.DELETE("/user/:name/tokens/:id",
+			auth.MakePermissionMiddleware(permission.UserLoginTokenAdmin),
+			routes.MakeDeleteUserLoginTokenHandler(dbInstance),
+		)
+
 		//-- Part handling ---------------------------------------------------------------------------------------------
 
 		// Get details about a given part

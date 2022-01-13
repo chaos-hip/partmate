@@ -391,3 +391,25 @@ func MakeListUserLoginTokensHandler(db db.DB) gin.HandlerFunc {
 		c.JSON(http.StatusOK, out)
 	}
 }
+
+func MakeDeleteUserLoginTokenHandler(db db.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Read the username from the path
+		id := strings.TrimSpace(c.Param("id"))
+		if id == "" {
+			c.AbortWithStatusJSON(
+				http.StatusBadRequest,
+				errors.NewResponse(errors.TypeIllegalData, "No token given", nil),
+			)
+			return
+		}
+		if err := db.DeleteLoginToken(id); err != nil {
+			c.AbortWithStatusJSON(
+				http.StatusInternalServerError,
+				errors.NewResponse(errors.TypeDBError, "Failed to delete login token", err),
+			)
+			return
+		}
+		c.Status(http.StatusNoContent)
+	}
+}

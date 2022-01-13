@@ -9,6 +9,296 @@
 			"name": "User",
 			"item": [
 				{
+					"name": "Login Tokens",
+					"item": [
+						{
+							"name": "Login with token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Correct response\", function () {",
+											"    const jsonData = pm.response.json();",
+											"    pm.response.to.have.status(200);",
+											"    pm.expect(jsonData.token).to.be.not.empty;",
+											"    pm.globals.set(\"partmateJwt\", jsonData.token);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/login/token/:id",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"login",
+										"token",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "foobar",
+											"description": "The token to login with"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Login token redirect",
+							"protocolProfileBehavior": {
+								"followRedirects": false
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/t/:token",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"t",
+										":token"
+									],
+									"variable": [
+										{
+											"key": "token",
+											"value": "fooBar",
+											"description": "The login token used"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create new login token for user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Correct response\", function () {",
+											"    const jsonData = pm.response.json();",
+											"    pm.response.to.have.status(200);",
+											"    pm.expect(jsonData.token).to.be.not.empty;",
+											"    pm.globals.set(\"partmateJwt\", jsonData.token);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"expiresAt\": 1646866800000,\n    \"sessionLength\": 3600\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/user/:name/tokens",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"user",
+										":name",
+										"tokens"
+									],
+									"variable": [
+										{
+											"key": "name",
+											"value": "whity",
+											"description": "The name of the user to generate the token for"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get login tokens for user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Correct response\", function () {",
+											"    const jsonData = pm.response.json();",
+											"    pm.response.to.have.status(200);",
+											"    pm.expect(jsonData.token).to.be.not.empty;",
+											"    pm.globals.set(\"partmateJwt\", jsonData.token);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/user/:name/tokens",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"user",
+										":name",
+										"tokens"
+									],
+									"query": [
+										{
+											"key": "expired",
+											"value": "true",
+											"description": "Also list expired tokens?",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "name",
+											"value": "whity",
+											"description": "The name of the user to generate the token for"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete login token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Correct response\", function () {",
+											"    const jsonData = pm.response.json();",
+											"    pm.response.to.have.status(200);",
+											"    pm.expect(jsonData.token).to.be.not.empty;",
+											"    pm.globals.set(\"partmateJwt\", jsonData.token);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/user/:name/tokens/:id",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"user",
+										":name",
+										"tokens",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "name",
+											"value": "whity",
+											"description": "User name - only for decorative reasons"
+										},
+										{
+											"key": "id",
+											"value": "edk4PkVxXP7nQPoL98UFHT",
+											"description": "ID of the login token"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Permissions",
+					"item": [
+						{
+							"name": "Get available permissions",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/permissions",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"permissions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Set user permissions",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "[\n    \"link:create\",\n    \"link:delete\",\n    \"link:read\",\n    \"part.attachment:create\",\n    \"part.attachment:read\",\n    \"part.stock:manage\",\n    \"report.storageContents:view\",\n    \"report.venueSummary:view\",\n    \"user:create\",\n    \"user.permission:grant\",\n    \"user.password:admin\",\n    \"user.token:admin\",\n    \"user.password:set\",\n    \"venue:create\",\n    \"venue:delete\",\n    \"venue:finish\",\n    \"venue:read\",\n    \"venue.item:checkin\",\n    \"venue.item:checkout\",\n    \"venue.item:inspected\"\n]",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/user/:name/permissions",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"user",
+										":name",
+										"permissions"
+									],
+									"variable": [
+										{
+											"key": "name",
+											"value": "whity",
+											"description": "User name of the user to overwrite the permissions for"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "Login",
 					"event": [
 						{
@@ -76,60 +366,6 @@
 							"path": [
 								"api",
 								"user"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get available permissions",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseURL}}/api/permissions",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"permissions"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Set user permissions",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "[\n    \"link:create\",\n    \"link:delete\",\n    \"link:read\",\n    \"part.attachment:create\",\n    \"part.attachment:read\",\n    \"part.stock:manage\",\n    \"report.storageContents:view\",\n    \"report.venueSummary:view\",\n    \"user:create\",\n    \"user.permission:grant\",\n    \"user.password:admin\",\n    \"user.password:set\",\n    \"venue:create\",\n    \"venue:delete\",\n    \"venue:finish\",\n    \"venue:read\",\n    \"venue.item:checkin\",\n    \"venue.item:checkout\",\n    \"venue.item:inspected\"\n]",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseURL}}/api/user/:name/permissions",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"user",
-								":name",
-								"permissions"
-							],
-							"variable": [
-								{
-									"key": "name",
-									"value": "whity",
-									"description": "User name of the user to overwrite the permissions for"
-								}
 							]
 						}
 					},
@@ -571,6 +807,44 @@
 								{
 									"key": "id",
 									"value": "foobarbaz"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download attachment",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/attachments/:id",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"attachments",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "Q2QfDFAMjbtwEKwwiyyKSB",
+									"description": "ID (Link) for the attachment"
 								}
 							]
 						}

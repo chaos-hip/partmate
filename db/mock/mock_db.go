@@ -88,6 +88,17 @@ type MockDB struct {
 	deleteLinkByIDReturnsOnCall map[int]struct {
 		result1 error
 	}
+	DeleteLoginTokenStub        func(string) error
+	deleteLoginTokenMutex       sync.RWMutex
+	deleteLoginTokenArgsForCall []struct {
+		arg1 string
+	}
+	deleteLoginTokenReturns struct {
+		result1 error
+	}
+	deleteLoginTokenReturnsOnCall map[int]struct {
+		result1 error
+	}
 	GetAttachmentEntryStub        func(string) (*models.PartAttachment, error)
 	getAttachmentEntryMutex       sync.RWMutex
 	getAttachmentEntryArgsForCall []struct {
@@ -657,6 +668,67 @@ func (fake *MockDB) DeleteLinkByIDReturnsOnCall(i int, result1 error) {
 		})
 	}
 	fake.deleteLinkByIDReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *MockDB) DeleteLoginToken(arg1 string) error {
+	fake.deleteLoginTokenMutex.Lock()
+	ret, specificReturn := fake.deleteLoginTokenReturnsOnCall[len(fake.deleteLoginTokenArgsForCall)]
+	fake.deleteLoginTokenArgsForCall = append(fake.deleteLoginTokenArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.DeleteLoginTokenStub
+	fakeReturns := fake.deleteLoginTokenReturns
+	fake.recordInvocation("DeleteLoginToken", []interface{}{arg1})
+	fake.deleteLoginTokenMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *MockDB) DeleteLoginTokenCallCount() int {
+	fake.deleteLoginTokenMutex.RLock()
+	defer fake.deleteLoginTokenMutex.RUnlock()
+	return len(fake.deleteLoginTokenArgsForCall)
+}
+
+func (fake *MockDB) DeleteLoginTokenCalls(stub func(string) error) {
+	fake.deleteLoginTokenMutex.Lock()
+	defer fake.deleteLoginTokenMutex.Unlock()
+	fake.DeleteLoginTokenStub = stub
+}
+
+func (fake *MockDB) DeleteLoginTokenArgsForCall(i int) string {
+	fake.deleteLoginTokenMutex.RLock()
+	defer fake.deleteLoginTokenMutex.RUnlock()
+	argsForCall := fake.deleteLoginTokenArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *MockDB) DeleteLoginTokenReturns(result1 error) {
+	fake.deleteLoginTokenMutex.Lock()
+	defer fake.deleteLoginTokenMutex.Unlock()
+	fake.DeleteLoginTokenStub = nil
+	fake.deleteLoginTokenReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *MockDB) DeleteLoginTokenReturnsOnCall(i int, result1 error) {
+	fake.deleteLoginTokenMutex.Lock()
+	defer fake.deleteLoginTokenMutex.Unlock()
+	fake.DeleteLoginTokenStub = nil
+	if fake.deleteLoginTokenReturnsOnCall == nil {
+		fake.deleteLoginTokenReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.deleteLoginTokenReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }
@@ -1507,6 +1579,8 @@ func (fake *MockDB) Invocations() map[string][][]interface{} {
 	defer fake.createUserMutex.RUnlock()
 	fake.deleteLinkByIDMutex.RLock()
 	defer fake.deleteLinkByIDMutex.RUnlock()
+	fake.deleteLoginTokenMutex.RLock()
+	defer fake.deleteLoginTokenMutex.RUnlock()
 	fake.getAttachmentEntryMutex.RLock()
 	defer fake.getAttachmentEntryMutex.RUnlock()
 	fake.getAttachmentsByPartLinkMutex.RLock()

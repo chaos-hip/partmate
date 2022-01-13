@@ -46,6 +46,8 @@ type DB interface {
 	GetNonExpiredLoginTokenByID(id string) (*models.LoginToken, error)
 	// CreateLoginToken creates a new login token for a user
 	CreateLoginToken(models.LoginToken) error
+	// DeleteLoginToken removes the login token with the given ID
+	DeleteLoginToken(id string) error
 
 	//-- Links 🔗 --------------------------------------------
 
