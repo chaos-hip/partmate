@@ -143,7 +143,7 @@ export default defineComponent({
         url: '/admin/users',
         iosIcon: peopleOutline,
         mdIcon: peopleSharp,
-        perm: Permission.UserLoginTokenAdmin,
+        perm: [Permission.UserLoginTokenAdmin],
       },
     ];
 

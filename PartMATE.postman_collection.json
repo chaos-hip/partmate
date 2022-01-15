@@ -116,13 +116,13 @@
 									}
 								},
 								"url": {
-									"raw": "{{baseURL}}/api/user/:name/tokens",
+									"raw": "{{baseURL}}/api/users/:name/tokens",
 									"host": [
 										"{{baseURL}}"
 									],
 									"path": [
 										"api",
-										"user",
+										"users",
 										":name",
 										"tokens"
 									],
@@ -159,13 +159,13 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{baseURL}}/api/user/:name/tokens",
+									"raw": "{{baseURL}}/api/users/:name/tokens",
 									"host": [
 										"{{baseURL}}"
 									],
 									"path": [
 										"api",
-										"user",
+										"users",
 										":name",
 										"tokens"
 									],
@@ -210,13 +210,13 @@
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "{{baseURL}}/api/user/:name/tokens/:id",
+									"raw": "{{baseURL}}/api/users/:name/tokens/:id",
 									"host": [
 										"{{baseURL}}"
 									],
 									"path": [
 										"api",
-										"user",
+										"users",
 										":name",
 										"tokens",
 										":id"
@@ -230,6 +230,49 @@
 										{
 											"key": "id",
 											"value": "edk4PkVxXP7nQPoL98UFHT",
+											"description": "ID of the login token"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Login Token QR Code",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Correct response\", function () {",
+											"    const jsonData = pm.response.json();",
+											"    pm.response.to.have.status(200);",
+											"    pm.expect(jsonData.token).to.be.not.empty;",
+											"    pm.globals.set(\"partmateJwt\", jsonData.token);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/tokens/:id/qr",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"tokens",
+										":id",
+										"qr"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "CJssMqf54cuLhkMXHYxn3F",
 											"description": "ID of the login token"
 										}
 									]
@@ -267,7 +310,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "[\n    \"link:create\",\n    \"link:delete\",\n    \"link:read\",\n    \"part.attachment:create\",\n    \"part.attachment:read\",\n    \"part.stock:manage\",\n    \"report.storageContents:view\",\n    \"report.venueSummary:view\",\n    \"user:create\",\n    \"user.permission:grant\",\n    \"user.password:admin\",\n    \"user.token:admin\",\n    \"user.password:set\",\n    \"venue:create\",\n    \"venue:delete\",\n    \"venue:finish\",\n    \"venue:read\",\n    \"venue.item:checkin\",\n    \"venue.item:checkout\",\n    \"venue.item:inspected\"\n]",
+									"raw": "[\n    \"link:create\",\n    \"link:delete\",\n    \"link:read\",\n    \"part.attachment:create\",\n    \"part.attachment:read\",\n    \"part.stock:manage\",\n    \"report.storageContents:view\",\n    \"report.venueSummary:view\",\n    \"user:read\",\n    \"user:delete\",\n    \"user:create\",\n    \"user.permission:grant\",\n    \"user.password:admin\",\n    \"user.token:admin\",\n    \"user.password:set\",\n    \"venue:create\",\n    \"venue:delete\",\n    \"venue:finish\",\n    \"venue:read\",\n    \"venue.item:checkin\",\n    \"venue.item:checkout\",\n    \"venue.item:inspected\"\n]",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -275,13 +318,13 @@
 									}
 								},
 								"url": {
-									"raw": "{{baseURL}}/api/user/:name/permissions",
+									"raw": "{{baseURL}}/api/users/:name/permissions",
 									"host": [
 										"{{baseURL}}"
 									],
 									"path": [
 										"api",
-										"user",
+										"users",
 										":name",
 										"permissions"
 									],
@@ -345,6 +388,32 @@
 					"response": []
 				},
 				{
+					"name": "Get User by name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/users/:name",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								":name"
+							],
+							"variable": [
+								{
+									"key": "name",
+									"value": "whity",
+									"description": "The name of the user to delete"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Create User",
 					"request": {
 						"method": "POST",
@@ -359,13 +428,57 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseURL}}/api/user",
+							"raw": "{{baseURL}}/api/users",
 							"host": [
 								"{{baseURL}}"
 							],
 							"path": [
 								"api",
-								"user"
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/users",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/users/:name",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								":name"
+							],
+							"variable": [
+								{
+									"key": "name",
+									"value": "foo",
+									"description": "The name of the user to delete"
+								}
 							]
 						}
 					},

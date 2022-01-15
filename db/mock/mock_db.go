@@ -99,6 +99,17 @@ type MockDB struct {
 	deleteLoginTokenReturnsOnCall map[int]struct {
 		result1 error
 	}
+	DeleteUserStub        func(string) error
+	deleteUserMutex       sync.RWMutex
+	deleteUserArgsForCall []struct {
+		arg1 string
+	}
+	deleteUserReturns struct {
+		result1 error
+	}
+	deleteUserReturnsOnCall map[int]struct {
+		result1 error
+	}
 	GetAttachmentEntryStub        func(string) (*models.PartAttachment, error)
 	getAttachmentEntryMutex       sync.RWMutex
 	getAttachmentEntryArgsForCall []struct {
@@ -741,6 +752,67 @@ func (fake *MockDB) DeleteLoginTokenReturnsOnCall(i int, result1 error) {
 		})
 	}
 	fake.deleteLoginTokenReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *MockDB) DeleteUser(arg1 string) error {
+	fake.deleteUserMutex.Lock()
+	ret, specificReturn := fake.deleteUserReturnsOnCall[len(fake.deleteUserArgsForCall)]
+	fake.deleteUserArgsForCall = append(fake.deleteUserArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.DeleteUserStub
+	fakeReturns := fake.deleteUserReturns
+	fake.recordInvocation("DeleteUser", []interface{}{arg1})
+	fake.deleteUserMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *MockDB) DeleteUserCallCount() int {
+	fake.deleteUserMutex.RLock()
+	defer fake.deleteUserMutex.RUnlock()
+	return len(fake.deleteUserArgsForCall)
+}
+
+func (fake *MockDB) DeleteUserCalls(stub func(string) error) {
+	fake.deleteUserMutex.Lock()
+	defer fake.deleteUserMutex.Unlock()
+	fake.DeleteUserStub = stub
+}
+
+func (fake *MockDB) DeleteUserArgsForCall(i int) string {
+	fake.deleteUserMutex.RLock()
+	defer fake.deleteUserMutex.RUnlock()
+	argsForCall := fake.deleteUserArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *MockDB) DeleteUserReturns(result1 error) {
+	fake.deleteUserMutex.Lock()
+	defer fake.deleteUserMutex.Unlock()
+	fake.DeleteUserStub = nil
+	fake.deleteUserReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *MockDB) DeleteUserReturnsOnCall(i int, result1 error) {
+	fake.deleteUserMutex.Lock()
+	defer fake.deleteUserMutex.Unlock()
+	fake.DeleteUserStub = nil
+	if fake.deleteUserReturnsOnCall == nil {
+		fake.deleteUserReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.deleteUserReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }
@@ -1649,6 +1721,8 @@ func (fake *MockDB) Invocations() map[string][][]interface{} {
 	defer fake.deleteLinkByIDMutex.RUnlock()
 	fake.deleteLoginTokenMutex.RLock()
 	defer fake.deleteLoginTokenMutex.RUnlock()
+	fake.deleteUserMutex.RLock()
+	defer fake.deleteUserMutex.RUnlock()
 	fake.getAttachmentEntryMutex.RLock()
 	defer fake.getAttachmentEntryMutex.RUnlock()
 	fake.getAttachmentsByPartLinkMutex.RLock()
