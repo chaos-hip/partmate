@@ -3,6 +3,8 @@ import { StorageObj, StorageLocation } from '@/models/storage';
 import { LinkInfo, LinkType } from '@/models/link';
 import store from '../store';
 import { PartAttachment, PartAttachmentObj } from '@/models/attachment';
+import { User, UserObj } from '@/models/user';
+import { LoginToken, LoginTokenObj } from '@/models/loginToken';
 
 interface LoginResponse {
     token: string;
@@ -303,4 +305,112 @@ export async function getAttachmentsByPartLink(link: string): Promise<Array<Part
     }
     const objList = (await res.json()) as Array<PartAttachmentObj>;
     return objList.map(item => new PartAttachment(item));
+}
+
+/**
+ * Loads the list of users
+ * @returns A list of all existing users
+ */
+export async function getUsers(): Promise<Array<string>> {
+    const res = await fetch(`/api/users`, { method: 'GET', headers: prepareRequestHeaders() });
+    if (res.status !== 200) {
+        throw await makeApiError(res);
+    }
+    const list = (await res.json()) as Array<string>;
+    return list;
+}
+
+/**
+ * Removes the user with the given user name
+ *
+ * @param username The name of the user to remove
+ */
+export async function deleteUser(username: string): Promise<void> {
+    if (!isValidLink(username)) {
+        throw new Error('Invalid user name');
+    }
+    const res = await fetch(`/api/users/${username}`, { method: 'DELETE', headers: prepareRequestHeaders() });
+    if (res.status !== 204) {
+        throw await makeApiError(res);
+    }
+}
+
+/**
+ * Loads the list of users
+ * @returns A list of all existing users
+ */
+export async function getUserByName(name: string): Promise<User> {
+    if (!isValidLink(name)) {
+        throw new Error('Invalid user name');
+    }
+    const res = await fetch(`/api/users/${name}`, { method: 'GET', headers: prepareRequestHeaders() });
+    if (res.status !== 200) {
+        throw await makeApiError(res);
+    }
+    const item = (await res.json()) as UserObj;
+    return new User(item);
+}
+
+/**
+ * Loads a list of login tokens for the given user
+ * @param username The name of the user to get the login tokens for
+ * @returns The list of login tokens the user currently has
+ */
+export async function getLoginTokensForUser(username: string): Promise<Array<LoginToken>> {
+    if (!isValidLink(username)) {
+        throw new Error('Invalid user name');
+    }
+    const res = await fetch(`/api/users/${username}/tokens`, { method: 'GET', headers: prepareRequestHeaders() });
+    if (res.status !== 200) {
+        throw await makeApiError(res);
+    }
+    const items = (await res.json()) as Array<LoginTokenObj>;
+    return items.map(item => new LoginToken(item));
+}
+
+/**
+ * Deletes the login token entry having the given token string
+ *
+ * @param token The token string to delete the token entry for
+ */
+export async function deleteLoginToken(token: string): Promise<void> {
+    if (!isValidLink(token)) {
+        throw new Error('Invalid token');
+    }
+    // "foo" is just a stand-in since the user name doesn't matter
+    const res = await fetch(`/api/users/foo/tokens/${token}`, { method: 'DELETE', headers: prepareRequestHeaders() });
+    if (res.status !== 204) {
+        throw await makeApiError(res);
+    }
+}
+
+/**
+ * Creates a new login token for a user
+ *
+ * @param username The user name to create the new token for
+ * @param expires When will the token expire?
+ * @param sessionLength How long (in seconds) will a created session be?
+ */
+export async function createLoginToken(username: string, expires: Date | null, sessionLength: number): Promise<void> {
+    if (!isValidLink(username)) {
+        throw new Error('Invalid user name');
+    }
+    if (sessionLength < 60) {
+        sessionLength = 60;
+    }
+    const payload = {
+        expiresAt: expires ? expires.getTime() : null,
+        sessionLength: sessionLength,
+    };
+    const res = await fetch(
+        `/api/users/${username}/tokens`,
+        {
+            method: 'POST',
+            headers: prepareRequestHeaders(),
+            body: JSON.stringify(payload),
+        }
+    );
+    if (res.status !== 200) {
+        throw await makeApiError(res);
+    }
 }

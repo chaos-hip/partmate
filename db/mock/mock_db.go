@@ -203,6 +203,18 @@ type MockDB struct {
 		result1 *models.User
 		result2 error
 	}
+	GetUserListStub        func() ([]string, error)
+	getUserListMutex       sync.RWMutex
+	getUserListArgsForCall []struct {
+	}
+	getUserListReturns struct {
+		result1 []string
+		result2 error
+	}
+	getUserListReturnsOnCall map[int]struct {
+		result1 []string
+		result2 error
+	}
 	ListLoginTokensForUserStub        func(string, bool) ([]models.LoginToken, error)
 	listLoginTokensForUserMutex       sync.RWMutex
 	listLoginTokensForUserArgsForCall []struct {
@@ -1245,6 +1257,62 @@ func (fake *MockDB) GetUserByNameReturnsOnCall(i int, result1 *models.User, resu
 	}{result1, result2}
 }
 
+func (fake *MockDB) GetUserList() ([]string, error) {
+	fake.getUserListMutex.Lock()
+	ret, specificReturn := fake.getUserListReturnsOnCall[len(fake.getUserListArgsForCall)]
+	fake.getUserListArgsForCall = append(fake.getUserListArgsForCall, struct {
+	}{})
+	stub := fake.GetUserListStub
+	fakeReturns := fake.getUserListReturns
+	fake.recordInvocation("GetUserList", []interface{}{})
+	fake.getUserListMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *MockDB) GetUserListCallCount() int {
+	fake.getUserListMutex.RLock()
+	defer fake.getUserListMutex.RUnlock()
+	return len(fake.getUserListArgsForCall)
+}
+
+func (fake *MockDB) GetUserListCalls(stub func() ([]string, error)) {
+	fake.getUserListMutex.Lock()
+	defer fake.getUserListMutex.Unlock()
+	fake.GetUserListStub = stub
+}
+
+func (fake *MockDB) GetUserListReturns(result1 []string, result2 error) {
+	fake.getUserListMutex.Lock()
+	defer fake.getUserListMutex.Unlock()
+	fake.GetUserListStub = nil
+	fake.getUserListReturns = struct {
+		result1 []string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *MockDB) GetUserListReturnsOnCall(i int, result1 []string, result2 error) {
+	fake.getUserListMutex.Lock()
+	defer fake.getUserListMutex.Unlock()
+	fake.GetUserListStub = nil
+	if fake.getUserListReturnsOnCall == nil {
+		fake.getUserListReturnsOnCall = make(map[int]struct {
+			result1 []string
+			result2 error
+		})
+	}
+	fake.getUserListReturnsOnCall[i] = struct {
+		result1 []string
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *MockDB) ListLoginTokensForUser(arg1 string, arg2 bool) ([]models.LoginToken, error) {
 	fake.listLoginTokensForUserMutex.Lock()
 	ret, specificReturn := fake.listLoginTokensForUserReturnsOnCall[len(fake.listLoginTokensForUserArgsForCall)]
@@ -1597,6 +1665,8 @@ func (fake *MockDB) Invocations() map[string][][]interface{} {
 	defer fake.getStorageLocationByLinkMutex.RUnlock()
 	fake.getUserByNameMutex.RLock()
 	defer fake.getUserByNameMutex.RUnlock()
+	fake.getUserListMutex.RLock()
+	defer fake.getUserListMutex.RUnlock()
 	fake.listLoginTokensForUserMutex.RLock()
 	defer fake.listLoginTokensForUserMutex.RUnlock()
 	fake.removePartStockMutex.RLock()

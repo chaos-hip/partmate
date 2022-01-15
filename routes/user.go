@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"git.chaos-hip.de/RepairCafe/PartMATE/auth"
 	"git.chaos-hip.de/RepairCafe/PartMATE/db"
 	"git.chaos-hip.de/RepairCafe/PartMATE/errors"
 	"git.chaos-hip.de/RepairCafe/PartMATE/models"
@@ -411,5 +412,78 @@ func MakeDeleteUserLoginTokenHandler(db db.DB) gin.HandlerFunc {
 			return
 		}
 		c.Status(http.StatusNoContent)
+	}
+}
+
+func MakeListUsersHandler(db db.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		list, err := db.GetUserList()
+		if err != nil {
+			c.AbortWithStatusJSON(
+				http.StatusInternalServerError,
+				errors.NewResponse(errors.TypeDBError, "Cannot read user list", err),
+			)
+		}
+		c.JSON(http.StatusOK, list)
+	}
+}
+
+func MakeUserDeleteHandler(db db.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Read the username from the path
+		username := strings.TrimSpace(c.Param("name"))
+		if username == "" {
+			c.AbortWithStatusJSON(
+				http.StatusBadRequest,
+				errors.NewResponse(errors.TypeIllegalData, "No username given", nil),
+			)
+			return
+		}
+		currentUser := auth.UserFromContext(c)
+		if currentUser == nil || username == currentUser.Username {
+			c.AbortWithStatusJSON(
+				http.StatusBadRequest,
+				errors.NewResponse(errors.TypeIllegalData, "You cannot delete yourself", nil),
+			)
+			return
+		}
+		if err := db.DeleteUser(username); err != nil {
+			c.AbortWithStatusJSON(
+				http.StatusInternalServerError,
+				errors.NewResponse(errors.TypeDBError, "Cannot delete user", err),
+			)
+			return
+		}
+		c.Status(http.StatusNoContent)
+	}
+}
+
+func MakeGetUserByNameHandler(db db.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Read the username from the path
+		username := strings.TrimSpace(c.Param("name"))
+		if username == "" {
+			c.AbortWithStatusJSON(
+				http.StatusBadRequest,
+				errors.NewResponse(errors.TypeIllegalData, "No username given", nil),
+			)
+			return
+		}
+		user, err := db.GetUserByName(username)
+		if err != nil {
+			c.AbortWithStatusJSON(
+				http.StatusInternalServerError,
+				errors.NewResponse(errors.TypeDBError, "Failed to fetch user details", err),
+			)
+			return
+		}
+		if user == nil {
+			c.AbortWithStatusJSON(
+				http.StatusNotFound,
+				errors.NewResponse(errors.TypeNotFound, "User does not exist", nil),
+			)
+			return
+		}
+		c.JSON(http.StatusOK, user.ToDTO())
 	}
 }

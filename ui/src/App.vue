@@ -21,6 +21,10 @@
                 class="hydrated"
                 v-show="$store.state.user && $store.state.user.valid"
                 :class="{ selected: selectedIndex === i }"
+                v-if="
+                  !Array.isArray(p.perm) ||
+                  ($store.state.user && $store.state.user.can(...p.perm))
+                "
               >
                 <ion-icon
                   slot="start"
@@ -75,8 +79,22 @@
 import { IonApp, IonContent, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonMenu, IonMenuToggle, IonNote, IonRouterOutlet, IonSplitPane } from '@ionic/vue';
 import { defineComponent, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { searchOutline, searchSharp, cameraOutline, cameraSharp, codeSlashOutline, codeSlashSharp, logInOutline, logInSharp, logOutOutline, logOutSharp } from 'ionicons/icons';
+import {
+  searchOutline,
+  searchSharp,
+  cameraOutline,
+  cameraSharp,
+  codeSlashOutline,
+  codeSlashSharp,
+  logInOutline,
+  logInSharp,
+  logOutOutline,
+  logOutSharp,
+  peopleOutline,
+  peopleSharp,
+} from 'ionicons/icons';
 import { useI18n } from 'vue-i18n';
+import { Permission } from '@/models/user'
 
 export default defineComponent({
   name: 'App',
@@ -120,6 +138,13 @@ export default defineComponent({
         iosIcon: searchOutline,
         mdIcon: searchSharp
       },
+      {
+        title: t('menu.userAdmin'),
+        url: '/admin/users',
+        iosIcon: peopleOutline,
+        mdIcon: peopleSharp,
+        perm: Permission.UserLoginTokenAdmin,
+      },
     ];
 
     const path = window.location.pathname.split('example/')[1];
@@ -142,6 +167,9 @@ export default defineComponent({
       logInSharp,
       logOutOutline,
       logOutSharp,
+      peopleOutline,
+      peopleSharp,
+      Permission,
       t,
       isSelected: (url: string) => url === route.path ? 'selected' : ''
     }
@@ -155,7 +183,7 @@ export default defineComponent({
     login: 'Einloggen'
     logout: 'Ausloggen'
     search: 'Suche'
-    scan: 'Scannen'
+    userAdmin: 'Benutzer'
   'Not authenticated. You have to log-in to use this API': |
     Du bist nicht eingeloggt.
     <br>Bitte melde dich erneut an.
@@ -168,7 +196,7 @@ export default defineComponent({
     login: 'Login'
     logout: 'Logout'
     search: 'Search'
-    scan: 'Scan'
+    userAdmin: 'Users'
   'Not authenticated. You have to log-in to use this API': |
     Your are not logged in.
     <br>Please authenticate again.

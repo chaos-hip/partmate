@@ -37,6 +37,10 @@ type DB interface {
 	GetUserByName(name string) (*models.User, error)
 	// CreateUser creates a new user in the database
 	CreateUser(models.User) error
+	// DeleteUser deletes the user with the given name from the database
+	DeleteUser(name string) error
+	// GetUserList returns a list of all existing user names
+	GetUserList() ([]string, error)
 	// SetUserPermissions sets the permissions for the selected user based on the given user struct
 	SetUserPermissions(models.User) error
 

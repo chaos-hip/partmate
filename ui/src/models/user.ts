@@ -57,6 +57,10 @@ export enum Permission {
     UserPasswordAdmin = "user.password:admin",
     // UserLoginTokenAdmin allows administrating the login tokens to all users
     UserLoginTokenAdmin = "user.token:admin",
+    // UserRead allows access to the user administration in general including the user list
+    UserRead = "user:read",
+    // UserDelete allows to delete users
+    UserDelete = "user:delete",
 
     //-- Venues --------------------------------------------------------------------------------------------------------
 
@@ -84,20 +88,35 @@ export enum Permission {
     VenueItemInspected = "venue.item:inspected",
 }
 
+export interface UserObj {
+    name: string;
+    permissions?: Array<string>;
+}
+
 export class User {
     name: string;
     expires: number;
     permissions: Map<string, boolean>;
 
-    constructor(jwt: string) {
-        const payload = decodeJWTPayload(jwt);
-        this.name = payload.sub || '';
-        this.expires = payload.exp || 0;
+    constructor(data: string | UserObj) {
         this.permissions = new Map<string, boolean>();
-        if (payload.perm && Array.isArray(payload.perm)) {
-            payload.perm.forEach(item => {
-                this.permissions.set(item, true);
-            });
+        if (typeof data == 'string') {
+            const payload = decodeJWTPayload(data);
+            this.name = payload.sub || '';
+            this.expires = payload.exp || 0;
+            if (payload.perm && Array.isArray(payload.perm)) {
+                payload.perm.forEach(item => {
+                    this.permissions.set(item, true);
+                });
+            }
+        } else {
+            this.expires = 0;
+            this.name = data.name;
+            if (data.permissions && Array.isArray(data.permissions)) {
+                data.permissions.forEach(item => {
+                    this.permissions.set(item, true);
+                });
+            }
         }
     }
 

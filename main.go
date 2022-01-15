@@ -209,31 +209,52 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 
 		// Create a new user
 		apiRouter.POST(
-			"/user",
+			"/users",
 			auth.MakePermissionMiddleware(permission.UserCreate),
 			routes.MakeUserCreateHandler(dbInstance),
 		)
 
+		// Delete an existing user
+		apiRouter.DELETE(
+			"/users/:name",
+			auth.MakePermissionMiddleware(permission.UserDelete),
+			routes.MakeUserDeleteHandler(dbInstance),
+		)
+
+		// Get a list of users
+		apiRouter.GET(
+			"/users",
+			auth.MakePermissionMiddleware(permission.UserRead),
+			routes.MakeListUsersHandler(dbInstance),
+		)
+
+		// Get info about a single user
+		apiRouter.GET(
+			"/users/:name",
+			auth.MakePermissionMiddleware(permission.UserRead),
+			routes.MakeGetUserByNameHandler(dbInstance),
+		)
+
 		// Set user permissions
-		apiRouter.POST("/user/:name/permissions",
+		apiRouter.POST("/users/:name/permissions",
 			auth.MakePermissionMiddleware(permission.UserGrantPermissions),
 			routes.MakeUserSetPermissionsHandler(dbInstance),
 		)
 
 		// Create a new login token for an existing user
-		apiRouter.POST("/user/:name/tokens",
+		apiRouter.POST("/users/:name/tokens",
 			auth.MakePermissionMiddleware(permission.UserLoginTokenAdmin),
 			routes.MakeCreateUserLoginTokenHandler(dbInstance),
 		)
 
 		// List existing tokens for an existing user
-		apiRouter.GET("/user/:name/tokens",
+		apiRouter.GET("/users/:name/tokens",
 			auth.MakePermissionMiddleware(permission.UserLoginTokenAdmin),
 			routes.MakeListUserLoginTokensHandler(dbInstance),
 		)
 
 		// Delete login token by token ID (:name is ignored here)
-		apiRouter.DELETE("/user/:name/tokens/:id",
+		apiRouter.DELETE("/users/:name/tokens/:id",
 			auth.MakePermissionMiddleware(permission.UserLoginTokenAdmin),
 			routes.MakeDeleteUserLoginTokenHandler(dbInstance),
 		)

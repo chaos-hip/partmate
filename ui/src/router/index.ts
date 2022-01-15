@@ -60,7 +60,17 @@ const routes: Array<RouteRecordRaw> = [
     name: 'StorageContentsViewer',
     path: '/storage/:id/contents',
     component: () => import('../views/StorageContents.vue'),
-  }
+  },
+  {
+    name: 'UserAdminView',
+    path: '/admin/users',
+    component: () => import('../views/AdminUser.vue'),
+  },
+  {
+    name: 'UserEditor',
+    path: '/admin/users/:name',
+    component: () => import('../views/User.vue'),
+  },
 
 ]
 

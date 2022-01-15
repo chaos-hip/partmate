@@ -41,6 +41,10 @@ const (
 	UserPasswordAdmin = "user.password:admin"
 	// UserLoginTokenAdmin allows administrating the login tokens to all users
 	UserLoginTokenAdmin = "user.token:admin"
+	// UserRead allows access to the user administration in general including the user list
+	UserRead = "user:read"
+	// UserDelete allows to delete users
+	UserDelete = "user:delete"
 
 	//-- Venues --------------------------------------------------------------------------------------------------------
 
@@ -80,6 +84,8 @@ func Exists(perm string) bool {
 		PartStockManage,
 		ReportStorageContents,
 		ReportVenueSummary,
+		UserRead,
+		UserDelete,
 		UserCreate,
 		UserGrantPermissions,
 		UserPasswordAdmin,
@@ -109,6 +115,8 @@ func AvailablePermissions() []string {
 		PartStockManage,
 		ReportStorageContents,
 		ReportVenueSummary,
+		UserRead,
+		UserDelete,
 		UserCreate,
 		UserGrantPermissions,
 		UserPasswordAdmin,

@@ -59,3 +59,26 @@ func (d *DB) SetUserPermissions(u models.User) error {
 	}
 	return nil
 }
+
+// GetUserList returns a list of all existing users
+func (d *DB) GetUserList() ([]string, error) {
+	out := []string{}
+	if err := d.db.Select(
+		&out,
+		fmt.Sprintf(`SELECT name from %s ORDER BY name`, userTableName),
+	); err != nil {
+		return nil, fmt.Errorf("failed to fetch user names: %w", err)
+	}
+	return out, nil
+}
+
+// DeleteUser deletes the user with the given name from the database
+func (d *DB) DeleteUser(name string) error {
+	if _, err := d.db.Exec(
+		fmt.Sprintf(`DELETE from %s WHERE name = ?`, userTableName),
+		name,
+	); err != nil {
+		return fmt.Errorf("failed to delete user: %w", err)
+	}
+	return nil
+}
