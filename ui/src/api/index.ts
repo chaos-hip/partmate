@@ -6,6 +6,30 @@ import { PartAttachment, PartAttachmentObj } from '@/models/attachment';
 import { User, UserObj } from '@/models/user';
 import { LoginToken, LoginTokenObj } from '@/models/loginToken';
 
+//-- Helpers -----------------------------------------------------------------------------------------------------------
+
+
+/**
+ * Checks if the given link is valid
+ * @param link The link to check
+ * @returns `true` if the link is a valid one
+ */
+function isValidLink(link: string): boolean {
+    return (/^[a-z0-9]+$/i).test(link);
+}
+
+function prepareRequestHeaders(): HeadersInit {
+    const out = new Headers({
+        'Content-Type': 'application/json',
+    });
+    if (store.state.jwt) {
+        out.set('Authorization', `Bearer ${store.state.jwt}`);
+    }
+    return out;
+}
+
+//-- Helper classes and interfaces -------------------------------------------------------------------------------------
+
 interface LoginResponse {
     token: string;
 }
@@ -44,6 +68,14 @@ async function makeApiError(res: Response): Promise<ApiError> {
     return new ApiError(obj, res);
 }
 
+interface SearchPayload {
+    term?: string;
+    offset: number;
+    limit: number;
+}
+
+//-- API functions -----------------------------------------------------------------------------------------------------
+
 /**
  * Logs in the user with the given credentials.
  * Will throw an error if something goes wrong.
@@ -53,7 +85,7 @@ async function makeApiError(res: Response): Promise<ApiError> {
  * @param username The user name to log in with
  * @param password The password to log in with
  */
-export async function login(username: string, password: string) {
+export async function login(username: string, password: string): Promise<void> {
     const res = await fetch('/api/login', {
         method: 'POST',
         headers: {
@@ -75,29 +107,27 @@ export async function login(username: string, password: string) {
     store.commit('loggedIn', data.token);
 }
 
-interface SearchPayload {
-    term?: string;
-    offset: number;
-    limit: number;
-}
-
 /**
- * Checks if the given link is valid
- * @param link The link to check
- * @returns `true` if the link is a valid one
+ * Tries to log-in using an access token
+ *
+ * @param token The token to log-in with
  */
-function isValidLink(link: string): boolean {
-    return (/^[a-z0-9]+$/i).test(link);
-}
-
-function prepareRequestHeaders(): HeadersInit {
-    const out = new Headers({
-        'Content-Type': 'application/json',
-    });
-    if (store.state.jwt) {
-        out.set('Authorization', `Bearer ${store.state.jwt}`);
+export async function tokenLogin(token: string): Promise<void> {
+    if (!isValidLink(token)) {
+        throw new Error('Invalid token');
     }
-    return out;
+    const res = await fetch(`/api/login/token/${token}`, {
+        method: 'POST',
+    });
+    if (res.status != 200) {
+        const err = await makeApiError(res);
+        throw err;
+    }
+    const data = (await res.json()) as LoginResponse;
+    if (!data.token) {
+        throw new Error("No token in server response");
+    }
+    store.commit('loggedIn', data.token);
 }
 
 /**

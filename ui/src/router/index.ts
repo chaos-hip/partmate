@@ -13,6 +13,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/Login.vue')
   },
   {
+    name: 'TokenLogin',
+    path: '/token/:id',
+    component: () => import('../views/TokenLogin.vue')
+  },
+  {
     name: 'Search',
     path: '/search',
     component: () => import('../views/Search.vue'),
@@ -80,10 +85,10 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.name !== 'Login' && (!store.state.user || !store.state.user.valid)) {
+  if (to.name !== 'Login' && to.name !== 'TokenLogin' && (!store.state.user || !store.state.user.valid)) {
     next('/login');
     return;
-  } else if (to.name === 'Login' && store.state.user && store.state.user.valid) {
+  } else if ((to.name === 'Login' || to.name === 'TokenLogin') && store.state.user && store.state.user.valid) {
     next('/');
     return;
   }

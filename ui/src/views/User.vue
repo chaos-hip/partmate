@@ -71,7 +71,7 @@
             v-if="selectedToken"
             :src="`/api/tokens/${selectedToken}/qr`"
           ></ion-img>
-          <ion-button @click="setClipboard(selectedToken)" expand="block">
+          <ion-button @click="setClipboard()" expand="block">
             {{ t("modal.details.button") }}
           </ion-button>
         </ion-content>
@@ -377,7 +377,7 @@ export default defineComponent({
       this.reloadTokens();
       this.createModalShowing = false;
     },
-    async setClipboard(token: string) {
+    async setClipboard() {
       await navigator.clipboard.writeText(this.selectedTokenUrl);
     }
   },
