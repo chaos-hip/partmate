@@ -187,6 +187,10 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 	// Unsecured link redirection
 	router.GET("/l/:id", routes.MakeLinkRedirectHandler(dbInstance, baseURL)) // Redirect to the correct UI view based on the incoming link
 
+	// Unsecured token QR code generation
+	// Can be unsecured since you will be able to login if the token exists and else we don't render anything
+	router.GET("/api/tokens/:id/qr", routes.MakeGetTokenQRCodeHandler(dbInstance, baseURL))
+
 	//-- Login via token ----------------------------------------------------------------------------------------------
 
 	// Redirect to the correct UI view for logging in with a token

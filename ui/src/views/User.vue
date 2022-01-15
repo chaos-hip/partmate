@@ -37,7 +37,7 @@
           t("token.none")
         }}</ion-item>
         <ion-item-sliding v-for="token in tokens" :key="token.token">
-          <ion-item>
+          <ion-item @click="selectedToken = token.token" detail>
             <ion-icon :icon="qrCodeOutline" slot="start"></ion-icon>
             <ion-label>
               <h2>{{ token.token }}</h2>
@@ -57,6 +57,25 @@
         </ion-item-sliding>
       </ion-list>
       <ion-loading :is-open="loading" :message="t('loading')"></ion-loading>
+      <ion-modal :is-open="selectedToken !== ''">
+        <ion-toolbar>
+          <ion-title>{{ t("modal.details.title") }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button @click="selectedToken = ''">
+              {{ t("btn.cancel") }}
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+        <ion-content fullscreen>
+          <ion-img
+            v-if="selectedToken"
+            :src="`/api/tokens/${selectedToken}/qr`"
+          ></ion-img>
+          <ion-button @click="setClipboard(selectedToken)" expand="block">
+            {{ t("modal.details.button") }}
+          </ion-button>
+        </ion-content>
+      </ion-modal>
       <ion-modal :is-open="createModalShowing">
         <ion-toolbar>
           <ion-title>{{ t("modal.new.title") }}</ion-title>
@@ -171,6 +190,7 @@ import {
   actionSheetController,
   IonSelect,
   IonSelectOption,
+  IonImg,
 } from '@ionic/vue';
 import { defineComponent, ref, Ref } from '@vue/runtime-core';
 import { skullOutline, linkSharp, ellipsisHorizontal, ellipsisVertical, qrCodeOutline } from 'ionicons/icons';
@@ -206,6 +226,7 @@ export default defineComponent({
     IonItemOption,
     IonSelect,
     IonSelectOption,
+    IonImg,
   },
   props: {
     username: String,
@@ -218,7 +239,10 @@ export default defineComponent({
   computed: {
     currentUsername() {
       return this.username || this.$route.params.name || '';
-    }
+    },
+    selectedTokenUrl() {
+      return this.selectedToken ? `${window.location.protocol}//${window.location.host}/t/${this.selectedToken}` : '';
+    },
   },
   methods: {
     currentTimestamp() {
@@ -264,7 +288,7 @@ export default defineComponent({
             icon: qrCodeOutline,
             handler: () => {
               this.createModalShowing = true;
-              this.detailsModalShowing = false;
+              this.selectedToken = '';
             }
           }
         ],
@@ -353,6 +377,9 @@ export default defineComponent({
       this.reloadTokens();
       this.createModalShowing = false;
     },
+    async setClipboard(token: string) {
+      await navigator.clipboard.writeText(this.selectedTokenUrl);
+    }
   },
   setup() {
     const { t, dismissError, showError } = errorDisplay();
@@ -361,7 +388,7 @@ export default defineComponent({
     const tokens: Ref<Array<LoginToken>> = ref([]);
     const loading = ref(false);
     const createModalShowing = ref(false); // Create Token
-    const detailsModalShowing = ref(false); // Show Token QR code
+    const selectedToken = ref("");
     const newTokenExpires = ref("today");
     const newTokenSessionLength = ref("28800");
 
@@ -380,7 +407,7 @@ export default defineComponent({
       loading,
       Permission,
       createModalShowing,
-      detailsModalShowing,
+      selectedToken,
       newTokenExpires,
       newTokenSessionLength,
     }
@@ -409,6 +436,9 @@ token:
   second: Sekunde
   seconds: Sekunden
 modal:
+  details:
+    title: Token Details
+    button: Link kopieren
   new:
     title: Neuer token
     field:
@@ -463,6 +493,9 @@ token:
   second: Second
   seconds: Seconds
 modal:
+  details:
+    title: Token details
+    button: Copy to clipboard
   new:
     title: New token
     field:
