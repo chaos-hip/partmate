@@ -15,7 +15,13 @@
       <ion-list v-if="attachmentList.length > 0">
         <ion-item-sliding v-for="att in attachmentList" :key="att.id">
           <ion-item lines="full" :href="att.getDownloadLink()" target="_blank">
-            <ion-icon :icon="getFileIcon(att.mimeType)" slot="start"></ion-icon>
+            <ion-icon
+              :icon="getFileIcon(att.mimeType)"
+              slot="start"
+            ></ion-icon>
+            <ion-thumbnail v-if="att.isImage" slot="end">
+              <img :src="att.getThumbnailPath()" />
+            </ion-thumbnail>
             <ion-label>
               <h2>{{ att.name }}</h2>
               <p>{{ att.description }}</p>

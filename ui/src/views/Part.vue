@@ -16,11 +16,15 @@
             <ion-card v-if="!loading && part">
               <img :src="part.getThumbnailPath()" class="partPreview" />
               <ion-card-header>
-                <ion-card-subtitle color="primary">{{
-                  part.storage.name
-                }}</ion-card-subtitle>
-                <ion-card-title>{{ part.name }}</ion-card-title>
-                <p>{{ part.description }}</p>
+                <ion-card-subtitle color="primary">
+                  {{ part.storage.name }}
+                </ion-card-subtitle>
+                <ion-card-title>
+                  {{ part.name }}
+                </ion-card-title>
+                <p>
+                  {{ part.description }}
+                </p>
               </ion-card-header>
               <ion-card-content class="comment">
                 {{ part.comment }}

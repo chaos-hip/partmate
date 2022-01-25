@@ -23,7 +23,21 @@ export class PartAttachment {
         }
     }
 
+    get isImage(): boolean {
+        switch (this.mimeType) {
+            case "image/png":
+            case "image/jpeg":
+            case "image/gif":
+                return true
+        }
+        return false;
+    }
+
     getDownloadLink(): string {
         return `/api/attachments/${this.id}`;
+    }
+
+    getThumbnailPath(): string {
+        return `/api/attachments/${this.id}/thumb`;
     }
 }
