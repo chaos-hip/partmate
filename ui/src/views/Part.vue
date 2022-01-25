@@ -10,45 +10,57 @@
       </ion-toolbar>
     </ion-header>
     <ion-content fullscreen>
-      <ion-card v-if="!loading && part">
-        <img :src="part.getThumbnailPath()" class="partPreview" />
-        <ion-card-header>
-          <ion-card-subtitle color="primary">{{
-            part.storage.name
-          }}</ion-card-subtitle>
-          <ion-card-title>{{ part.name }}</ion-card-title>
-          <p>{{ part.description }}</p>
-        </ion-card-header>
-        <ion-card-content>
-          {{ part.comment }}
-        </ion-card-content>
-        <ion-item
-          detail
-          :lines="
-            $store.state.user && $store.state.user.can(Permission.LinkRead)
-              ? 'full'
-              : 'none'
-          "
-          @click="$router.push(`/part/${partId}/attachments`)"
-          v-if="
-            $store.state.user &&
-            $store.state.user.can(Permission.PartAttachmentRead)
-          "
-        >
-          <ion-icon slot="start" :icon="documentsSharp"></ion-icon>
-          <ion-label>{{ t("part.attachments") }}</ion-label>
-          <ion-note>{{ part.attachmentCount }}</ion-note>
-        </ion-item>
-        <ion-item
-          detail
-          lines="none"
-          @click="$router.push(`/link/${partId}/links`)"
-          v-if="$store.state.user && $store.state.user.can(Permission.LinkRead)"
-        >
-          <ion-icon slot="start" :icon="linkSharp"></ion-icon>
-          <ion-label>{{ t("part.links") }}</ion-label>
-        </ion-item>
-      </ion-card>
+      <ion-grid :fixed="true">
+        <ion-row>
+          <ion-col size="12" size-sm="8" size-md="6" size-xl="5">
+            <ion-card v-if="!loading && part">
+              <img :src="part.getThumbnailPath()" class="partPreview" />
+              <ion-card-header>
+                <ion-card-subtitle color="primary">{{
+                  part.storage.name
+                }}</ion-card-subtitle>
+                <ion-card-title>{{ part.name }}</ion-card-title>
+                <p>{{ part.description }}</p>
+              </ion-card-header>
+              <ion-card-content class="comment">
+                {{ part.comment }}
+              </ion-card-content>
+              <ion-item
+                detail
+                :lines="
+                  $store.state.user &&
+                  $store.state.user.can(Permission.LinkRead)
+                    ? 'full'
+                    : 'none'
+                "
+                @click="$router.push(`/part/${partId}/attachments`)"
+                v-if="
+                  $store.state.user &&
+                  $store.state.user.can(Permission.PartAttachmentRead)
+                "
+              >
+                <ion-icon slot="start" :icon="documentsSharp"></ion-icon>
+                <ion-label>{{ t("part.attachments") }}</ion-label>
+                <ion-note slot="end" color="medium">
+                  {{ part.attachmentCount }}
+                </ion-note>
+              </ion-item>
+              <ion-item
+                detail
+                lines="none"
+                @click="$router.push(`/link/${partId}/links`)"
+                v-if="
+                  $store.state.user &&
+                  $store.state.user.can(Permission.LinkRead)
+                "
+              >
+                <ion-icon slot="start" :icon="linkSharp"></ion-icon>
+                <ion-label>{{ t("part.links") }}</ion-label>
+              </ion-item>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
       <ion-loading :is-open="loading" :message="t('loading')"></ion-loading>
     </ion-content>
   </ion-page>
@@ -76,6 +88,10 @@ import {
   IonIcon,
   isPlatform,
   IonMenuButton,
+  IonCol,
+  IonRow,
+  IonGrid,
+  IonNote,
 } from '@ionic/vue';
 import { defineComponent, ref, Ref } from '@vue/runtime-core';
 import { documentsSharp, linkSharp } from 'ionicons/icons';
@@ -102,6 +118,10 @@ export default defineComponent({
     IonLoading,
     IonIcon,
     IonMenuButton,
+    IonCol,
+    IonRow,
+    IonGrid,
+    IonNote,
   },
   props: {
     id: String,
@@ -178,8 +198,11 @@ err:
 <style scoped>
 .partPreview {
   width: 100%;
-  height: auto;
   object-fit: cover;
+}
+
+.comment {
+  white-space: pre-line;
 }
 
 ion-card ion-item {

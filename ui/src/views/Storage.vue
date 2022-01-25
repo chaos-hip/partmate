@@ -21,36 +21,42 @@
       </ion-toolbar>
     </ion-header>
     <ion-content fullscreen>
-      <ion-card v-if="!loading && storage">
-        <ion-card-header>
-          <ion-card-subtitle color="primary">
-            {{ storage.category.fullPath }}
-          </ion-card-subtitle>
-          <ion-card-title>
-            {{ storage.name }}
-          </ion-card-title>
-          <p>{{ storage.description }}</p>
-        </ion-card-header>
-        <ion-item
-          detail
-          lines="none"
-          @click="$router.push(`/link/${storage.id}/links`)"
-        >
-          <ion-icon slot="start" :icon="linkSharp"></ion-icon>
-          <ion-label>{{ t("storage.links") }}</ion-label>
-        </ion-item>
-        <ion-item
-          detail
-          lines="none"
-          @click="$router.push(`/storage/${storage.id}/contents`)"
-        >
-          <ion-icon slot="start" :icon="hardwareChipOutline"></ion-icon>
-          <ion-label>{{ t("storage.contents") }}</ion-label>
-          <ion-note slot="end" color="medium">
-            {{ storage.partsContained }}
-          </ion-note>
-        </ion-item>
-      </ion-card>
+      <ion-grid :fixed="true">
+        <ion-row>
+          <ion-col size="12" size-sm="8" size-md="6" size-xl="5">
+            <ion-card v-if="!loading && storage">
+              <ion-card-header>
+                <ion-card-subtitle color="primary">
+                  {{ storage.category.fullPath }}
+                </ion-card-subtitle>
+                <ion-card-title>
+                  {{ storage.name }}
+                </ion-card-title>
+                <p>{{ storage.description }}</p>
+              </ion-card-header>
+              <ion-item
+                detail
+                lines="none"
+                @click="$router.push(`/link/${storage.id}/links`)"
+              >
+                <ion-icon slot="start" :icon="linkSharp"></ion-icon>
+                <ion-label>{{ t("storage.links") }}</ion-label>
+              </ion-item>
+              <ion-item
+                detail
+                lines="none"
+                @click="$router.push(`/storage/${storage.id}/contents`)"
+              >
+                <ion-icon slot="start" :icon="hardwareChipOutline"></ion-icon>
+                <ion-label>{{ t("storage.contents") }}</ion-label>
+                <ion-note slot="end" color="medium">
+                  {{ storage.partsContained }}
+                </ion-note>
+              </ion-item>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
       <ion-loading :is-open="loading" :message="t('loading')"></ion-loading>
     </ion-content>
   </ion-page>
@@ -77,6 +83,9 @@ import {
   IonButton,
   IonNote,
   isPlatform,
+  IonCol,
+  IonRow,
+  IonGrid,
 } from '@ionic/vue';
 import { defineComponent, ref, Ref } from '@vue/runtime-core';
 import { linkSharp, hardwareChipOutline, ellipsisVertical, ellipsisHorizontal } from 'ionicons/icons';
@@ -103,6 +112,9 @@ export default defineComponent({
     IonIcon,
     IonButton,
     IonNote,
+    IonCol,
+    IonRow,
+    IonGrid,
   },
   props: {
     id: String,
