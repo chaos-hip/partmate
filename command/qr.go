@@ -53,6 +53,8 @@ type QR struct {
 	short bool
 	// The recovery level to use
 	recoveryLevel string
+	// Comma-separated list of predefined codes to include into the generated ones
+	ids string
 }
 
 func NewQR() *QR {
@@ -68,6 +70,7 @@ func NewQR() *QR {
 		rLevelHighest,
 		fmt.Sprintf("Recovery level to use - one of %+v", []string{rLevelLow, rLevelMedium, rLevelHigh, rLevelHighest}),
 	)
+	out.fs.StringVar(&out.ids, "ids", "", "Comma-separated list of pre-defined IDs to include into the QR codes")
 	return out
 }
 
@@ -127,9 +130,22 @@ func (q *QR) Run(args []string) error {
 	dc.SetHexColor("ffffff")
 	dc.DrawRectangle(0, 0, a4WidthInPx, a4HeightInPx)
 	dc.Fill()
+	predefinedCodes := []string{}
+	if strings.TrimSpace(q.ids) != "" {
+		for _, id := range strings.Split(q.ids, ",") {
+			predefinedCodes = append(predefinedCodes, strings.TrimSpace(id))
+		}
+	}
+	var count int
 	for yPos := 0; yPos < cellsY; yPos++ {
 		for xPos := 0; xPos < cellsX; xPos++ {
-			code := shortuuid.New()
+			var code string
+			if count < len(predefinedCodes) {
+				// Take one of the predefined IDs
+				code = predefinedCodes[count]
+			} else {
+				code = shortuuid.New()
+			}
 			img, err := q.createCodeImage(code)
 			if err != nil {
 				return fmt.Errorf("%d, %d: failed to generate output: %w", xPos, yPos, err)
@@ -138,6 +154,7 @@ func (q *QR) Run(args []string) error {
 			x := pageBorderPx + (bounds.Dx() * xPos)
 			y := pageBorderPx + (bounds.Dy() * yPos)
 			dc.DrawImage(img, x, y)
+			count++
 		}
 	}
 	return dc.SavePNG(q.outputFile)
