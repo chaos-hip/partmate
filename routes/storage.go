@@ -170,7 +170,7 @@ func MakeStorageContentReportByToken(dbInstance db.DB) gin.HandlerFunc {
 			return
 		}
 		// Download is one-time only
-		//delete(contentReportDownloadTokens, token)
+		delete(contentReportDownloadTokens, token)
 		search.StorageLocationLink = id
 		search.IgnoreMaxLimit = true
 		search.Limit = 100000
