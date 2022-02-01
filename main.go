@@ -190,6 +190,11 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 	// Unsecured token QR code generation
 	// Can be unsecured since you will be able to login if the token exists and else we don't render anything
 	router.GET("/api/tokens/:id/qr", routes.MakeGetTokenQRCodeHandler(dbInstance, baseURL))
+	router.GET("/api/storage/:id/qr", routes.MakeGetStorageQRCodeHandler(dbInstance, baseURL))
+	router.GET("/api/parts/:id/qr", routes.MakeGetPartQRCodeHandler(dbInstance, baseURL))
+
+	// Downloading a report via token - for now only the storage content report is supported
+	router.GET("/reports/:token", routes.MakeStorageContentReportByToken(dbInstance))
 
 	//-- Login via token ----------------------------------------------------------------------------------------------
 
@@ -267,9 +272,6 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 
 		// Get details about a given part
 		apiRouter.GET("/parts/:id", routes.MakeGetPartByLinkHandler(dbInstance))
-
-		// Get the QR code for a part
-		apiRouter.GET("/parts/:id/qr", handleTeaPottJeeey)
 
 		// Search for parts
 		apiRouter.POST("/parts/search", routes.MakePartsSearchHandler(dbInstance))
@@ -412,9 +414,9 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 		//-- Reporting / Printing --------------------------------------------------------------------------------------
 
 		// Create a list with the contents of a storage location
-		apiRouter.POST("/storage-locations/:id/reports/contents",
+		apiRouter.POST("/storage/:id/reports/contents",
 			auth.MakePermissionMiddleware(permission.ReportStorageContents),
-			handleTeaPottJeeey,
+			routes.MakeStorageContentReport(dbInstance),
 		)
 
 		// Summary about a venue

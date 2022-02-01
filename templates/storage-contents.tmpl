@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Lagerort - {{ .Storage.Name }}</title>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 13px;
+      }
+
+      .storagePath {
+        font-style: italic;
+        color: #888;
+        margin: 0;
+      }
+
+      .title {
+        margin: 0 0 20px 0;
+      }
+
+      .thumb {
+        width: 64px;
+        height: 64px;
+        object-fit: cover;
+      }
+
+      th {
+        text-align: left;
+      }
+
+      tr {
+        break-inside: avoid;
+        box-sizing: content-box;
+        border-bottom-width: 1px;
+        border-bottom-style: solid;
+        border-bottom-color: #ccc;
+      }
+
+      td h1 {
+        font-size: 1.3em;
+        margin: 4px 0 0 0;
+      }
+
+      td h2 {
+        font-size: 1em;
+        margin: 0;
+        font-weight: normal;
+      }
+
+      td p {
+        font-size: 0.8em;
+        margin: 0;
+        word-wrap: normal;
+        overflow: hidden;
+      }
+
+      td {
+        padding: 4px;
+        vertical-align: top;
+      }
+
+      td.stock {
+        vertical-align: middle;
+      }
+
+      table {
+        border-collapse: collapse;
+        border-spacing: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      {{if .Parts}}
+      <table>
+        <thead>
+          <tr>
+            <th colspan="4">
+              <div class="storagePath">
+                {{ slice .Storage.StorageCategory.Path 18 }}
+              </div>
+              <h1 class="title">
+                {{ .Storage.Name }}
+              </h1>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {{
+            range.Parts
+          }}
+          <tr>
+            <td class="img"><img class="thumb" src="/api/parts/{{ .Link.Value }}/qr" /></td>
+            <td class="img">
+              {{if .ImageLink.Valid}}
+              <img class="thumb" src="/api/attachments/{{ .ImageLink.Value }}/thumb" />
+              {{else}}
+              <img class="thumb" src="/ui/assets/img/noThumb.png" />
+              {{ end }}
+            </td>
+            <td class="text">
+              <h1>{{ .Name }}</h1>
+              <h2>{{ .Description }}</h2>
+            </td>
+            <td class="stock">{{ .StockLevel }}</td>
+          </tr>
+          {{
+            end
+          }}
+        </tbody>
+      </table>
+      {{else}}
+      <div>Diese Location beinhaltet keine Teile</div>
+      {{ end }}
+    </main>
+  </body>
+</html>

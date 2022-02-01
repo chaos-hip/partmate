@@ -10,7 +10,7 @@
           {{ storage ? storage.name : "" }}
         </ion-title>
         <ion-buttons slot="end">
-          <ion-button>
+          <ion-button @click="showOptions()">
             <ion-icon
               slot="icon-only"
               :ios="ellipsisHorizontal"
@@ -86,10 +86,11 @@ import {
   IonCol,
   IonRow,
   IonGrid,
+  actionSheetController,
 } from '@ionic/vue';
 import { defineComponent, ref, Ref } from '@vue/runtime-core';
 import { linkSharp, hardwareChipOutline, ellipsisVertical, ellipsisHorizontal } from 'ionicons/icons';
-import { getStorageById } from '@/api';
+import { getStorageById, prepareStorageContentReport } from '@/api';
 import { errorDisplay } from '@/composables/errorDisplay';
 
 export default defineComponent({
@@ -145,6 +146,29 @@ export default defineComponent({
       }
       this.loading = false;
     },
+    async showOptions() {
+      const sheet = await actionSheetController.create({
+        header: this.t('actions.title'),
+        buttons: [
+          {
+            text: this.t('actions.contentReport'),
+            icon: hardwareChipOutline,
+            handler: async () => {
+              if (!this.storageId) {
+                return;
+              }
+              try {
+                const token = await prepareStorageContentReport(this.storageId as string);
+                window.open(`/reports/${token}`, 'report');
+              } catch (err) {
+                this.showError(String(err), 'err.load');
+              }
+            }
+          }
+        ],
+      });
+      await sheet.present();
+    },
   },
   setup() {
     const { t, dismissError, showError } = errorDisplay();
@@ -175,6 +199,9 @@ storage:
     contents: Teile
 err:
   load: Lagerort konnte nicht geladen werden
+actions:
+  title: Actions
+  contentReport: Inhaltsliste drucken...
 </i18n>
 <i18n locale="en" lang="yaml">
 loading: Loading...
@@ -183,6 +210,9 @@ storage:
     contents: Parts
 err:
   load: Failed to load storage location information
+actions:
+  title: Actions
+  contentReport: Open content report...
 </i18n>
 
 <style scoped>

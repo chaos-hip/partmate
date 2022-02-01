@@ -162,7 +162,7 @@ func (d *DB) GetPartByLink(id string) (*models.Part, error) {
 func (d *DB) SearchParts(search models.Search) ([]models.Part, error) {
 	res := []*models.Part{}
 	term := fmt.Sprintf("%%%s%%", search.Term)
-	if search.Limit > maximumPageSize {
+	if search.Limit > maximumPageSize && !search.IgnoreMaxLimit {
 		search.Limit = maximumPageSize
 	}
 	if search.Limit == 0 {

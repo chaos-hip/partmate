@@ -338,6 +338,25 @@ export async function getAttachmentsByPartLink(link: string): Promise<Array<Part
 }
 
 /**
+ * Prepares a report showing a printable storage location content list
+ * Once created, the token can be used to open the report in a new tab
+ *
+ * @param storageId The ID of the storage location to create the report for
+ * @returns A token that can be used to open the report
+ */
+export async function prepareStorageContentReport(storageId: string): Promise<string> {
+    if (!isValidLink(storageId)) {
+        throw new Error('Invalid link ID');
+    }
+    const res = await fetch(`/api/storage/${storageId}/reports/contents`, { method: 'POST', headers: prepareRequestHeaders() });
+    if (res.status !== 200) {
+        throw await makeApiError(res);
+    }
+    const list = (await res.json()) as string;
+    return list;
+}
+
+/**
  * Loads the list of users
  * @returns A list of all existing users
  */
