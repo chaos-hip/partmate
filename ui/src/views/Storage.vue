@@ -92,6 +92,7 @@ import { defineComponent, ref, Ref } from '@vue/runtime-core';
 import { linkSharp, hardwareChipOutline, ellipsisVertical, ellipsisHorizontal } from 'ionicons/icons';
 import { getStorageById, prepareStorageContentReport } from '@/api';
 import { errorDisplay } from '@/composables/errorDisplay';
+import { Permission } from '@/models/user';
 
 export default defineComponent({
   name: 'StorageOverview',
@@ -132,6 +133,12 @@ export default defineComponent({
     }
   },
   methods: {
+    can(permission: Permission) {
+      if (!this.$store.state.user) {
+        return false;
+      }
+      return this.$store.state.user.can(permission);
+    },
     async loadStorageLocation() {
       this.storage = null;
       if (!this.storageId) {
@@ -147,25 +154,30 @@ export default defineComponent({
       this.loading = false;
     },
     async showOptions() {
-      const sheet = await actionSheetController.create({
-        header: this.t('actions.title'),
-        buttons: [
-          {
-            text: this.t('actions.contentReport'),
-            icon: hardwareChipOutline,
-            handler: async () => {
-              if (!this.storageId) {
-                return;
-              }
-              try {
-                const token = await prepareStorageContentReport(this.storageId as string);
-                window.open(`/reports/${token}`, 'report');
-              } catch (err) {
-                this.showError(String(err), 'err.load');
-              }
+      let buttons = [];
+      if (this.can(Permission.ReportStorageContents)) {
+        buttons.push({
+          text: this.t('actions.contentReport'),
+          icon: hardwareChipOutline,
+          handler: async () => {
+            if (!this.storageId) {
+              return;
+            }
+            try {
+              const token = await prepareStorageContentReport(this.storageId as string);
+              window.open(`/reports/${token}`, 'report');
+            } catch (err) {
+              this.showError(String(err), 'err.load');
             }
           }
-        ],
+        });
+      }
+      if (buttons.length == 0) {
+        return;
+      }
+      const sheet = await actionSheetController.create({
+        header: this.t('actions.title'),
+        buttons: buttons,
       });
       await sheet.present();
     },
