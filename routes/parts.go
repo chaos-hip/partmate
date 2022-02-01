@@ -99,7 +99,7 @@ func MakeGetPartQRCodeHandler(dbInstance db.DB, defaultBaseURL string) gin.Handl
 		if baseURL == "" {
 			baseURL = getBaseURLFromRequest(c)
 		}
-		url := fmt.Sprintf("%s/t/%s", baseURL, id)
+		url := fmt.Sprintf("%s/l/%s", baseURL, id)
 		// Render the QR code
 		code, err := qr.Encode(url, qr.M, qr.Auto)
 		if err != nil {
