@@ -154,7 +154,7 @@ export default defineComponent({
       this.loading = false;
     },
     async showOptions() {
-      let buttons = [];
+      const buttons = [];
       if (this.can(Permission.ReportStorageContents)) {
         buttons.push({
           text: this.t('actions.contentReport'),
