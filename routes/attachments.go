@@ -120,7 +120,7 @@ func MakePartAttachmentDownloadHandler(dbInstance db.DB) gin.HandlerFunc {
 			)
 			return
 		}
-		c.Writer.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", att.OriginalName))
+		c.Writer.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", att.OriginalName))
 		http.ServeFile(c.Writer, c.Request, att.StorageLocation())
 	}
 }
