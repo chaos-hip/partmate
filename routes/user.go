@@ -22,6 +22,11 @@ import (
 	"github.com/spf13/cast"
 )
 
+const (
+	// The length of a typical login session
+	defaultSessionLength = time.Hour * 8
+)
+
 // MakeUserCreateHandler creates the handler for the "NewUser" endpoint
 func MakeUserCreateHandler(db db.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -133,7 +138,7 @@ func MakeLoginHandler(db db.DB, privateKey *rsa.PrivateKey, issuer string) gin.H
 			return
 		}
 		// All fine - we can assume the user to be logged in. Create a JWT and send it back
-		jwt, err := createJWT(*user, privateKey, issuer, time.Now().Add(time.Hour))
+		jwt, err := createJWT(*user, privateKey, issuer, time.Now().Add(defaultSessionLength))
 		if err != nil {
 			logrus.WithError(err).Error("Failed to create JWT")
 			c.AbortWithStatusJSON(
