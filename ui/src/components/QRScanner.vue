@@ -21,6 +21,24 @@
         accept="image/*"
         @change="onFileChosen"
       />
+      <ion-item>
+        <ion-label position="fixed">{{ t("label.manualEntry") }}</ion-label>
+        <ion-input
+          autofocus
+          clear-input
+          required
+          id="qrManualInput"
+          v-model="enteredString"
+          @keyup="onKeyUp"
+        ></ion-input>
+      </ion-item>
+      <ion-button
+        expand="block"
+        @click="onScanSuccess(enteredString)"
+        v-if="enteredString.trim() != ''"
+      >
+        {{ t("btn.manualCommit") }}
+      </ion-button>
     </ion-content>
   </ion-page>
 </template>
@@ -38,6 +56,9 @@ import {
   toastController,
   IonicSafeString,
   IonIcon,
+  IonItem,
+  IonLabel,
+  IonInput,
 } from '@ionic/vue';
 import { defineComponent, ref, Ref } from '@vue/runtime-core';
 import { useI18n } from 'vue-i18n';
@@ -57,6 +78,9 @@ export default defineComponent({
     IonContent,
     IonButton,
     IonIcon,
+    IonItem,
+    IonLabel,
+    IonInput,
   },
   mounted() {
     this.$nextTick(function () {
@@ -69,6 +93,7 @@ export default defineComponent({
   },
   methods: {
     async startScanning() {
+      (document.querySelector('#qrManualInput') as HTMLInputElement).focus();
       const config: Html5QrcodeCameraScanConfig = {
         fps: 10,
         qrbox: 300,
@@ -180,7 +205,12 @@ export default defineComponent({
     onCloseClick() {
       this.$emit('scan-cancel');
       this.stopScanning();
-    }
+    },
+    onKeyUp(ev: KeyboardEvent) {
+      if (ev.key == 'Enter') {
+        this.onScanSuccess(this.enteredString.trim());
+      }
+    },
   },
   setup() {
     const { t } = useI18n({
@@ -190,11 +220,13 @@ export default defineComponent({
 
     const scanner: Ref<null> | Ref<Html5Qrcode> = ref(null);
     const waitingForResult = ref(false);
+    const enteredString = ref("");
 
     return {
       t,
       scanner,
       waitingForResult,
+      enteredString,
       alertCircleOutline,
       documentOutline,
     }
@@ -207,24 +239,30 @@ title: Scannen
 btn:
   close: Abbrechen
   dismiss: Schließen
+  manualCommit: Manelle Eingabe
 link:
   loading: Lade...
 err:
   loadLinkInfo: Fehler beim Laden der Link-Infos
   startScanning: Konnte Scanner nicht starten
   scanFromFile: Im Bild wurde kein Code gefunden
+label:
+  manualEntry: Code
 </i18n>
 <i18n locale="en" lang="yaml">
 title: Scan
 btn:
   close: Cancel
   dismiss: Schließen
+  manualCommit: Manelle entry
 link:
   loading: Loading...
 err:
   loadLinkInfo: Error while loading link infos
   startScanning: Failed to start scanner
   scanFromFile: No code found in file
+label:
+  manualEntry: Code
 </i18n>
 
 <style scoped>

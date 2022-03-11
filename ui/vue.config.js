@@ -2,20 +2,7 @@ module.exports = {
     runtimeCompiler: true,
 
     devServer: {
-        proxy: {
-            '/api': {
-                target: 'http://localhost:3000',
-                changeOrigin: true,
-                logLevel: 'info'
-            }
-        },
-        proxy: {
-            '/reports': {
-                target: 'http://localhost:3000',
-                changeOrigin: true,
-                logLevel: 'info'
-            }
-        }
+        proxy: 'http://localhost:3000'
     },
 
     publicPath: process.env.NODE_ENV === 'production' ? '/ui/' : '/',
