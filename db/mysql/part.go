@@ -111,6 +111,8 @@ var (
 		linkTableName,
 		linkTableName,
 	)
+
+	queryMovePart = fmt.Sprintf(`UPDATE %s SET storageLocation_id = ? WHERE id = ?`, partTableName)
 )
 
 func (d *DB) doCreateLinksForPart(p *models.Part) error {
@@ -236,4 +238,14 @@ func (d *DB) AddPartStock(id, price, comment string, amount uint) error {
 // RemovePartStock removes one or more parts of the selected part type from the inventory
 func (d *DB) RemovePartStock(id, comment string, amount uint) error {
 	return fmt.Errorf("not implemented")
+}
+
+// MovePart moves a part from its current storage location to a new one
+// This function does not care about existence so the calling func needs to resolve the internal IDs and
+// check if both included entities are really present
+func (d *DB) MovePart(partID int, newLocationID int) error {
+	if _, err := d.db.Exec(queryMovePart, newLocationID, partID); err != nil {
+		return err
+	}
+	return nil
 }

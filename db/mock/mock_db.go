@@ -240,6 +240,18 @@ type MockDB struct {
 		result1 []models.LoginToken
 		result2 error
 	}
+	MovePartStub        func(int, int) error
+	movePartMutex       sync.RWMutex
+	movePartArgsForCall []struct {
+		arg1 int
+		arg2 int
+	}
+	movePartReturns struct {
+		result1 error
+	}
+	movePartReturnsOnCall map[int]struct {
+		result1 error
+	}
 	RemovePartStockStub        func(string, string, uint) error
 	removePartStockMutex       sync.RWMutex
 	removePartStockArgsForCall []struct {
@@ -1450,6 +1462,68 @@ func (fake *MockDB) ListLoginTokensForUserReturnsOnCall(i int, result1 []models.
 	}{result1, result2}
 }
 
+func (fake *MockDB) MovePart(arg1 int, arg2 int) error {
+	fake.movePartMutex.Lock()
+	ret, specificReturn := fake.movePartReturnsOnCall[len(fake.movePartArgsForCall)]
+	fake.movePartArgsForCall = append(fake.movePartArgsForCall, struct {
+		arg1 int
+		arg2 int
+	}{arg1, arg2})
+	stub := fake.MovePartStub
+	fakeReturns := fake.movePartReturns
+	fake.recordInvocation("MovePart", []interface{}{arg1, arg2})
+	fake.movePartMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *MockDB) MovePartCallCount() int {
+	fake.movePartMutex.RLock()
+	defer fake.movePartMutex.RUnlock()
+	return len(fake.movePartArgsForCall)
+}
+
+func (fake *MockDB) MovePartCalls(stub func(int, int) error) {
+	fake.movePartMutex.Lock()
+	defer fake.movePartMutex.Unlock()
+	fake.MovePartStub = stub
+}
+
+func (fake *MockDB) MovePartArgsForCall(i int) (int, int) {
+	fake.movePartMutex.RLock()
+	defer fake.movePartMutex.RUnlock()
+	argsForCall := fake.movePartArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *MockDB) MovePartReturns(result1 error) {
+	fake.movePartMutex.Lock()
+	defer fake.movePartMutex.Unlock()
+	fake.MovePartStub = nil
+	fake.movePartReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *MockDB) MovePartReturnsOnCall(i int, result1 error) {
+	fake.movePartMutex.Lock()
+	defer fake.movePartMutex.Unlock()
+	fake.MovePartStub = nil
+	if fake.movePartReturnsOnCall == nil {
+		fake.movePartReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.movePartReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *MockDB) RemovePartStock(arg1 string, arg2 string, arg3 uint) error {
 	fake.removePartStockMutex.Lock()
 	ret, specificReturn := fake.removePartStockReturnsOnCall[len(fake.removePartStockArgsForCall)]
@@ -1743,6 +1817,8 @@ func (fake *MockDB) Invocations() map[string][][]interface{} {
 	defer fake.getUserListMutex.RUnlock()
 	fake.listLoginTokensForUserMutex.RLock()
 	defer fake.listLoginTokensForUserMutex.RUnlock()
+	fake.movePartMutex.RLock()
+	defer fake.movePartMutex.RUnlock()
 	fake.removePartStockMutex.RLock()
 	defer fake.removePartStockMutex.RUnlock()
 	fake.searchPartsMutex.RLock()

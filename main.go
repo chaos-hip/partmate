@@ -276,6 +276,9 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 		// Search for parts
 		apiRouter.POST("/parts/search", routes.MakePartsSearchHandler(dbInstance))
 
+		// Move a part to a new storage location
+		apiRouter.POST("/parts/:id/rpc/move", routes.MakeMovePartHandler(dbInstance))
+
 		// Add an attachment to a part
 		apiRouter.POST("/parts/:id/attachments",
 			auth.MakePermissionMiddleware(permission.PartAttachmentCreate),

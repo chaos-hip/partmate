@@ -121,3 +121,69 @@ func MakeGetPartQRCodeHandler(dbInstance db.DB, defaultBaseURL string) gin.Handl
 		png.Encode(c.Writer, code)
 	}
 }
+
+type partMoveRequest struct {
+	To string `json:"to"`
+}
+
+// MakeMovePartHandler creates a HTTP handler that moves a part from one storage location to another
+func MakeMovePartHandler(dbInstance db.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := strings.TrimSpace(c.Param("id"))
+		if id == "" {
+			c.AbortWithStatusJSON(
+				http.StatusBadRequest,
+				errors.NewResponse(errors.TypeIllegalData, "No part ID provided", nil),
+			)
+			return
+		}
+		part, err := dbInstance.GetPartByLink(id)
+		if err != nil {
+			c.AbortWithStatusJSON(
+				http.StatusInternalServerError,
+				errors.NewResponse(errors.TypeDBError, "Failed to fetch part", err),
+			)
+			return
+		}
+		if part == nil {
+			c.AbortWithStatusJSON(
+				http.StatusNotFound,
+				errors.NewResponse(errors.TypeNotFound, "Part not found", nil),
+			)
+			return
+		}
+		var req partMoveRequest
+		if err := c.BindJSON(&req); err != nil {
+			c.AbortWithStatusJSON(
+				http.StatusNotFound,
+				errors.NewResponse(errors.TypeIllegalData, "No target storage location provided", nil),
+			)
+			return
+		}
+		storage, err := dbInstance.GetStorageLocationByLink(req.To)
+		if err != nil {
+			c.AbortWithStatusJSON(
+				http.StatusInternalServerError,
+				errors.NewResponse(errors.TypeDBError, "Failed to fetch storage location", err),
+			)
+			return
+		}
+		if storage == nil {
+			c.AbortWithStatusJSON(
+				http.StatusNotFound,
+				errors.NewResponse(errors.TypeNotFound, "Target storage location not found", nil),
+			)
+			return
+		}
+		// All checked - let's do the thing...
+		if err := dbInstance.MovePart(part.ID, storage.ID); err != nil {
+			c.AbortWithStatusJSON(
+				http.StatusInternalServerError,
+				errors.NewResponse(errors.TypeDBError, "Failed to move part to new storage location", err),
+			)
+			return
+		}
+		c.Status(http.StatusNoContent)
+	}
+
+}

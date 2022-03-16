@@ -22,6 +22,11 @@ type DB interface {
 	// ordered by name
 	SearchParts(search models.Search) ([]models.Part, error)
 
+	// MovePart moves a part from its current storage location to a new one
+	// This function does not care about existence so the calling func needs to resolve the internal IDs and
+	// check if both included entities are really present
+	MovePart(partID int, newLocationID int) error
+
 	//-- Storage locations 📦 --------------------------------
 
 	// SearchStorageLocations searches for storage locations matching the provided search term.
