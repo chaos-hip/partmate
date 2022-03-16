@@ -213,7 +213,7 @@ export default defineComponent({
         }
       } else if (
         document.activeElement !== (document.querySelector('#qrManualInput input') as HTMLElement) &&
-        /^[a-z0-9_.-]$/i.test(ev.key)
+        ev.key.length == 1
       ) {
         this.enteredString += ev.key;
       }
