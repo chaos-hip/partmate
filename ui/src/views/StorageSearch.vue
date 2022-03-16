@@ -22,6 +22,13 @@
           <ion-button @click="$emit('cancelled')" v-if="selectOnly">
             {{ t("btn.cancel") }}
           </ion-button>
+          <ion-button @click="scanQRCode()" v-if="enableQR">
+            <ion-icon
+              slot="icon-only"
+              :ios="cameraOutline"
+              :md="cameraSharp"
+            ></ion-icon>
+          </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
@@ -85,11 +92,11 @@ import {
   IonRefresherContent,
   IonButtons,
   IonButton,
+  IonIcon,
 } from '@ionic/vue';
 import { defineComponent, ref } from '@vue/runtime-core';
 import { chevronDownCircleOutline, cameraOutline, cameraSharp } from 'ionicons/icons';
 import { searchStorageLocation } from '@/api';
-import PartOverview from '@/views/Part.vue';
 import { errorDisplay } from '@/composables/errorDisplay';
 
 export default defineComponent({
@@ -109,12 +116,14 @@ export default defineComponent({
     IonRefresherContent,
     IonButtons,
     IonButton,
+    IonIcon,
   },
   props: {
     /**
      * Set to `true` in order to use the search for selecting a part or storage location
      */
     selectOnly: Boolean,
+    enableQR: Boolean,
   },
   methods: {
     storageSelected(id: string) {
@@ -171,7 +180,6 @@ export default defineComponent({
       stillScrolling,
       pageSize,
       chevronDownCircleOutline,
-      PartOverview,
       cameraSharp,
       cameraOutline,
     }

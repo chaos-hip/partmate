@@ -84,6 +84,7 @@ import {
   IonIcon,
   IonLabel,
   IonItem,
+  IonText,
   IonModal,
   toastController,
 } from '@ionic/vue';
@@ -114,6 +115,7 @@ export default defineComponent({
     IonIcon,
     IonLabel,
     IonItem,
+    IonText,
     IonModal,
     PartSearchView,
     StorageSearchView,

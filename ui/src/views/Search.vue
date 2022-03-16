@@ -21,8 +21,6 @@
       :is-open="qrModalIsOpen"
       @onDidDismiss="handleScanCancel"
       keyboard-close
-      :initialBreakpoint="0.5"
-      :breakpoints="[0.5, 1]"
     >
       <scan-view
         @scanCancel="handleScanCancel"

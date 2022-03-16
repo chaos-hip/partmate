@@ -29,7 +29,6 @@
           required
           id="qrManualInput"
           v-model="enteredString"
-          @keyup="onKeyUp"
         ></ion-input>
       </ion-item>
       <ion-button
@@ -93,7 +92,7 @@ export default defineComponent({
   },
   methods: {
     async startScanning() {
-      (document.querySelector('#qrManualInput') as HTMLInputElement).focus();
+      document.addEventListener("keyup", this.onKeyUp);
       const config: Html5QrcodeCameraScanConfig = {
         fps: 10,
         qrbox: 300,
@@ -158,6 +157,7 @@ export default defineComponent({
       return (arr && arr.length > 1) ? arr[1] : '';
     },
     async stopScanning() {
+      document.removeEventListener("keyup", this.onKeyUp);
       if (this.scanner !== null) {
         try {
           await (this.scanner as Html5Qrcode).stop();
@@ -208,7 +208,14 @@ export default defineComponent({
     },
     onKeyUp(ev: KeyboardEvent) {
       if (ev.key == 'Enter') {
-        this.onScanSuccess(this.enteredString.trim());
+        if (this.enteredString.trim()) {
+          this.onScanSuccess(this.enteredString.trim());
+        }
+      } else if (
+        document.activeElement !== (document.querySelector('#qrManualInput input') as HTMLElement) &&
+        /^[a-z0-9_.-]$/i.test(ev.key)
+      ) {
+        this.enteredString += ev.key;
       }
     },
   },

@@ -7,8 +7,40 @@
           <ion-menu-button color="primary"></ion-menu-button>
         </ion-buttons>
         <ion-title>{{ part ? part.name : "" }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button @click="showOptions()">
+            <ion-icon
+              slot="icon-only"
+              :ios="ellipsisHorizontal"
+              :md="ellipsisVertical"
+            ></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
+    <ion-modal
+      :is-open="searchModalOpen"
+      @onDidDismiss="handleSearchCancel"
+      keyboard-close
+    >
+      <storage-search-view
+        :selectOnly="true"
+        :enableQR="true"
+        @storageSelected="handleSelect"
+        @cancelled="handleSearchCancel"
+        @scanQr="handleScanRequest"
+      ></storage-search-view>
+    </ion-modal>
+    <ion-modal
+      :is-open="qrModalIsOpen"
+      @onDidDismiss="handleScanCancel"
+      keyboard-close
+    >
+      <scan-view
+        @scanCancel="handleScanCancel"
+        @scanResult="handleScanResult"
+      ></scan-view>
+    </ion-modal>
     <ion-content fullscreen>
       <ion-grid :fixed="true">
         <ion-row>
@@ -71,39 +103,46 @@
 </template>
 
 <script lang="ts">
+import { getPartById, movePart } from '@/api';
+import { errorDisplay } from '@/composables/errorDisplay';
+import { LinkInfo, LinkType } from '@/models/link';
 import { Part } from '@/models/part';
 import { Permission } from '@/models/user';
+import StorageSearchView from '@/views/StorageSearch.vue';
+import ScanView from '@/components/QRScanner.vue';
 import {
-  IonPage,
-  IonToolbar,
-  IonButtons,
-  IonTitle,
-  IonHeader,
+  actionSheetController,
   IonBackButton,
-  IonContent,
+  IonButton,
+  IonButtons,
   IonCard,
   IonCardContent,
   IonCardHeader,
-  IonCardTitle,
   IonCardSubtitle,
+  IonCardTitle,
+  IonCol,
+  IonContent,
+  IonGrid,
+  IonHeader,
+  IonIcon,
   IonItem,
   IonLabel,
   IonLoading,
-  IonIcon,
-  isPlatform,
   IonMenuButton,
-  IonCol,
-  IonRow,
-  IonGrid,
+  IonModal,
   IonNote,
+  IonPage,
+  IonRow,
+  IonTitle,
+  IonToolbar,
+  isPlatform,
+  toastController
 } from '@ionic/vue';
 import { defineComponent, ref, Ref } from '@vue/runtime-core';
-import { documentsSharp, linkSharp } from 'ionicons/icons';
-import { getPartById } from '@/api';
-import { errorDisplay } from '@/composables/errorDisplay';
+import { documentsSharp, ellipsisHorizontal, ellipsisVertical, enterOutline, linkSharp } from 'ionicons/icons';
 
 export default defineComponent({
-  name: 'part-overview',
+  name: 'PartOverview',
   components: {
     IonPage,
     IonToolbar,
@@ -126,6 +165,10 @@ export default defineComponent({
     IonRow,
     IonGrid,
     IonNote,
+    IonButton,
+    IonModal,
+    StorageSearchView,
+    ScanView,
   },
   props: {
     id: String,
@@ -156,23 +199,88 @@ export default defineComponent({
       }
       this.loading = false;
     },
+    async showOptions() {
+      const sheet = await actionSheetController.create({
+        header: this.t('actions.title'),
+        buttons: [
+          {
+            text: this.t('actions.move'),
+            icon: enterOutline,
+            handler: () => {
+              this.searchModalOpen = true;
+            }
+          }
+        ],
+      });
+      await sheet.present();
+    },
+    handleSearchCancel() {
+      this.searchModalOpen = false;
+    },
+    async handleSelect(selectedTarget: string) {
+      this.searchModalOpen = false;
+      this.qrModalIsOpen = false;
+      if (this.part == null) {
+        return;
+      }
+      const part = (this.part as Part);
+      try {
+        await movePart(part.id, selectedTarget);
+        const toast = await toastController.create({
+          message: this.t('msg.partMoved'),
+          position: 'bottom',
+          icon: enterOutline,
+          color: 'success',
+          duration: 1000,
+        });
+        await toast.present();
+        await this.loadPart();
+      } catch (err) {
+        this.showError(String(err), 'err.movePartFailed');
+      }
+    },
+    handleScanRequest() {
+      this.searchModalOpen = false;
+      this.qrModalIsOpen = true;
+    },
+    handleScanCancel() {
+      this.qrModalIsOpen = false;
+    },
+    async handleScanResult(link: LinkInfo) {
+      this.qrModalIsOpen = false;
+      if (link.targetType != LinkType.StorageLocation) {
+        this.showError(this.t('err.wrongType'))
+        return;
+      }
+      this.handleSelect(link.link);
+    },
   },
+
   setup() {
     const { t, dismissError, showError } = errorDisplay();
 
     const part: Ref<Part> | Ref<null> = ref(null);
     const loading = ref(false);
 
+    const searchModalOpen = ref(false);
+    const qrModalIsOpen = ref(false);
+
     return {
       t,
       showError,
       dismissError,
-      documentsSharp,
-      linkSharp,
       isPlatform,
       part,
       loading,
       Permission,
+      searchModalOpen,
+      qrModalIsOpen,
+      // Icons
+      documentsSharp,
+      linkSharp,
+      ellipsisHorizontal,
+      ellipsisVertical,
+      enterOutline,
     }
   }
 });
@@ -185,8 +293,17 @@ part:
     subtitle: Teil
     attachments: Dateien
     links: Links
+actions:
+  title: Actions
+  move: Teil umziehen...
+msg:
+  partMoved: Teil erfolgreich umgezogen
+btn:
+  dismiss: Schließen
 err:
   load: Teileinfo konnte nicht geladen werden
+  movePartFailed: Teileumzug fehlgeschlagen
+  wrongType: Der gescannte Link verweist nicht auf einen Lagerort
 </i18n>
 <i18n locale="en" lang="yaml">
 loading: Loading...
@@ -195,8 +312,17 @@ part:
     subtitle: 'Part'
     attachments: 'Files'
     links: 'Links'
+actions:
+  title: Actions
+  move: Move part...
+msg:
+  partMoved: Part moved successfully
+btn:
+  dismiss: Dismiss
 err:
   load: Failed to load part information
+  movePartFailed: Failed to move part
+  wrongType: Scanned link does not point to a storage location
 </i18n>
 
 <style scoped>

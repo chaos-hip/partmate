@@ -463,3 +463,32 @@ export async function createLoginToken(username: string, expires: Date | null, s
         throw await makeApiError(res);
     }
 }
+
+/**
+ * Moves a part to a new storage location
+ *
+ * @param partLink Link to the part that should be moved
+ * @param storageLink Link to the storage location that the part will be moved to
+ */
+export async function movePart(partLink: string, storageLink: string): Promise<void> {
+    if (!isValidLink(partLink)) {
+        throw new Error('Invalid part link');
+    }
+    if (!isValidLink(storageLink)) {
+        throw new Error('Invalid storage link');
+    }
+    const payload = {
+        to: storageLink
+    }
+    const res = await fetch(
+        `/api/parts/${partLink}/rpc/move`,
+        {
+            method: 'POST',
+            headers: prepareRequestHeaders(),
+            body: JSON.stringify(payload),
+        }
+    );
+    if (res.status !== 204) {
+        throw await makeApiError(res);
+    }
+}
