@@ -716,6 +716,43 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Move part to new storage location",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"to\": \"zoink\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/parts/:id/rpc/move",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"parts",
+								":id",
+								"rpc",
+								"move"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "baz",
+									"description": "ID (link) of the part to move into a new location"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1082,6 +1119,84 @@
 									"key": "id",
 									"value": "YvuaRtCo6damzu3yUHr8VB",
 									"description": "ID of the storage location to load (link)"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reports",
+			"item": [
+				{
+					"name": "Prepare Storage content report",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"term\": \"Container\",\n    \"limit\": 10,\n    \"offset\": 0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/storage/:id/reports/contents",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"storage",
+								":id",
+								"reports",
+								"contents"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "YvuaRtCo6damzu3yUHr8VB",
+									"description": "ID of the storage location to load (link)"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download prepared report",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"term\": \"Container\",\n    \"limit\": 10,\n    \"offset\": 0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/reports/:token",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"reports",
+								":token"
+							],
+							"variable": [
+								{
+									"key": "token",
+									"value": "AR9jHo9BCGgRG4vUchttSg"
 								}
 							]
 						}
