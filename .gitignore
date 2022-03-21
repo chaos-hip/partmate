@@ -1,5 +1,5 @@
 # Project executables
-PartMATE
+partmate
 *.exe
 
 # Visual Studio Code workspace
@@ -9,14 +9,13 @@ PartMATE
 vendor/
 
 # dumps
-partkeepr.sql
+*.sql
 
 # docker-compose .env file
 .env
 
 # Local docker volumes for testing
-docker/volumes/mariadb/
-docker/volumes/partmate/data/
+docker
 
 .DS_Store
 node_modules

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"text/template"
 
-	"git.chaos-hip.de/RepairCafe/PartMATE/db"
+	"github.com/chaos-hip/partmate/db"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jmoiron/sqlx"

@@ -1,4 +1,4 @@
-module git.chaos-hip.de/RepairCafe/PartMATE
+module github.com/chaos-hip/partmate
 
 go 1.17
 

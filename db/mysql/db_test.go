@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"git.chaos-hip.de/RepairCafe/PartMATE/db"
-	"git.chaos-hip.de/RepairCafe/PartMATE/db/mysql"
+	"github.com/chaos-hip/partmate/db"
+	"github.com/chaos-hip/partmate/db/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/lithammer/shortuuid/v3"
 	. "github.com/smartystreets/goconvey/convey"

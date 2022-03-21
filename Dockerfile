@@ -1,8 +1,6 @@
 ARG ENVIRONMENT=develop
 FROM golang:alpine AS goBuilder
 
-ENV GOPRIVATE="git.chaos-hip.de"
-
 RUN echo "Downloading software" && \
     apk add --no-cache git openssh alpine-sdk gcc-go && \
     echo "Downloading mage..." && \
@@ -13,8 +11,8 @@ RUN echo "Downloading software" && \
     echo "Installing golint" && \
     go get -u golang.org/x/lint/golint
 
-COPY . /go/src/git.chaos-hip.de/RepairCafe/PartMATE
-WORKDIR /go/src/git.chaos-hip.de/RepairCafe/PartMATE
+COPY . /go/src/github.com/chaos-hip/partmate
+WORKDIR /go/src/github.com/chaos-hip/partmate
 RUN go build
 
 FROM node:latest AS nodeBuilder
@@ -27,9 +25,9 @@ RUN export NODE_OPTIONS=--openssl-legacy-provider && \
 # The real image
 FROM alpine
 WORKDIR /opt/app/
-COPY --from=goBuilder /go/src/git.chaos-hip.de/RepairCafe/PartMATE/PartMATE .
-COPY --from=goBuilder /go/src/git.chaos-hip.de/RepairCafe/PartMATE/dbmigrations/ ./dbmigrations/
-COPY --from=goBuilder /go/src/git.chaos-hip.de/RepairCafe/PartMATE/templates/ ./templates/
+COPY --from=goBuilder /go/src/github.com/chaos-hip/partmate/partmate .
+COPY --from=goBuilder /go/src/github.com/chaos-hip/partmate/dbmigrations/ ./dbmigrations/
+COPY --from=goBuilder /go/src/github.com/chaos-hip/partmate/templates/ ./templates/
 COPY --from=nodeBuilder /src/dist/ ./public/
 RUN echo "Creating application user" && \
     adduser \
@@ -44,4 +42,4 @@ RUN echo "Creating application user" && \
     mkdir -p /opt/app/data && \
     chown appuser:appuser /opt/app/data
 USER appuser:appuser
-CMD ["./PartMATE"]
+CMD ["./partmate"]

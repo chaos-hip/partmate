@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"git.chaos-hip.de/RepairCafe/PartMATE/models"
+	"github.com/chaos-hip/partmate/models"
 )
 
 const (
