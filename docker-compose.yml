@@ -22,7 +22,7 @@ services:
     image: adminer
     restart: unless-stopped
     ports:
-      - '8080:8080'
+      - '8081:8080'
     networks:
       - net
   partkeepr:
@@ -35,7 +35,7 @@ services:
       PARTKEEPR_DATABASE_PASS:
       PARTKEEPR_SECRET:
     ports:
-      - '80:80'
+      - '8080:80'
     volumes:
       - partkeepr_conf:/var/www/html/app/config
       - ${DOCKER_VOLUME_DIR}/partkeepr/data:/var/www/html/data
