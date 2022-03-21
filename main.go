@@ -466,7 +466,11 @@ func initConfig() (*viper.Viper, error) {
 	conf.SetDefault(confKeyDBPass, "change_me")
 	conf.SetDefault(confKeyDBName, "partkeepr")
 	conf.SetDefault(confKeyListen, ":3000")
-	conf.SetDefault(confKeyDataDir, filepath.Join(".", "data"))
+	workDir, err := filepath.Abs(".")
+	if err != nil {
+		return nil, fmt.Errorf("failed to find current working directory: %w", err)
+	}
+	conf.SetDefault(confKeyDataDir, filepath.Join(workDir, "data"))
 
 	// JWT
 	conf.SetDefault(confKeyJWTIssuer, "partmate")
