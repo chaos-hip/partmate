@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"fmt"
 	"strings"
 )
 
@@ -17,10 +18,11 @@ type StorageCategory struct {
 // normalizePath returns the parent path of the current category with the root level removed
 func (c *StorageCategory) normalizePath() string {
 	parts := strings.Split(c.Path, " ➤ ")[1:]
-	if len(parts) == 1 {
+	fmt.Printf("Parts: %#v\n", parts)
+	if len(parts) < 1 {
 		return "/"
 	}
-	parts = parts[:len(parts)-2]
+	parts = parts[:len(parts)-1]
 	return "/" + strings.Join(parts, "/")
 }
 
