@@ -401,6 +401,39 @@ export async function getUserByName(name: string): Promise<User> {
 }
 
 /**
+ * Get the list of permissions existing in the system
+ *
+ * @returns A list of all permissions defined in the system
+ */
+export async function getAvailablePermissions(): Promise<Array<string>> {
+    const res = await fetch(`/api/permissions`, { method: 'GET', headers: prepareRequestHeaders() });
+    if (res.status !== 200) {
+        throw await makeApiError(res);
+    }
+    return (await res.json()) as Array<string>;
+}
+
+/**
+ * Sets the permissions granted to a given user
+ *
+ * @param username The name of the user to apply permissions for
+ * @param permissions The list of permissions this user should have
+ */
+export async function setUserPermissions(username: string, permissions: Array<string>): Promise<void> {
+    if (!isValidLink(username)) {
+        throw new Error('Invalid user name');
+    }
+    const res = await fetch(`/api/users/${username}/permissions`, {
+        method: 'POST',
+        headers: prepareRequestHeaders(),
+        body: JSON.stringify(permissions),
+    });
+    if (res.status !== 204) {
+        throw await makeApiError(res);
+    }
+}
+
+/**
  * Loads a list of login tokens for the given user
  * @param username The name of the user to get the login tokens for
  * @returns The list of login tokens the user currently has

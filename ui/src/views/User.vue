@@ -23,7 +23,12 @@
         <ion-card-header>
           <ion-card-title>{{ user.name }}</ion-card-title>
         </ion-card-header>
-        <ion-item lines="none" v-if="can(Permission.UserGrantPermissions)">
+        <ion-item
+          lines="none"
+          v-if="can(Permission.UserGrantPermissions)"
+          detail
+          @click="$router.push(`/admin/users/${currentUsername}/permissions`)"
+        >
           <ion-icon slot="start" :icon="skullOutline"></ion-icon>
           <ion-label>{{ t("user.permissions") }}</ion-label>
           <ion-note>{{ user.permissions.size }}</ion-note>

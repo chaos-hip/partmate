@@ -76,6 +76,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/admin/users/:name',
     component: () => import('../views/User.vue'),
   },
+  {
+    name: 'UserPermissionEditor',
+    path: '/admin/users/:name/permissions',
+    component: () => import('../views/UserPermissions.vue'),
+  },
 
 ]
 
