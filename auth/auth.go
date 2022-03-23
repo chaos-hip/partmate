@@ -37,22 +37,30 @@ func UserFromContext(c *gin.Context) *models.User {
 
 }
 
-func returnAccessDenied(c *gin.Context, details string) {
+func returnAccessDenied(c *gin.Context, details string, lackingPermissions bool) {
+	status := http.StatusForbidden
+	if !lackingPermissions {
+		status = http.StatusUnauthorized
+		c.Header("WWW-Authenticate", `Bearer realm="api" scope="partMATE"`)
+	}
 	if strings.HasPrefix(c.Request.URL.Path, "/api") {
 		// Return a JSON-based error
 		res := &errors.ErrorResponse{
 			Type:    errors.TypeForbidden,
 			Message: "Access denied",
 		}
+		if lackingPermissions {
+			res.Type = errors.TypeInsufficientPermissions
+		}
 		if details != "" {
 			res.Details = gin.H{
 				"error": details,
 			}
 		}
-		c.JSON(http.StatusForbidden, res)
+		c.JSON(status, res)
 	} else {
 		// Return HTML
-		c.HTML(http.StatusForbidden, "access-denied.tmpl", gin.H{
+		c.HTML(status, "access-denied.tmpl", gin.H{
 			"error": details,
 		})
 	}
@@ -65,7 +73,7 @@ func MakeAuthMiddleware(repo db.DB, pubkey *rsa.PublicKey) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := strings.TrimPrefix(c.GetHeader(authHeaderKey), "Bearer ")
 		if token == "" {
-			returnAccessDenied(c, "No token sent with request")
+			returnAccessDenied(c, "No token sent with request", false)
 			return
 		}
 		// Try to decode the JWT
@@ -74,7 +82,7 @@ func MakeAuthMiddleware(repo db.DB, pubkey *rsa.PublicKey) gin.HandlerFunc {
 		})
 		if err != nil {
 			logrus.WithError(err).Error("Illegal token presented by user request")
-			returnAccessDenied(c, err.Error())
+			returnAccessDenied(c, err.Error(), false)
 			return
 		}
 		// JWT is valid - load the user from the DB
@@ -82,12 +90,16 @@ func MakeAuthMiddleware(repo db.DB, pubkey *rsa.PublicKey) gin.HandlerFunc {
 		user, err := repo.GetUserByName(claims.Subject)
 		if err != nil {
 			logrus.WithError(err).Errorf("Failed to retrieve user by name %#v", claims.Subject)
-			returnAccessDenied(c, fmt.Sprintf("Cannot read user information: %s", err.Error()))
+			returnAccessDenied(c, fmt.Sprintf("Cannot read user information: %s", err.Error()), false)
 			return
 		}
 		if user == nil {
 			logrus.Errorf("Cannot use authenticated token: User %#v does not exist", claims.Subject)
-			returnAccessDenied(c, fmt.Sprintf("Sorry, your user %#v does not exist in the database", claims.Subject))
+			returnAccessDenied(
+				c,
+				fmt.Sprintf("Sorry, your user %#v does not exist in the database", claims.Subject),
+				false,
+			)
 			return
 		}
 		userToContext(c, user)
@@ -101,7 +113,7 @@ func MakePermissionMiddleware(permissions ...string) gin.HandlerFunc {
 		user := UserFromContext(c)
 		if user == nil {
 			logrus.Errorf("No user present during permission check")
-			returnAccessDenied(c, errNoPermission)
+			returnAccessDenied(c, errNoPermission, true)
 			return
 		}
 		if !user.Can(permissions...) {
@@ -112,7 +124,7 @@ func MakePermissionMiddleware(permissions ...string) gin.HandlerFunc {
 				user.Username,
 				permissions,
 			)
-			returnAccessDenied(c, errNoPermission)
+			returnAccessDenied(c, errNoPermission, true)
 			return
 		}
 	}

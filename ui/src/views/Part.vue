@@ -7,7 +7,7 @@
           <ion-menu-button color="primary"></ion-menu-button>
         </ion-buttons>
         <ion-title>{{ part ? part.name : "" }}</ion-title>
-        <ion-buttons slot="end">
+        <ion-buttons slot="end" v-if="anyActionAllowed">
           <ion-button @click="showOptions()">
             <ion-icon
               slot="icon-only"
@@ -182,6 +182,9 @@ export default defineComponent({
   computed: {
     partId() {
       return this.id || this.$route.params.id || '';
+    },
+    anyActionAllowed() {
+      return this.$store.state.user && this.$store.state.user.can(Permission.PartMove);
     }
   },
   methods: {
@@ -200,17 +203,19 @@ export default defineComponent({
       this.loading = false;
     },
     async showOptions() {
-      const sheet = await actionSheetController.create({
-        header: this.t('actions.title'),
-        buttons: [
-          {
-            text: this.t('actions.move'),
-            icon: enterOutline,
-            handler: () => {
-              this.searchModalOpen = true;
-              this.qrModalIsOpen = false;
-            }
-          },
+      if (!this.anyActionAllowed) {
+        return;
+      }
+      const buttons = [];
+      if (this.$store.state.user && this.$store.state.user.can(Permission.PartMove)) {
+        buttons.push({
+          text: this.t('actions.move'),
+          icon: enterOutline,
+          handler: () => {
+            this.searchModalOpen = true;
+            this.qrModalIsOpen = false;
+          }
+        },
           {
             text: this.t('actions.moveQR'),
             icon: qrCode,
@@ -218,8 +223,11 @@ export default defineComponent({
               this.searchModalOpen = false;
               this.qrModalIsOpen = true;
             }
-          }
-        ],
+          });
+      }
+      const sheet = await actionSheetController.create({
+        header: this.t('actions.title'),
+        buttons: buttons,
       });
       await sheet.present();
     },

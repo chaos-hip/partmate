@@ -60,7 +60,7 @@ export class ApiError extends Error {
 }
 
 async function makeApiError(res: Response): Promise<ApiError> {
-    if (res.status == 403) {
+    if (res.status == 401) {
         // Logged out again
         store.commit('loggedOut');
     }

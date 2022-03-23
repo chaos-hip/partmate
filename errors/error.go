@@ -11,6 +11,8 @@ const (
 	TypeDBError = "DB_OPERATION_FAILED"
 	// TypeForbidden is the error type for failed logins
 	TypeForbidden = "ACCESS_DENIED"
+	// TypeInsufficientPermissions is the error type for a request that failed due to the user lacking a permission
+	TypeInsufficientPermissions = "MISSING_PERMISSION"
 	// TypeConflict is the error type for trying to create an already existing entity
 	TypeConflict = "CONFLICT"
 	// TypeValidationFailed is the error type for invalid input data

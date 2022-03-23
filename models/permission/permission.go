@@ -20,6 +20,8 @@ const (
 	PartAttachmentRead = "part.attachment:read"
 	// PartStockManage allows adding and removing stock for parts
 	PartStockManage = "part.stock:manage"
+	// PartMove allows moving a part into a new storage location
+	PartMove = "part:move"
 
 	//-- Reporting -----------------------------------------------------------------------------------------------------
 
