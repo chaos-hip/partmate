@@ -139,7 +139,7 @@ import {
   toastController
 } from '@ionic/vue';
 import { defineComponent, ref, Ref } from '@vue/runtime-core';
-import { documentsSharp, ellipsisHorizontal, ellipsisVertical, enterOutline, linkSharp } from 'ionicons/icons';
+import { documentsSharp, ellipsisHorizontal, ellipsisVertical, enterOutline, linkSharp, qrCode } from 'ionicons/icons';
 
 export default defineComponent({
   name: 'PartOverview',
@@ -208,6 +208,15 @@ export default defineComponent({
             icon: enterOutline,
             handler: () => {
               this.searchModalOpen = true;
+              this.qrModalIsOpen = false;
+            }
+          },
+          {
+            text: this.t('actions.moveQR'),
+            icon: qrCode,
+            handler: () => {
+              this.searchModalOpen = false;
+              this.qrModalIsOpen = true;
             }
           }
         ],
@@ -281,6 +290,7 @@ export default defineComponent({
       ellipsisHorizontal,
       ellipsisVertical,
       enterOutline,
+      qrCode,
     }
   }
 });
@@ -296,6 +306,7 @@ part:
 actions:
   title: Actions
   move: Teil umziehen...
+  moveQR: Teil umziehen (via Code)...
 msg:
   partMoved: Teil erfolgreich umgezogen
 btn:
@@ -315,6 +326,7 @@ part:
 actions:
   title: Actions
   move: Move part...
+  moveQR: Move part (via code)...
 msg:
   partMoved: Part moved successfully
 btn:
