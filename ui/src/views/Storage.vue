@@ -86,6 +86,7 @@ import {
   IonCol,
   IonRow,
   IonGrid,
+  IonMenuButton,
   actionSheetController,
 } from '@ionic/vue';
 import { defineComponent, ref, Ref } from '@vue/runtime-core';
@@ -117,6 +118,7 @@ export default defineComponent({
     IonCol,
     IonRow,
     IonGrid,
+    IonMenuButton,
   },
   props: {
     id: String,
