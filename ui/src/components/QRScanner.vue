@@ -92,7 +92,7 @@ export default defineComponent({
   },
   methods: {
     async startScanning() {
-      document.addEventListener("keyup", this.onKeyUp);
+      document.addEventListener("keydown", this.onKey);
       const config: Html5QrcodeCameraScanConfig = {
         fps: 10,
         qrbox: 300,
@@ -157,7 +157,7 @@ export default defineComponent({
       return (arr && arr.length > 1) ? arr[1] : '';
     },
     async stopScanning() {
-      document.removeEventListener("keyup", this.onKeyUp);
+      document.removeEventListener("keydown", this.onKey);
       if (this.scanner !== null) {
         try {
           await (this.scanner as Html5Qrcode).stop();
@@ -206,7 +206,7 @@ export default defineComponent({
       this.$emit('scan-cancel');
       this.stopScanning();
     },
-    onKeyUp(ev: KeyboardEvent) {
+    onKey(ev: KeyboardEvent) {
       if (ev.key == 'Enter') {
         if (this.enteredString.trim()) {
           this.onScanSuccess(this.enteredString.trim());
@@ -246,7 +246,7 @@ title: Scannen
 btn:
   close: Abbrechen
   dismiss: Schließen
-  manualCommit: Manelle Eingabe
+  manualCommit: Manuelle Eingabe
 link:
   loading: Lade...
 err:
@@ -261,7 +261,7 @@ title: Scan
 btn:
   close: Cancel
   dismiss: Schließen
-  manualCommit: Manelle entry
+  manualCommit: Manual entry
 link:
   loading: Loading...
 err:

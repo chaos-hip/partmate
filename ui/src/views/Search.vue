@@ -27,7 +27,7 @@
         @scanResult="handleScanResult"
       ></scan-view>
     </ion-modal>
-    <ion-tabs @ionTabsDidChange="afterTabChange">
+    <ion-tabs>
       <ion-router-outlet></ion-router-outlet>
 
       <ion-tab-bar slot="bottom">
@@ -98,9 +98,6 @@ export default defineComponent({
     selectOnly: Boolean,
   },
   methods: {
-    afterTabChange(...rest: any[]) {
-      console.dir(rest);
-    },
     scanQRCode() {
       this.qrModalIsOpen = true;
     },
