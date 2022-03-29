@@ -190,6 +190,7 @@ perm:
   'link:create': "Link erstellen"
   'link:delete': "Link löschen"
   'link:read': "Links anzeigen"
+  'part:move': "Teil umziehen"
   part:
     'attachment:create': "Teile: Dateien hochladen"
     'attachment:read': "Teile: Dateien anzeigen"
@@ -233,6 +234,7 @@ perm:
   'link:create': "Create link"
   'link:delete': "Delete link"
   'link:read': "Show links"
+  'part:move': "Teil umziehen"
   part:
     'attachment:create': "Parts: Upload files"
     'attachment:read': "Parts: View files"
