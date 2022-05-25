@@ -10,8 +10,9 @@ import (
 )
 
 const (
-	partTableName         = "Part"
-	partCategoryTableName = "PartCategory"
+	partTableName          = "Part"
+	partCategoryTableName  = "PartCategory"
+	partParameterTableName = "PartParameter"
 )
 
 var (
@@ -58,7 +59,17 @@ var (
 		linkTableName,
 	)
 
-	querySearchPartsByTerm            = `(parts.name LIKE ? OR parts.description LIKE ?)`
+	querySearchPartsByTerm = fmt.Sprintf(`(
+			parts.name LIKE ?
+		OR
+			parts.description LIKE ?
+		OR
+			parts.comment LIKE ?
+		OR
+			parts.id IN (SELECT part_id FROM %s WHERE valueType = 'string' AND stringValue LIKE ?)
+		)`,
+		partParameterTableName,
+	)
 	querySearchPartsByStorageLocation = fmt.Sprintf(
 		`parts.storageLocation_id = (SELECT storageID FROM %s storageLinks WHERE storageLinks.link = ?)`,
 		linkTableName,
@@ -179,7 +190,7 @@ func (d *DB) SearchParts(search models.Search) ([]models.Part, error) {
 	}
 	if search.Term != "" || len(where) == 0 {
 		where = append(where, querySearchPartsByTerm)
-		params = append(params, term, term)
+		params = append(params, term, term, term, term)
 	}
 	query := fmt.Sprintf(`%s
 	WHERE
