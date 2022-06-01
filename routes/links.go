@@ -6,9 +6,9 @@ import (
 	"regexp"
 	"strings"
 
-	"git.chaos-hip.de/RepairCafe/PartMATE/db"
-	"git.chaos-hip.de/RepairCafe/PartMATE/errors"
-	"git.chaos-hip.de/RepairCafe/PartMATE/models"
+	"github.com/chaos-hip/partmate/db"
+	"github.com/chaos-hip/partmate/errors"
+	"github.com/chaos-hip/partmate/models"
 	"github.com/gin-gonic/gin"
 )
 

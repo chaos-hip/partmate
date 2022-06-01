@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 
-	"git.chaos-hip.de/RepairCafe/PartMATE/db"
-	"git.chaos-hip.de/RepairCafe/PartMATE/models"
+	"github.com/chaos-hip/partmate/db"
+	"github.com/chaos-hip/partmate/models"
 	"github.com/lithammer/shortuuid/v3"
 )
 

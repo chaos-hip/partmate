@@ -8,8 +8,8 @@ import (
 	"regexp"
 	"strings"
 
-	"git.chaos-hip.de/RepairCafe/PartMATE/db"
-	"git.chaos-hip.de/RepairCafe/PartMATE/models"
+	"github.com/chaos-hip/partmate/db"
+	"github.com/chaos-hip/partmate/models"
 	"github.com/logrusorgru/aurora/v3"
 	"golang.org/x/term"
 )

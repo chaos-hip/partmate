@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"git.chaos-hip.de/RepairCafe/PartMATE/auth/hash"
-	"git.chaos-hip.de/RepairCafe/PartMATE/models/permission"
+	"github.com/chaos-hip/partmate/auth/hash"
+	"github.com/chaos-hip/partmate/models/permission"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/sirupsen/logrus"
 )

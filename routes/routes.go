@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"git.chaos-hip.de/RepairCafe/PartMATE/errors"
+	"github.com/chaos-hip/partmate/errors"
 	"github.com/gin-gonic/gin"
 )
 
