@@ -3,7 +3,7 @@ package db
 import (
 	"fmt"
 
-	"github.com/chaos-hip/partmate/models"
+	"git.chaos-hip.de/RepairCafe/PartMATE/models"
 )
 
 var (

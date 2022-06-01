@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/chaos-hip/partmate/auth/hash"
+	"git.chaos-hip.de/RepairCafe/PartMATE/auth/hash"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
