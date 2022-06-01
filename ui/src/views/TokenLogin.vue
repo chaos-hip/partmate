@@ -30,7 +30,7 @@ import { tokenLogin } from '../api';
 import { errorDisplay } from '@/composables/errorDisplay';
 
 export default defineComponent({
-  name: 'Folder',
+  name: 'partmate-token-login',
   components: {
     IonButtons,
     IonContent,

@@ -68,7 +68,7 @@ import { login } from '../api';
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
-  name: 'Folder',
+  name: 'partmate-login',
   components: {
     IonButtons,
     IonContent,
