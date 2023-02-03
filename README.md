@@ -1,6 +1,6 @@
 # PartMATE
 
-[![build-push](https://github.com/chaos-hip/partmate/actions/workflows/build.yaml/badge.svg?branch=master)](https://github.com/chaos-hip/partmate/actions/workflows/build-push.yaml)
+[![build-push](https://github.com/chaos-hip/partmate/actions/workflows/build.yaml/badge.svg?branch=master)](https://github.com/chaos-hip/partmate/actions/workflows/build.yaml)
 
 A Companion App for [PartKeepr](https://partkeepr.org) that provides quick access to the most essential functions via mobile-friendly web interface.
 
