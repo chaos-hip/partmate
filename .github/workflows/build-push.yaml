@@ -3,8 +3,6 @@ run-name: Build docker image and push to Docker Hub
 on:
   workflow_dispatch:
   push:
-    branches:
-      - 'master'
     tags:
       - 'v*.*.*'
   pull_request:
@@ -20,6 +18,8 @@ jobs:
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+      - name: Setup nodejs
+        uses: actions/setup-node@v3
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
@@ -37,6 +37,10 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - run: cd ui
+      - run: npm ci
+      - run: npm run build
+      - run: cd ..
       - name: Build and push
         uses: docker/build-push-action@v4
         with:

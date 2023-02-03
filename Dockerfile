@@ -15,20 +15,13 @@ COPY . /go/src/github.com/chaos-hip/partmate
 WORKDIR /go/src/github.com/chaos-hip/partmate
 RUN go build
 
-FROM node:latest AS nodeBuilder
-COPY ./ui /src
-WORKDIR /src
-RUN export NODE_OPTIONS=--openssl-legacy-provider && \
-    npm ci && \
-    npm run build
-
 # The real image
 FROM alpine
+COPY ./ui/dist /opt/app/public
 WORKDIR /opt/app/
 COPY --from=goBuilder /go/src/github.com/chaos-hip/partmate/partmate .
 COPY --from=goBuilder /go/src/github.com/chaos-hip/partmate/dbmigrations/ ./dbmigrations/
 COPY --from=goBuilder /go/src/github.com/chaos-hip/partmate/templates/ ./templates/
-COPY --from=nodeBuilder /src/dist/ ./public/
 RUN echo "Creating application user" && \
     adduser \
     --disabled-password \
