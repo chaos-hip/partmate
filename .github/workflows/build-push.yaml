@@ -37,10 +37,10 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - run: cd ui
       - run: npm ci
+        working-directory: ui
       - run: npm run build
-      - run: cd ..
+        working-directory: ui
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
