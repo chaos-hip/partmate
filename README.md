@@ -1,6 +1,6 @@
 # PartMATE
 
-[![Build Status](https://drone.westphal.dev/api/badges/RepairCafe/PartMATE/status.svg)](https://drone.westphal.dev/RepairCafe/PartMATE)
+[![build-push](https://github.com/chaos-hip/partmate/actions/workflows/build.yaml/badge.svg?branch=master)](https://github.com/chaos-hip/partmate/actions/workflows/build-push.yaml)
 
 A Companion App for [PartKeepr](https://partkeepr.org) that provides quick access to the most essential functions via mobile-friendly web interface.
 
