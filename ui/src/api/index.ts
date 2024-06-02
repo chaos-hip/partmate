@@ -15,7 +15,7 @@ import { LoginToken, LoginTokenObj } from '@/models/loginToken';
  * @returns `true` if the link is a valid one
  */
 function isValidLink(link: string): boolean {
-    return (/^[a-z0-9]+$/i).test(link);
+    return (/^[a-z0-9_.-]{1,64}$/i).test(link);
 }
 
 function prepareRequestHeaders(): HeadersInit {
