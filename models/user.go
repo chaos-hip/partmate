@@ -25,11 +25,11 @@ type User struct {
 
 // CheckPassword takes a given password and checks if the password has matches that input
 func (u *User) CheckPassword(input string) bool {
-	hash, err := hash.FromString(u.PasswordHash)
+	hashData, err := hash.FromString(u.PasswordHash)
 	if err != nil {
-		logrus.WithError(err).Error("Failed to decode password hash for user %#v: %w", u.Username, err)
+		logrus.WithError(err).Errorf("Failed to decode password hash for user %#v: %s", u.Username, err.Error())
 	}
-	return hash.Matches(input)
+	return hashData.Matches(input)
 }
 
 // ToDTO converts the user DB model to its DTO representation
@@ -89,11 +89,11 @@ func (u *UserDTO) ToUser() (*User, error) {
 	}
 	out.RawPermissions = string(permData)
 	if u.Password != "" {
-		hash, err := hash.NewArgon(u.Password)
+		hashData, err := hash.NewArgon(u.Password)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create password hash for user: %w", err)
 		}
-		out.PasswordHash = hash.String()
+		out.PasswordHash = hashData.String()
 	}
 	return out, nil
 }

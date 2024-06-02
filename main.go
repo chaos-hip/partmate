@@ -149,7 +149,7 @@ func initLogger(conf *viper.Viper) error {
 		logrus.Info("Setting log level to 'error'")
 		logrus.SetLevel(logrus.ErrorLevel)
 	default:
-		logrus.Warnf("Illegal log level %#v - falling back to default level \"info\"")
+		logrus.Warnf("Illegal log level %#v - falling back to default level \"info\"", conf.GetString("log.level"))
 		logrus.SetLevel(logrus.InfoLevel)
 	}
 	return nil
@@ -186,6 +186,8 @@ func initRouting(dbInstance db.DB, privateKey *rsa.PrivateKey, conf *viper.Viper
 
 	// Unsecured link redirection
 	router.GET("/l/:id", routes.MakeLinkRedirectHandler(dbInstance, baseURL)) // Redirect to the correct UI view based on the incoming link
+	// Link redirection - fallback path
+	router.GET("/i/:id", routes.MakeLinkRedirectHandler(dbInstance, baseURL))
 
 	// Unsecured token QR code generation
 	// Can be unsecured since you will be able to login if the token exists and else we don't render anything
