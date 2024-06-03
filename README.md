@@ -1,6 +1,6 @@
 # PartMATE
 
-[![build](https://github.com/chaos-hip/partmate/actions/workflows/build.yaml/badge.svg?branch=master)](https://github.com/chaos-hip/partmate/actions/workflows/build.yaml)
+![maturity: experimental](https://img.shields.io/badge/maturity-experimental-yellow) ![maturity: experimental](https://img.shields.io/badge/development-maintenance-yellow) ![maturity: experimental](https://img.shields.io/badge/support-limited-yellow)
 
 A Companion App for [PartKeepr](https://partkeepr.org) that provides quick access to the most essential functions via mobile-friendly web interface.
 
